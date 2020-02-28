@@ -1,0 +1,17 @@
+.fullRow{
+    background-color:#ffffff;min-height:30px;border:solid 1px;font-size:12pt;border-bottom:none
+}
+
+.noWrap{
+    white-space:nowrap   
+}
+ .leftArea{
+    margin:0;padding:0;width:20%;display:inline-block;vertical-align: text-top
+ }
+ .centerArea{
+    text-align:center;margin:0;padding:0;width:60%;vertical-align: text-top;
+    min-height:640px;display:inline-block  
+ }
+ .rightArea{
+    margin:0;padding:0;width:20%;vertical-align: text-top;border-left:none;display:inline-block
+ }

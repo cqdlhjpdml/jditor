@@ -1,0 +1,151 @@
+
+//Connector:special node can be Linked between each other.
+function Connector(owner){
+    Connector.prototype.initialize.apply(this,null);
+    this.elementType="Connector"
+    this.height=8;
+    this.width=8;
+    this.fillColor="125,125,125";
+    this.alpha=1;
+    this.owner=owner;
+    this.owner_id=owner._id;
+    this.serializedProperties.push("owner_id");
+    owner.connectors.push(this);
+
+    return this;
+}
+
+
+Connector.prototype=new JTopo.Node();
+JTopo.Connector=Connector;
+///////////////////////////////////////////////
+function FreeLink(nodeA,nodeZ,text){
+  this.initialize=function(nodeA,nodeZ,text){
+    FreeLink.prototype.initialize.apply(this,arguments);
+    this.showAZ=true;
+    this.elementType="FreeLink";
+    this.nodeA_id=nodeA._id;
+    this.nodeZ_id=nodeZ._id;
+    this.text=text;
+    this.serializedProperties.push("nodeA_id");
+    this.serializedProperties.push("nodeZ_id");
+
+ }
+  
+this.clickHandler = function(a) {
+  if(this.showAZ==false){
+    this.nodeA.visible=true;
+    this.nodeZ.visible=true;
+  }
+  else{
+    this.nodeA.visible=false;
+    this.nodeZ.visible=false; 
+  }
+  this.showAZ=!this.showAZ;
+  this.dispatchEvent("click", a)
+}
+  this.initialize(nodeA,nodeZ,text) 
+}
+FreeLink.prototype=new JTopo.Link;
+JTopo.FreeLink=FreeLink;
+//////////////////////////////////
+
+/////////////////////////////////
+JTopo.loadFromJson=function(jsonStr, canvas,stage) {
+  eval("var jsonObj = " + jsonStr);
+  if(!stage)
+        var stage = new JTopo.Stage(canvas);
+  else stage.clear();
+  for (var k in jsonObj)
+      "childs" != k && (stage[k] = jsonObj[k]);
+  var scenes = jsonObj.childs;
+  return scenes.forEach(function(a) {
+      var b = new JTopo.Scene(stage);
+      for (var c in a)
+          "childs" != c && (b[c] = a[c]),
+          "background" == c && (b.background = a[c]);
+      var d = a.childs;
+      d.forEach(function(a) {
+          var c = null
+            , t = a.elementType;
+          c=JTopo.createNode(t,a,b);
+          if(c)  b.add(c);
+      })
+  }),
+  stage
+}
+//////////////////////////////////////
+/*从JSON文件中加载时创建NODES*/
+JTopo.Nodes_Tables={};
+JTopo.createNode=function(nodeType,properties,scene){
+ 
+  var createFuns={};
+  createFuns["node"]=function(){
+    var node=new JTopo.Node;
+    setProperyies(node,properties);
+    var id=node._id;
+    JTopo.Nodes_Tables[id]=node;
+    return node;
+  }
+  createFuns["CircleNode"]=function(){
+    var node=new JTopo.CircleNode;
+    setProperyies(node,properties);
+    var id=node._id;
+    JTopo.Nodes_Tables[id]=node;
+    return nodes[id];;
+  }
+  createFuns["TextNode"]=function(){
+    var node=new JTopo.TextNode;
+    setProperyies(node,properties);
+    var id=node._id;
+    JTopo.Nodes_Tables[id]=node;
+    return node;
+  }
+  
+  createFuns["SvgNode"]=function(){
+    var selector=properties['selector'];
+    var text=properties['text']
+    var node=new JTopo.SvgNode(selector,text);
+    setProperyies(node,properties);
+    var id=node._id;
+    JTopo.Nodes_Tables[id]=node;
+    return node;
+  }
+  createFuns["Connector"]=function(){
+    var owner=JTopo.Nodes_Tables[properties['owner_id']]
+    var node=new JTopo.Connector(owner);
+    owner.connectors.push(node);
+    setProperyies(node,properties);
+    var id=node._id;
+    JTopo.Nodes_Tables[id]=node;
+    return node;
+  }
+  createFuns["FreeLink"]=function(){
+    var nodeA=JTopo.Nodes_Tables[properties['nodeA_id']];
+    var nodeZ=JTopo.Nodes_Tables[properties['nodeZ_id']];
+    var text=JTopo.Nodes_Tables[properties['text']];
+    var node=new JTopo.FreeLink(nodeA,nodeZ,text);
+    setProperyies(node,properties);
+    var id=node._id;
+    JTopo.Nodes_Tables[id]=node;
+    return node;
+  }
+  function setProperyies(node,properties){
+    for (var e in properties)
+              node[e] = properties[e];
+     
+  }
+  if(createFuns[nodeType]) return createFuns[nodeType]();
+  else return null;
+   
+}
+///////////////////////////
+JTopo.Element.initialize=function(){
+  this.elementType = "element",
+  this.serializedProperties = ["elementType","_id"],
+  this.propertiesStack = [];
+  let t=(new Date).getTime();//防止ID重复
+  while(t==(new Date).getTime());
+  this._id = "" + (new Date).getTime()
+}
+
