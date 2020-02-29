@@ -520,18 +520,30 @@ class MyDialog{
 
 //////////////////////////////////////////////////////////
 class LoginDialog extends MyDialog{
+    restetUI(){
+        let pwdInput=document.getElementById(`${this.pwdInputID}`);
+        let hintSpan=document.getElementById(`${this.jqHintSpanID}`);
+        $(hintSpan).css({"background-color":"#d0d0d0"});
+        pwdInput.value="";
+        $(hintSpan).html("请输入用户名和密码");
+    }
     wsNotiyHandler(wsLoginEvent){
-        /*wsLoginEvent.eventInfo:reponse from server,
-        response={task:"login"|"register"|...,resutlt:{succeed:true|false,msg:"login Ok"}}*/
+      //for login task,reponse from server to client=
+      //{task:"login",resutlt:{succeed:true|false,msg:"login Ok"},user:{name:username,pwd:password}} 
         
         var response=wsLoginEvent.response;
         var hintSpan=document.getElementById(`${this.jqHintSpanID}`);
         
     
         if(response.result.succeed==true){
-            $(hintSpan).css({"background-color":"#d0d0d0"});
+            $(hintSpan).css({"background-color":"#e0d0d0"});
             $(hintSpan).html(response.result.msg+"，对话框将自动关闭");
-            setTimeout(()=>{$(`#${this.id}` ).dialog("close")},3000);
+            this.dispatchEvent(wsLoginEvent);
+                       
+            setTimeout(()=>{
+                          $(`#${this.id}` ).dialog("close")
+                             
+                           },2000);
         }
         else{
             $(hintSpan).css({"background-color":"#eed0d0"});
@@ -544,6 +556,7 @@ class LoginDialog extends MyDialog{
         
         WsAgent.addEventListener(this,USER_LOGIN_EVENT,this.wsNotiyHandler);
         $(`#${this.id}` ).dialog({
+            close:false,
             autoOpen:false,
             resizable: false,
             height: "auto",
@@ -558,19 +571,24 @@ class LoginDialog extends MyDialog{
                         var pwd=document.getElementById(me.pwdInputID).value;
                         //if(username.length<3){return;}//check the valid of username
                         //if(pwd.length<6){return;}//check valid of password
-                        //{task:[login|register|save|open],data:{..}}
-                        var msg={task:"login",data:{name:`${username}`,pwd:`${pwd}`,}};
-                        var jsonMsg=JSON.stringify(msg);
-                        WsAgent.send(jsonMsg);
+                        //request={task:[login|register|save|open],user:{name:username,pwd:password}}
+                        var request={task:"login",user:{name:`${username}`,pwd:`${pwd}`,}};
+                        var jsonRequest=JSON.stringify(request);
+                        WsAgent.send(jsonRequest);
                     }
-                  },
+                },
                
               "Cancel":{ 
                 text:"退出",
-                click:function(  ){ $(`#${this.id}` ).dialog("close")},
-              },
-              
+                click:function(  ){ 
+                  $(`#${this.id}` ).dialog("close");
+                  
+                },
+              }
           }});
+          
+          $(`#${this.id}`).on( "dialogclose", function(){me.restetUI.call(me)} );
+       
 
     }
     contentBar(){
@@ -585,7 +603,7 @@ class LoginDialog extends MyDialog{
         this.pwdInputID=CommonUtilities.getGuid();
         this.usernameRuleID=CommonUtilities.getGuid();
         this.passwordRuleID=CommonUtilities.getGuid();
-        this.jqUserInoBar=$(`<div" method="get">\
+        this.jqUserInoBar=$(`<div" >\
                          用户名: <input type="text"   id=${this.useInputID} /><span id=${this.usernameRuleID}>${this.usernameRule}</span>\
                          密码: <input type="password" id=${this.pwdInputID} /><span id=${this.passwordRuleID}>${this.passwordRule}</span>\
                          </div>`);
@@ -611,6 +629,7 @@ class LoginDialog extends MyDialog{
         this.usernameRule=usernameRule;
         this.passwordRule=passwordRule;
         this.create();
+        this.restetUI();
     }
 
    
@@ -620,9 +639,12 @@ class LoginTool extends Command{
     constructor(toolItem,toolMannager){
         super(toolItem,toolMannager);
         this.dialog=new LoginDialog("请登录","用户名不少于6位","密码长度不少于6位");
-
+        this.dialog.addEventListener(this,USER_LOGIN_EVENT,this.loginSucceed);
     }
-    
+    loginSucceed(loginEvent)
+    {
+        this.toolManager.editor.username=loginEvent.response.user.name;
+    }
     execute(event){
         
         this.dialog.show();
@@ -630,48 +652,109 @@ class LoginTool extends Command{
 }
 ///////////////////////////////////////
 class SaveDialog extends MyDialog{
-    create(title){
-        this.jqDiaContainer=$(`<div id=${this.id} title=${title}></div>`);
-        this.jqDiaContainer.visible=false;
-        $(document.body).append(this.jqDiaContainer)
-        this.jqDiaContainer.append(this.contentBar());
-        this.jqDiaContainer.append(this.buttonBar());
-        $( `#${this.id}` ).dialog({
-            autoOpen: false,
-            show: {
-              effect: "blind",
-              duration: 1000
-            },
-            hide: {
-              effect: "explode",
-              duration: 1000
-            }
-          }); 
+    jqDialog(){
+        var me=this;
+        $(`#${this.id}` ).dialog({
+            autoOpen:false,
+            resizable: false,
+            height: "auto",
+            width: "auto",
+            modal: true,
+            buttons: {
+               "save":{
+                    text: "保存",
+                    
+                    click: function() {
+                        var filename=document.getElementById(me.fileInputID).value;
+                        var response=me.tool.handleOkClick(filename);
+                        var hintBar=document.getElementById(`${this.jqHintBarID}`);
+                        
+                        //if(!me.checkLogined()){
+                        //    $(hintBar).css({"background-color":"#eed0d0"});
+                        //    $(hintBar).html("保存文件需先登录！");
+                        //    return;
+                        //}
+                        
+                    }
+                  },
+               
+              "Cancel":{ 
+                text:"取消",
+                click:function(  ){ $(`#${this.id}` ).dialog("close")},
+              },
+              
+          }});
 
     }
- 
-    conteantBar(){
-        var jqContentBar=$("<div></>")
-        var jqPathTreeList=$("<ul></ul>");
+    contentBar(){
+        var  id=CommonUtilities.getGuid();
+        this.jqContentBar=$(`<div id=${id}></div>`);
+        this.jqContentBar.css({"display": "flex",
+                           'flex-direction':'column',
+                           'justify-content':'center',
+                           'align-items':'center'
+                        });
+        this.fileInputID=CommonUtilities.getGuid();
+        ;
+        this.jqFileBar=$(`<div><h5>文件名</h5><input type="text"  id=${this.fileInputID} />\
+                         
+                         </div>`);
+                         
+        this.jqFileBar.css({ "display": "flex",
+        'justify-content': 'space-around',  
+        'flex-direction':'row' ,
+        'align-items':'center'  
+        });
+        this.jqContentBar.append(this.jqFileBar);
+        this.jqHintBarID=CommonUtilities.getGuid();
+        this.jqHintBar=$(`<div id=${this.jqHintBarID}>文件将存到服务器</div>`);
+        this.jqHintBar.css({"display":"flex","margin-top":"25px",
+                      'align-items':'center','width':'200px','justify-content':'center',
+                      "height":"30px","font-size":"10pt","border-radius":"5px"})
+        this.jqContentBar.append(this.jqHintBar);
+             
+        return this.jqContentBar;
 
     }
-  
+    constructor(title,tool){
+        super(title);
+        this.tool=tool;
+        this.create();
+    }
 
 }
 //////////////////////////////////
-
+const FILE_SAVE_EVENT ="file-save-event";
 //////////////////////////////////
 class SaveTool extends Command{
     constructor(toolItem,toolMannager){
         super(toolItem,toolMannager);
-        this.dialog=new SaveDialog("basic","user1");
+        this.dialog=new SaveDialog("保存文件");
+        WsAgent.addEventListener(this,FILE_SAVE_EVENT,this.wsNotiyHandler);
+        
     }  
     execute(event){
+        this.dialog.show();
+        
+    }
+    wsNotiyHandler(fileSaveEvent){
+      console.log(fileSaveEvent);
+    }
+    saveFileTosever(filename){
         var stage=this.toolManager.editor.stage;
         var jsonStr=stage.toJson();
         this.toolManager.editor.fileJson=jsonStr;
-        this.dialog.show();
+        var username=this.toolManager.editor.username
+        //request={task:"savefile",file:{name:`${filename}`,username:`${username}`,content:`${jsonStr}`}};
+        var request={task:"savefile",file:{name:`${filename}`,username:`${username}`,content:`${jsonStr}`}};
+        var jsonRequest=JSON.stringify(request);
+        WsAgent.send(jsonRequest);
+        
     }
+    handleOkClick(filename){
+      this.saveFileToServer(filename);
+    }
+    
     
 }
 

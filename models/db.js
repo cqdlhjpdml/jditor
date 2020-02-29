@@ -22,10 +22,13 @@ class DB{
             timestamps: false
         });
         this.file = this.sequelize.define('file', {
-            username:Sequelize.STRING,
+            name:{type:Sequelize.STRING,primaryKey:true},
+            username:{type:Sequelize.STRING,primaryKey:true},
             content:Sequelize.STRING,
             ip: Sequelize.STRING,
-            folder:Sequelize.STRING},
+            timestamp:Sequelize.STRING,
+            folder:{type:Sequelize.STRING,primaryKey:true}},
+
             {timestamps: false});
          
     };
@@ -47,8 +50,35 @@ class DB{
             }
         })
     }
+    ////file={name:`${filename}`,username:`${username}`,content:`${jsonStr}`}};
+    async createFile(file)//to databse
+    { 
+        
+        await this.file.create({
+            username: file.username,
+            name:file.name,
+            content:file.content,
+            ip:file.ip,           
+            timestamp:file.timestamp,
+            folder:file.folder
+        });
+        return {result:1,msg:"创建用户成功"};
+    }
+    async getFiles(filter)
+    { 
+        
+        return await this.file.findAll({
+            where: filter
+        })
+    }
 
 }
-
-
+/*some test statements
+var db=new DB();
+//db.createFile({name:"file2",username:"dml",content:"hello world",ip:"127.0.0.1",timestamp:"2020-02-29",folder:"."})
+(async function a(){
+    var files=await db.getFiles({name:"file1"});
+    console.log(files.length);
+})()
+*/
 module.exports=new DB();

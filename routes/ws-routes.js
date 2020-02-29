@@ -8,7 +8,7 @@ class Login_Register{
   constructor(){this.db=db;}
   async checkuser(user){
     let users=await this.db.getUser(user.name);
-    if(users.length==0) return {succeed:false,msg:"该用户不存在!"};
+    if(users.length==0) return {succeed:false,msg:"该用户不存在!",};
     if(user.pwd)
       if(user.pwd==users[0].pwd) return {succeed:true,msg:"OK登录成功!"}; 
       else return {succeed:false,msg:"密码错误!"};
@@ -30,29 +30,31 @@ var Login_Register_Service=new Login_Register();
 ///////////////
 wss.on('connection', function connection(ws) {
     ws.on('message', async function incoming(message) {
-        
+        //received from client,message={task:[login|register|save|open],DATATYPE:{...}}
+        //DATATYPE=user|data|...
         var jsondata=JSON.parse(message);
-        //received from client,msg.data={task:[login|register|save|open],data:{..}}
+        
         var response,jsonReponse;
         switch(jsondata.task){
-            case "login":
-                let user=jsondata.data;
+          //for login task,message={task:[login|register|save|open],[user]:{name:username,pwd:password}}  
+          case "login":
+                let user=jsondata.user;
                 let r=await Login_Register_Service.login(user);
                 
                 if(r.succeed){
-                    //reponse to client:response={task:"login",resutlt:{succeed:true|false,msg:"login Ok"}}
-                    response={task:"login",result:{succeed:true,msg:"登录成功"}}
+                    //reponse to client:response={task:"login",resutlt:{succeed:true|false,msg:"login Ok"},user:{name:username,pwd:password}}
+                    response={task:"login",result:{succeed:true,msg:"登录成功"},"user":user}
                     jsonReponse=JSON.stringify(response);
                     ws.send(jsonReponse);
                 }
                 else{
-                  response={task:"login",result:{succeed:false,msg:"登录失败，密码或用户名错误！"}}
+                  response={task:"login",result:{succeed:false,msg:"登录失败，密码或用户名错误！"},"user":user}
                   jsonReponse=JSON.stringify(response);
                   ws.send(jsonReponse);
                 }
                 break;
             default:
-                response={scceed:false,msg:"该操作未定义"}
+                response={scceed:false,msg:"该操作未定义",data:{}}///????
                 jsonReponse=JSON.stringify(response);
                 ws.send(jsonReponse);    
         }

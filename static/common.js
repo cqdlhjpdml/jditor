@@ -47,11 +47,15 @@ class WS_Agent{
   send(message){this.ws.send(message)};
   onMessageHandler(msg){
     
-    //msg.data={task:"login"|"register"|...,resutlt:{succeed:true|false,msg:"login Ok"}}*/
+    //from server,msg.data={task:"login"|"register"|...,resutlt:{succeed:true|false,msg:"login Ok"},[data]:{}}*/
+
+    
     var response=JSON.parse(msg.data);
     
     switch(response.task){
-       case "login":
+      //for login task,reponse from server to client=
+      //{task:"login",resutlt:{succeed:true|false,msg:"login Ok"},user:{name:username,pwd:password}} 
+      case "login":
           var loginEvent=new UserLoginEvent(this,USER_LOGIN_EVENT,response);
           this.eventDispatcher.dispatchEvent(loginEvent);
           break;

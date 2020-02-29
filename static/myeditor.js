@@ -129,6 +129,7 @@ class MyEditor{
     constructor(divContainer,drawObj){   
         this.eventDispatcher=new EventDispatcher();
         this.drawObj=drawObj ;
+        this.username="guest";
         this.scenes={};
               
         var con=$('#'+divContainer);
