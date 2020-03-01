@@ -3,6 +3,85 @@ const Config=require("../server-config.js")
 const WebSocket = require('ws');
 const db=require("../models/db.js");
 const wss = new WebSocket.Server({ port: Config.webSocketPort });
+var taskRouter=new Array();
+
+//////////////////
+class  TaskRouter{
+  constructor(){
+    this.taskRouter={};
+    
+  }
+  addRouter(taskname,router){
+    if(!this.taskRouter[taskname])this.taskRouter[task]=new Array();
+    this.taskRouter[taskname].push(router);
+  }
+  route(taskreq){
+    var taskname=taskreq.taskname;
+    this.currentTaskreq=taskreq;
+    var handlers=this.taskRouter[taskname];
+    this.handlerLine=handlers;
+    this.nextHandlerIndex=0;
+    this.next();
+  }
+  removeRouter(taskname,handlername)
+  {
+    
+    var handlers=this.taskRouter[taskname];
+    for(let i=0;i<handlers.length;i++) {
+      let handler=handlers[i];
+      if(handler.name==handlername) handlers.splice(index, i);
+   }
+  }
+  next=()=>{
+    if(this.nextHandlerIndex>this.handlerLine.length) return;
+    else    return handlerLine[this.nextHandlerIndex++].doTask(this.currentTaskreq);
+  }
+  
+}
+var taskRouter=new TaskRouter();
+///////////////////
+class Task_Handler{
+  constructor(db,name){
+    this.db=db;
+    this.name=name;
+    
+  }
+  //virtual
+  doTask(taskReq,next){
+    //if there's a handler stack chain and you'd like to call the next handler after your codes,then
+    //next function should be called ,  if not to call the next function,the other hanlers in the stack following yours will be bypass.
+     
+    
+  }
+}
+////////////////////////////////
+class File_Serializer extends Task_Handler{
+  async checkvalid(file){
+    //file:{name:`${filename}`,username:`${username}`,content:`${jsonStr}`}
+    var filter={name:file.name,username:file.username,folder:file.folder};
+    if(!filter.name||!filter.username||!filter.folder) return {succeed:false,msg:"[用户名|文件名|路径]不能为空！"};
+    
+    var r=await this.db.getFiles(filter);
+    if(r.length!=0)      return {succeed:false,msg:"该文件已存在！" };
+    else return {succeed:true,msg:"OK！"}
+  }
+  async savefile(file){
+    
+    var r;
+    r=await this.checkvalid(file);
+    if(!r.succeed) return r;
+    return await this.db.createFile(file);
+       
+  }
+  /***************************/
+  doTask(taskReq){
+    this.taskReq=taskReq;
+    var file=taskreq.file;
+    return this.savefile(file);
+  }
+}
+
+taskRouter.addRouter('savefile',new File_Serializer("default-saveile-router",db));
 //////////////////
 class Login_Register{
   constructor(){this.db=db;}
@@ -26,16 +105,27 @@ class Login_Register{
   }
 
 }
+
+////////////////////////////////
+
 var Login_Register_Service=new Login_Register();
 ///////////////
 wss.on('connection', function connection(ws) {
     ws.on('message', async function incoming(message) {
-        //received from client,message={task:[login|register|save|open],DATATYPE:{...}}
-        //DATATYPE=user|data|...
+      var taskreq=JSON.parse(message);
+      var taskname=taskreq.taskname;
+      var jsonReponse
+      let r=await taskRutor.router(taskname);
+      r.taskname=taskname;
+      jsonReponse=JSON.stringify(r);
+      ws.send(jsonReponse);   
+      //received from client,message={task:[login|register|save|open],taskdata{...}}
+        /*
         var jsondata=JSON.parse(message);
+        var response,jsonReponse;*/
         
-        var response,jsonReponse;
-        switch(jsondata.task){
+        
+        /*switch(jsondata.task){
           //for login task,message={task:[login|register|save|open],[user]:{name:username,pwd:password}}  
           case "login":
                 let user=jsondata.user;
@@ -53,11 +143,15 @@ wss.on('connection', function connection(ws) {
                   ws.send(jsonReponse);
                 }
                 break;
+            //request={task:"savefile",file:{name:`${filename}`,username:`${username}`,content:`${jsonStr}`}};
+            case "savefile":
+                 
+                 break;
             default:
                 response={scceed:false,msg:"该操作未定义",data:{}}///????
                 jsonReponse=JSON.stringify(response);
                 ws.send(jsonReponse);    
-        }
+        }*/
         
 
     });

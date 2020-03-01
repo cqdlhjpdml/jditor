@@ -53,20 +53,20 @@ class DB{
     ////file={name:`${filename}`,username:`${username}`,content:`${jsonStr}`}};
     async createFile(file)//to databse
     { 
-        
-        await this.file.create({
+      try{
+          await this.file.create({
             username: file.username,
             name:file.name,
             content:file.content,
             ip:file.ip,           
             timestamp:file.timestamp,
             folder:file.folder
-        });
-        return {result:1,msg:"创建用户成功"};
+           });
+           return {result:1,msg:"文件保存成功"};
+         }catch(err){return {result:0,msg:err};}
     }
     async getFiles(filter)
     { 
-        
         return await this.file.findAll({
             where: filter
         })
