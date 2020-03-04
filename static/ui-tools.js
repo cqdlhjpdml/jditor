@@ -474,7 +474,7 @@ class MyDialog{
         return this.jqContentBar;
     }
     //overridable
-    getContentIno(){/*
+    getContentIno(){/*placeholder for future 
         返回信息，供buttonbar按钮的回调函数使用*/
         return null;
     }
@@ -519,6 +519,153 @@ class MyDialog{
 }
 
 //////////////////////////////////////////////////////////
+class OpenFileDialog extends MyDialog{
+     wsNotifyHandler(getFileListEvent){
+        var response=getFileListEvent.response;
+        var r=response.result;
+        var fileList=response.fileList;
+        let hintBar=document.getElementById(`${ this.jqHintBarID}`);
+        var selectList=document.getElementById(`${this.selectListID}`)
+        if(!r.succeed) {
+           
+            $(hintBar).html("获取文件列表失败！");
+            $(hintBar).css({"background-color":"#e0d0d0"});
+            return;
+        }
+        
+        $(hintBar).html("文件列表已加载！");
+        $(hintBar).css({"background-color":"#e0d0d0"});
+        for(let i=0;i<fileList.length;i++) {
+           let option=$(`<option>${fileList[i].filename}</option>`)
+           $(selectList).append(option);
+        } 
+        console.log(getFileListEvent);
+     }
+     //overridae
+     jqDialog(){
+        
+        WsAgent.addEventListener(this,GET_FILELIST_EVENT,this.wsNotifyHandler);
+        $(`#${this.id}` ).dialog({
+            close:false,
+            autoOpen:false,
+            resizable: false,
+            height: "auto",
+            width: "auto",
+            modal: true,
+            buttons: {
+               "open":{
+                    text: "打开",
+                    
+                    click: function() {/*
+                        var username=document.getElementById(me.useInputID).value;
+                        var pwd=document.getElementById(me.pwdInputID).value;
+                        //if(username.length<3){return;}//check the valid of username
+                        //if(pwd.length<6){return;}//check valid of password
+                        //request={task:[login|register|save|open],user:{name:username,pwd:password}}
+                        var request={taskname:"login",user:{name:`${username}`,pwd:`${pwd}`}};
+                        var jsonRequest=JSON.stringify(request);
+                        WsAgent.send(jsonRequest);
+                    */}
+                },
+               
+              "Cancel":{ 
+                text:"退出",
+                click:function(  ){ 
+                  $(`#${this.id}` ).dialog("close");
+                  
+                },
+              }
+          }});
+          
+          var me=this;
+          $(`#${this.id}`).on( "dialogopen", function(){
+                                 var taskreq={taskname:"getFileList",filter:{username:`${me.tool.getUsername()}`,folder:`.`}}
+                                 var jsonReq=JSON.stringify(taskreq)
+             
+                                WsAgent.send(jsonReq);  
+                                //me.restetUI.call(me)
+                            } );
+       
+
+    }
+    //override 
+    contentBar(){
+        this.jqContentBarID=CommonUtilities.getGuid();
+        this.jqContentBar=$(`<div id=${this.jqContentBarID}></div>`);
+        this.jqContentBar.css({"display": "flex",
+                           'flex-direction':'column',
+                           'justify-content':'center',
+                           'align-items':'center'
+                        });
+        this.fileListBarID=CommonUtilities.getGuid();
+        ;
+        this.jqFileListBar=$(`<div>文件名\
+                         
+                         </div>`);
+        this.jqFileListBar.css({ "display": "flex",
+        'justify-content': 'space-around',  
+        'flex-direction':'row' ,
+        'align-items':'center'  
+        });
+        
+        this.selectListID=CommonUtilities.getGuid();
+        this.jqSelectList=$(`<select id=${this.selectListID}></select>`);
+        this.jqFileListBar.append(this.jqSelectList);
+        this.jqContentBar.append(this.jqFileListBar);
+       
+        
+        this.jqHintBarID=CommonUtilities.getGuid();
+        this.jqHintBar=$(`<div id=${this.jqHintBarID}>正在加载文件列表</div>`);
+        this.jqHintBar.css({"display":"flex","margin-top":"25px",
+                      'align-items':'center','width':'200px','justify-content':'center',
+                      "height":"30px","font-size":"10pt","border-radius":"5px"})
+        this.jqContentBar.append(this.jqHintBar);
+        
+        
+             
+        return this.jqContentBar;
+
+    }
+    loadFileList(fileListEvent){
+      
+
+
+
+    }
+    constructor(title,tool){
+        super(title);
+        this.tool=tool;
+        this.create();
+        
+
+    }
+
+
+}
+/////////////////////////
+class OpenFileTool extends Command{
+    constructor(toolItem,toolMannager){
+        super(toolItem,toolMannager);
+        this.dialog=new OpenFileDialog("打开文件",this);
+               
+    }  
+    execute(event){
+        this.dialog.show();
+       
+    }
+    wsNotiyHandler(wsTaskEvent){
+        //placehoder for future;
+      
+    }
+  
+    getUsername(){
+        return this.toolManager.editor.username;
+    }
+    
+   
+}
+////////////////////////
+
 class LoginDialog extends MyDialog{
     restetUI(){
         let pwdInput=document.getElementById(`${this.pwdInputID}`);
@@ -572,7 +719,7 @@ class LoginDialog extends MyDialog{
                         //if(username.length<3){return;}//check the valid of username
                         //if(pwd.length<6){return;}//check valid of password
                         //request={task:[login|register|save|open],user:{name:username,pwd:password}}
-                        var request={task:"login",user:{name:`${username}`,pwd:`${pwd}`,}};
+                        var request={taskname:"login",user:{name:`${username}`,pwd:`${pwd}`}};
                         var jsonRequest=JSON.stringify(request);
                         WsAgent.send(jsonRequest);
                     }
@@ -652,6 +799,34 @@ class LoginTool extends Command{
 }
 ///////////////////////////////////////
 class SaveDialog extends MyDialog{
+    restetUI(){
+        let jqHintBar=document.getElementById(`${this.jqHintBarID}`);
+        
+        $(jqHintBar).css({"background-color":"#d0d0d0"});
+        $(jqHintBar).html("文件将存到服务器");
+        
+    }
+    wsNotiyHandler(wsTaskEvent){
+        var response=wsTaskEvent.response;
+        var hintSBar=document.getElementById(`${this.jqHintBarID}`);
+        //console.log(wsTaskEvent);
+        var response=wsTaskEvent.response;
+       
+        if(response.result.succeed==true){
+            $(hintSBar).css({"background-color":"#e0d0d0"});
+            $(hintSBar).html(response.result.msg+"，对话框将自动关闭");
+            this.dispatchEvent(wsTaskEvent);
+                       
+            setTimeout(()=>{
+                          $(`#${this.id}` ).dialog("close")
+                             
+                           },2000);
+        }
+        else{
+            $(hintSBar).css({"background-color":"#eed0d0"});
+            $(hintSBar).html(response.result.msg);
+        }
+    }
     jqDialog(){
         var me=this;
         $(`#${this.id}` ).dialog({
@@ -666,15 +841,17 @@ class SaveDialog extends MyDialog{
                     
                     click: function() {
                         var filename=document.getElementById(me.fileInputID).value;
-                        var response=me.tool.handleOkClick(filename);
-                        var hintBar=document.getElementById(`${this.jqHintBarID}`);
+                        var username=me.tool.getUsername();
+                        var content=me.tool.getContent();
+                        var date=new Date();
+                        var time=date.toLocaleDateString()+date.toLocaleTimeString();
+                        var ip="fakeIP";//real IP will be set by server;
+                        var folder='.';
                         
-                        //if(!me.checkLogined()){
-                        //    $(hintBar).css({"background-color":"#eed0d0"});
-                        //    $(hintBar).html("保存文件需先登录！");
-                        //    return;
-                        //}
-                        
+                        var request={taskname:"savefile",file:{name:`${filename}`,username:`${username}`,content:`${content}`,folder:`${folder}`},time:`${time}`,ip:`${ip}`};
+                        var jsonRequest=JSON.stringify(request);
+                        WsAgent.send(jsonRequest);
+                                               
                     }
                   },
                
@@ -684,7 +861,7 @@ class SaveDialog extends MyDialog{
               },
               
           }});
-
+      $(`#${this.id}`).on( "dialogclose", function(){me.restetUI.call(me)} )
     }
     contentBar(){
         var  id=CommonUtilities.getGuid();
@@ -716,46 +893,43 @@ class SaveDialog extends MyDialog{
         return this.jqContentBar;
 
     }
-    constructor(title,tool){
+    constructor(title,savetool){
         super(title);
-        this.tool=tool;
+        this.tool=savetool;
         this.create();
+        WsAgent.addEventListener(this,FILE_SAVE_EVENT,this.wsNotiyHandler);
+        this.restetUI();
     }
+    
 
 }
 //////////////////////////////////
-const FILE_SAVE_EVENT ="file-save-event";
+
+
 //////////////////////////////////
 class SaveTool extends Command{
     constructor(toolItem,toolMannager){
         super(toolItem,toolMannager);
-        this.dialog=new SaveDialog("保存文件");
-        WsAgent.addEventListener(this,FILE_SAVE_EVENT,this.wsNotiyHandler);
-        
+        this.dialog=new SaveDialog("保存文件",this);
+        this.dialog.addEventListener(this,FILE_SAVE_EVENT,this.wsNotiyHandler,)       
     }  
     execute(event){
         this.dialog.show();
         
     }
-    wsNotiyHandler(fileSaveEvent){
-      console.log(fileSaveEvent);
+    wsNotiyHandler(wsTaskEvent){
+        //placehoder for future;
+      
     }
-    saveFileTosever(filename){
+    getContent(){
         var stage=this.toolManager.editor.stage;
         var jsonStr=stage.toJson();
-        this.toolManager.editor.fileJson=jsonStr;
-        var username=this.toolManager.editor.username
-        //request={task:"savefile",file:{name:`${filename}`,username:`${username}`,content:`${jsonStr}`}};
-        var request={task:"savefile",file:{name:`${filename}`,username:`${username}`,content:`${jsonStr}`}};
-        var jsonRequest=JSON.stringify(request);
-        WsAgent.send(jsonRequest);
-        
+        return jsonStr; 
     }
-    handleOkClick(filename){
-      this.saveFileToServer(filename);
+    getUsername(){
+        return this.toolManager.editor.username;
     }
-    
-    
+      
 }
 
 class LoadTool extends Command{
@@ -1009,10 +1183,10 @@ class TabSheetsHeader{
                                               toolClass:SaveTool
                                            },
 
-                                           { caption:"载入",
+                                           { caption:"打开",
                                              icon:"load.png",
-                                             tooltips:"载入",
-                                             toolClass:LoadTool
+                                             tooltips:"打开",
+                                             toolClass:OpenFileTool
                                            },
                                            { caption:"追加标签页",
                                              icon:"appendTab.png",

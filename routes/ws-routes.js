@@ -12,16 +12,18 @@ class  TaskRouter{
     
   }
   addRouter(taskname,router){
-    if(!this.taskRouter[taskname])this.taskRouter[task]=new Array();
+    if(!this.taskRouter[taskname])
+        this.taskRouter[taskname]=new Array();
     this.taskRouter[taskname].push(router);
   }
-  route(taskreq){
+  async route(taskreq){
     var taskname=taskreq.taskname;
     this.currentTaskreq=taskreq;
     var handlers=this.taskRouter[taskname];
     this.handlerLine=handlers;
     this.nextHandlerIndex=0;
-    this.next();
+    var me=this;
+    return await this.next(me);
   }
   removeRouter(taskname,handlername)
   {
@@ -32,30 +34,43 @@ class  TaskRouter{
       if(handler.name==handlername) handlers.splice(index, i);
    }
   }
-  next=()=>{
-    if(this.nextHandlerIndex>this.handlerLine.length) return;
-    else    return handlerLine[this.nextHandlerIndex++].doTask(this.currentTaskreq);
+  async next(me){
+    if(me.nextHandlerIndex>me.handlerLine.length) return;
+    else  return  await  me.handlerLine[me.nextHandlerIndex++].doTask(me.currentTaskreq);
   }
   
 }
 var taskRouter=new TaskRouter();
 ///////////////////
 class Task_Handler{
-  constructor(db,name){
+  constructor(name,db){
     this.db=db;
     this.name=name;
     
   }
   //virtual
-  doTask(taskReq,next){
+  async doTask(taskReq,next){
     //if there's a handler stack chain and you'd like to call the next handler after your codes,then
     //next function should be called ,  if not to call the next function,the other hanlers in the stack following yours will be bypass.
-     
+    //await callFunction 
     
   }
 }
+//////////////
+class getFileList_TaskHandler extends Task_Handler{
+  async getFileList(filter){
+    return await this.db.getFileList(filter)
+  }
+  async doTask(taskReq){
+    var filter=taskReq.filter
+    var r= await this.getFileList(filter);
+    var response={taskname:taskReq.taskname,result:{succeed:true,msg:"文件列表已返回"},fileList:r};
+    return response;
+  }
+}
+
 ////////////////////////////////
-class File_Serializer extends Task_Handler{
+class SaveFile_TaskHandler extends Task_Handler{
   async checkvalid(file){
     //file:{name:`${filename}`,username:`${username}`,content:`${jsonStr}`}
     var filter={name:file.name,username:file.username,folder:file.folder};
@@ -67,35 +82,35 @@ class File_Serializer extends Task_Handler{
   }
   async savefile(file){
     
-    var r;
+    var r,response;
     r=await this.checkvalid(file);
-    if(!r.succeed) return r;
-    return await this.db.createFile(file);
+    if(!r.succeed) {
+      response={taskname:"savefile",result:r}
+      return response;
+    }
+    r=await this.db.createFile(file);
+    response={taskname:"savefile",result:r};
+    return response;
        
   }
   /***************************/
-  doTask(taskReq){
+  async doTask(taskReq){
     this.taskReq=taskReq;
-    var file=taskreq.file;
-    return this.savefile(file);
+    var file=taskReq.file;
+    return await this.savefile(file);
   }
 }
-
-taskRouter.addRouter('savefile',new File_Serializer("default-saveile-router",db));
-//////////////////
-class Login_Register{
-  constructor(){this.db=db;}
-  async checkuser(user){
+//////////////////////
+class Login_Register_TaskHandller extends Task_Handler{
+  async checvalid(user){
+    if(!user.pwd|!user.name) return {succeed:false,msg:"用户名或密码为空!"};
     let users=await this.db.getUser(user.name);
     if(users.length==0) return {succeed:false,msg:"该用户不存在!",};
     if(user.pwd)
       if(user.pwd==users[0].pwd) return {succeed:true,msg:"OK登录成功!"}; 
       else return {succeed:false,msg:"密码错误!"};
   }
-  async login(user){
-      if(!user.pwd) return {succeed:false,msg:"密码为空!"};
-      return(await this.checkuser(user));
-  }
+
   async register(user){
       if(!user.name||!user.pwd) return {succeed:false,msg:"用户名或密码为空!"};
       let r=await this.checkuser(user);
@@ -103,57 +118,46 @@ class Login_Register{
       return( await this.db.createUser(user));
     
   }
-
+  async login(user){
+                let response;
+                let jsonresponse;
+                let r=await this.checvalid(user);
+                if(!r.succeed) {
+                  response={taskname:"login",result:r};
+                  return response;
+                   
+                }
+                
+                else{
+                    //reponse to client:response={task:"login",resutlt:{succeed:true|false,msg:"login Ok"},user:{name:username,pwd:password}}
+                    response={taskname:"login",result:r,"user":user}
+                    return response;
+                }
+  }
+  async doTask(taskReq){
+    this.taskReq=taskReq;
+    var user=taskReq.user;
+    return await this.login(user);
+  }
 }
 
+taskRouter.addRouter('savefile',new SaveFile_TaskHandler("default-saveFile-handler",db));
+taskRouter.addRouter('login',new Login_Register_TaskHandller("default-login-hanler",db));
+taskRouter.addRouter('register',new Login_Register_TaskHandller("default-register-handler",db));
+taskRouter.addRouter('getFileList',new getFileList_TaskHandler("default-getFilList-handler",db));
+//////////////////
 ////////////////////////////////
 
-var Login_Register_Service=new Login_Register();
+
 ///////////////
 wss.on('connection', function connection(ws) {
     ws.on('message', async function incoming(message) {
       var taskreq=JSON.parse(message);
       var taskname=taskreq.taskname;
       var jsonReponse
-      let r=await taskRutor.router(taskname);
-      r.taskname=taskname;
+      let r=await taskRouter.route(taskreq);
       jsonReponse=JSON.stringify(r);
       ws.send(jsonReponse);   
-      //received from client,message={task:[login|register|save|open],taskdata{...}}
-        /*
-        var jsondata=JSON.parse(message);
-        var response,jsonReponse;*/
-        
-        
-        /*switch(jsondata.task){
-          //for login task,message={task:[login|register|save|open],[user]:{name:username,pwd:password}}  
-          case "login":
-                let user=jsondata.user;
-                let r=await Login_Register_Service.login(user);
-                
-                if(r.succeed){
-                    //reponse to client:response={task:"login",resutlt:{succeed:true|false,msg:"login Ok"},user:{name:username,pwd:password}}
-                    response={task:"login",result:{succeed:true,msg:"登录成功"},"user":user}
-                    jsonReponse=JSON.stringify(response);
-                    ws.send(jsonReponse);
-                }
-                else{
-                  response={task:"login",result:{succeed:false,msg:"登录失败，密码或用户名错误！"},"user":user}
-                  jsonReponse=JSON.stringify(response);
-                  ws.send(jsonReponse);
-                }
-                break;
-            //request={task:"savefile",file:{name:`${filename}`,username:`${username}`,content:`${jsonStr}`}};
-            case "savefile":
-                 
-                 break;
-            default:
-                response={scceed:false,msg:"该操作未定义",data:{}}///????
-                jsonReponse=JSON.stringify(response);
-                ws.send(jsonReponse);    
-        }*/
-        
-
     });
     
     

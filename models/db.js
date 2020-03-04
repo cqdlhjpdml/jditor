@@ -62,16 +62,17 @@ class DB{
             timestamp:file.timestamp,
             folder:file.folder
            });
-           return {result:1,msg:"文件保存成功"};
-         }catch(err){return {result:0,msg:err};}
+           return {succeed:true,msg:"文件保存成功"};
+         }catch(err){return {succeed:false,msg:err};}
     }
-    async getFiles(filter)
+    async getFileList(filter)
     { 
-        return await this.file.findAll({
+        return await this.file.findAll({attributes:[['name','filename']],
             where: filter
         })
     }
-
+     
+  
 }
 /*some test statements
 var db=new DB();

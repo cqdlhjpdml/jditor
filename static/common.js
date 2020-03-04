@@ -34,13 +34,16 @@ class EditorEvent{
   }
 }
 const USER_LOGIN_EVENT="user_login_event";
-class UserLoginEvent{
-   constructor(publisher,eventname,response)//eventInfo={succeed:true|false[,detail:detailInfo]}
-   {
-    this.publisher=publisher;
-    this.name=eventname;
-    this.response=response;
-   }
+const FILE_SAVE_EVENT ="file-save-event";
+const GET_FILELIST_EVENT="get_fieList_event"
+
+class TaskEvent{
+  constructor(publisher,eventname,response)//eventInfo={succeed:true|false[,detail:detailInfo]}
+  {
+   this.publisher=publisher;
+   this.name=eventname;
+   this.response=response;
+  }
 }
 ///////////////////////
 class WS_Agent{
@@ -52,15 +55,23 @@ class WS_Agent{
     
     var response=JSON.parse(msg.data);
     
-    switch(response.task){
+    switch(response.taskname){
       //for login task,reponse from server to client=
       //{task:"login",resutlt:{succeed:true|false,msg:"login Ok"},user:{name:username,pwd:password}} 
       case "login":
-          var loginEvent=new UserLoginEvent(this,USER_LOGIN_EVENT,response);
+          var loginEvent=new TaskEvent(this,USER_LOGIN_EVENT,response);
           this.eventDispatcher.dispatchEvent(loginEvent);
           break;
-       default:
-         throw("未定义的操作，服务器无法！")
+      case "savefile":
+           var saveFileEvent=new TaskEvent(this,FILE_SAVE_EVENT,response);
+           this.eventDispatcher.dispatchEvent(getFileListEvent);
+           break;
+      case "getFileList":
+           var getFileListEvent=new TaskEvent(this,GET_FILELIST_EVENT,response);
+           this.eventDispatcher.dispatchEvent(getFileListEvent);
+           break;
+      default:
+         throw(response.taskname+":"+"未定义的操作，服务器无法执行！")
     }
   }
   constructor(serverAdress){

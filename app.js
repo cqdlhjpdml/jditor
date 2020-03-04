@@ -13,8 +13,12 @@ const main = (ctx) => {
   console.log(ctx.response.body);
 };
 router.get("/",main);
-var port=Config.httpPort;
 
+const getDir=(ctx,next)=>{
+  console.log(ctx);next();
+}
+var port=Config.httpPort;
+app.use(getDir);
 app.use(router.routes());
 app.listen(port);
 console.log('listening on port:'+port);
