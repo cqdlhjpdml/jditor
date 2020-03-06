@@ -19,6 +19,7 @@ class Page{
         this.sceneName=sceneName;
         this.page_id="";
         this.createPage();
+        
         this.dpiMm=CommonUtilities.getScrDpiPerMm();
         this.EventDispatcher=new EventDispatcher();
         console.log(this.dpiMm['x']);
@@ -36,6 +37,7 @@ class Page{
     this.pageBoxheight=this.pageFormat.height*this.pageFormat.pageScale;
     canvas.height+=this.pageBoxheight+this.pageFormat.spaceBetweenPages;
     this.totalHeight=canvas.height;
+    /*
     var pft=this.pageFormat;
     
     var pageBox=new this.editor.drawObj.DisplayElement();
@@ -53,6 +55,8 @@ class Page{
     this.cy=this.totalHeight-this.pageFormat.pageDownSpace*this.pageFormat.pageScale;
     this.pageEditRegionWidth=(this.pageFormat.width-this.pageFormat.pageLeftSpace-this.pageFormat.pageRightSpace)*this.pageFormat.pageScale;
     this.pageEditRegionHeight=(this.pageFormat.height-this.pageFormat.pageUpSpace-this.pageFormat.pageDownSpace)*this.pageFormat.pageScale;
+    */
+    /*
     var editRegion=new this.editor.drawObj.DisplayElement();
     editRegion.paint=function(cxt2d){
         cxt2d.strokeStyle="#dddddd";
@@ -80,7 +84,7 @@ class Page{
         cxt2d.stroke();
     }
     this.editor.scenes[this.sceneName].add(editRegion);
-    this.editRegion=editRegion;
+    this.editRegion=editRegion;*/
    
  }
  setPageDirection(direction){
@@ -129,7 +133,7 @@ class MyEditor{
     constructor(divContainer,drawObj){   
         this.eventDispatcher=new EventDispatcher();
         this.drawObj=drawObj ;
-        this.username="guest";
+        this.username="dml";console.log("statement for debug");;
         this.scenes={};
               
         var con=$('#'+divContainer);
@@ -148,18 +152,14 @@ class MyEditor{
         this.canvas.width=0;this.canvas.height=10;
         this.cxt2d=this.canvas.getContext('2d');
         this.stage=new this.drawObj.Stage(this.canvas);
-        this.addTab("pageScene");
+        this.createTab("pageScene");
         //this.stage.mode="edit"   ;// you must set stage's mode after scene added        
         this.toolManager.createTools(this.currentScene); 
         this.pages=new Array();//
         this.initilize();
         
         this.addPage(this,"pageScene",PageFormat.DefaultPageA4);
-        var textNode = new this.drawObj.TextNode('热力系统示意图');
-        textNode.font = 'bold 16px 微软雅黑';
-        textNode.fontColor="#303030"
-        textNode.setLocation(317, 250);
-        this.scenes["pageScene"].add(textNode);
+        
        
         
         
@@ -203,16 +203,16 @@ class MyEditor{
         scene.mode="edit";
         return scene;
     }
-    setCurrentScene(newScene){
+    setCurrentScene(focusScene){
         for(let s in this.scenes){
-            if(this.scenes[s]===newScene) this.scenes[s].visible=true;
+            if(this.scenes[s]===focusScene) this.scenes[s].visible=true;
             else this.scenes[s].visible=false;
         };
         var previousScene=this.currentScene;
-        this.dispatchEvent(new EditorEvent(this,CURRENT_SCENE_CHANGE,newScene,previousScene));
-        this.currentScene=newScene;
+        this.dispatchEvent(new EditorEvent(this,CURRENT_SCENE_CHANGE,focusScene,previousScene));
+        this.currentScene=focusScene;
     }
-    addTab(tabname){
+    createTab(tabname){
         var scene=this.createScene(tabname);
         this.setCurrentScene(scene);
         
@@ -223,10 +223,38 @@ class MyEditor{
     setStageCursor(cursor){
        this.stage.cursor=cursor;
     }
-    
-    insert(cmd){}
-    save(){}
-    load(){}
-    groupElements(){}
+    removeAllScenes(){
+        this.scenes={};
+        this.tabSheetsManager.removeAllTabs();
+    }
+    loadFileFromJson(fileJson){
+        this.removeAllScenes();
+        var stage=this.stage; 
+        stage.clear();
+        var jsonObj=JSON.parse(fileJson);
+        
+        for (var k in jsonObj)
+             "childs" != k && (stage[k] = jsonObj[k]);//set the properties except the scences
+        var scenes = jsonObj.childs;
+        var me=this;
+        scenes.forEach(function(a) {
+                var b = new JTopo.Scene(stage);
+                for (var c in a)// a is a scene
+                   "childs" != c && (b[c] = a[c]),
+                   "background" == c && (b.background = a[c]);
+                var d = a.childs;// d is the collection of elements such such as textNode,svgNode and so on
+                d.forEach(function(n) {
+                                       var c = null
+                                       , t = n.elementType;
+                                        c=JTopo.createNode(t,n);
+                                       if(c)  b.add(c);
+                                     })
+                me.scenes[b.name]=b;
+                me.tabSheetsManager.appendTab(b);                     
+                            });
+             
+       
+    }
+  
 
 }

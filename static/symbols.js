@@ -325,7 +325,7 @@ function SvgNode(selector,text){
       this.text=text;
       this.selector=selector;
       this.elementType="SvgNode";
-      var properties="symbolType,svgScaleX,svgScaleY,selector,text".split(",");
+      var properties="svgScaleX,svgScaleY,selector".split(",");
       this.serializedProperties=this.serializedProperties.concat(properties);
       this.toFill=false;//not to fill the node's background
       this.borderwidth=0;//not to draw the border;

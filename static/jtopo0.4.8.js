@@ -46,9 +46,10 @@
               , c = this.serializedProperties.length;
             return this.serializedProperties.forEach(function(d, e) {
                 var f = a[d];
-                "string" == typeof f && (f = '"' + f + '"'),
+                if(typeof f!="undefined")//dml add the if condition ,don't output the properties whose values are equal to undefined 
+                {"string" == typeof f && (f = '"' + f + '"'),
                 b += '"' + d + '":' + f,
-                c > e + 1 && (b += ",")
+                c > e + 1 && (b += ",")}
             }),
             b += "}"
         }
@@ -933,6 +934,7 @@ function(a) {//stage
             a
         }
         ,
+        /*dml :the original function toJson replaced by the written
         this.toJson = function() {
             {
                 var b = this
@@ -950,7 +952,33 @@ function(a) {//stage
             }),
             c += "]",
             c += "}"
-        }
+        }*/
+        /*dml :the written function named toJson is to replace the original stage's toJson funciton as to  
+         fix the bug missing the ',' symbol between the scene's json output*/
+        this.toJson = function() {
+            var b = this;
+            var  c = '{"version":"' + a.version + '",';
+            this.serializedProperties.length;
+            var d;
+            this.serializedProperties.forEach(function(a) {
+                                                           
+                                                           if(typeof b[a]!="undefined"){
+                                                            d=b[a];   
+                                                           "string" == typeof d && (d = '"' + d + '"'),c += '"' + a + '":' + d + "," 
+                                                           }
+                                                          });
+            c += '"childs":[';
+            let childs=this.childs;
+            let len=childs.length;
+            for(i=0;i<len;i++)
+            {
+              c+=childs[i].toJson();
+              if(i!=len-1) c+=',';
+            }
+            c += "]";
+            c += "}";
+            return c;
+          }
         ,
         function() {
             0 == n.frames ? setTimeout(arguments.callee, 100) : n.frames < 0 ? (n.repaint(),
@@ -1033,6 +1061,7 @@ function(a) {//Scene
             this.selectedElements = [],
             this.paintAll = !1
             var c = "background,backgroundColor,mode,paintAll,areaSelect,translate,translateX,translateY,lastTranslatedX,lastTranslatedY,alpha,visible,scaleX,scaleY".split(",");
+            c.push("name");
             this.serializedProperties = this.serializedProperties.concat(c)
         }
         ,
@@ -1563,10 +1592,14 @@ function(a) {//Scene
             }
             this.serializedProperties.forEach(function(c) {
                 var d = a[c];
-                //"background" == c && (d = a._background.src),//dml:changed to following line
-                "background" == c &&( a._background)&& (d = a._background.src),//dml
-                "string" == typeof d && (d = '"' + d + '"'),
-                b += '"' + c + '":' + d + ","
+                
+                if(typeof d!='undefined')//dml add the if condition ,don't output the properties whose values are equal to undefined
+                {//"background" == c && (d = a._background.src),//dml:changed to following line
+                    "background" == c &&( a._background)&& (d = a._background.src),//dml
+                    "string" == typeof d && (d = '"' + d + '"'),
+                    b += '"' + c + '":' + d + ","
+                   
+                }
             }),
             b += '"childs":[';
             var c = this.childs.length;

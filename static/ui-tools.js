@@ -520,31 +520,47 @@ class MyDialog{
 
 //////////////////////////////////////////////////////////
 class OpenFileDialog extends MyDialog{
-     wsNotifyHandler(getFileListEvent){
+    resetUI(){
+        
+        this.jqSelectList.html("");
+        this.jqHintBar.css({"display":"flex","margin-top":"25px",
+        'align-items':'center','width':'200px','justify-content':'center',
+        "height":"30px","font-size":"10pt","border-radius":"5px"});
+        this.jqHintBar.html("正在加载文件列表")
+       
+    }
+
+    wsNotifyFileLoadHandler(openFileEvent){
+        console.log(openFileEvent);
+        var fileJson=openFileEvent.response.result.content;
+        this.tool.toolManager.editor.loadFileFromJson(fileJson);
+        
+    }
+
+    wsNotifyFileListHandler(getFileListEvent){
         var response=getFileListEvent.response;
         var r=response.result;
         var fileList=response.fileList;
-        let hintBar=document.getElementById(`${ this.jqHintBarID}`);
-        var selectList=document.getElementById(`${this.selectListID}`)
+        
         if(!r.succeed) {
            
-            $(hintBar).html("获取文件列表失败！");
-            $(hintBar).css({"background-color":"#e0d0d0"});
+            this.jqHintBar.html("获取文件列表失败！");
+            this.jqHintBar.css({"background-color":"#e0d0d0"});
             return;
         }
         
-        $(hintBar).html("文件列表已加载！");
-        $(hintBar).css({"background-color":"#e0d0d0"});
+        this.jqHintBar.html("文件列表已加载！");
+        this.jqHintBar.css({"background-color":"#e0d0d0"});
         for(let i=0;i<fileList.length;i++) {
            let option=$(`<option>${fileList[i].filename}</option>`)
-           $(selectList).append(option);
+           this.jqSelectList.append(option);
         } 
-        console.log(getFileListEvent);
+        //console.log(getFileListEvent);
      }
      //overridae
      jqDialog(){
-        
-        WsAgent.addEventListener(this,GET_FILELIST_EVENT,this.wsNotifyHandler);
+        WsAgent.addEventListener(this,OPEN_FILE_EVENT,this.wsNotifyFileLoadHandler);
+        WsAgent.addEventListener(this,GET_FILELIST_EVENT,this.wsNotifyFileListHandler);
         $(`#${this.id}` ).dialog({
             close:false,
             autoOpen:false,
@@ -556,16 +572,14 @@ class OpenFileDialog extends MyDialog{
                "open":{
                     text: "打开",
                     
-                    click: function() {/*
-                        var username=document.getElementById(me.useInputID).value;
-                        var pwd=document.getElementById(me.pwdInputID).value;
-                        //if(username.length<3){return;}//check the valid of username
-                        //if(pwd.length<6){return;}//check valid of password
-                        //request={task:[login|register|save|open],user:{name:username,pwd:password}}
-                        var request={taskname:"login",user:{name:`${username}`,pwd:`${pwd}`}};
+                    click: function() {
+                        var username=me.tool.getUsername();
+                        var filename=me.jqSelectList[0].selectedOptions[0].value;
+                        //request={taskname:[login|register|save|open],user:{name:username,pwd:password}}
+                        var request={taskname:"openfile",file:{username:`${username}`,filename:`${filename}`,folder:'.'}};
                         var jsonRequest=JSON.stringify(request);
                         WsAgent.send(jsonRequest);
-                    */}
+                    }
                 },
                
               "Cancel":{ 
@@ -583,10 +597,10 @@ class OpenFileDialog extends MyDialog{
                                  var jsonReq=JSON.stringify(taskreq)
              
                                 WsAgent.send(jsonReq);  
-                                //me.restetUI.call(me)
+                                me.resetUI.call(me);
                             } );
        
-
+   
     }
     //override 
     contentBar(){
@@ -848,7 +862,7 @@ class SaveDialog extends MyDialog{
                         var ip="fakeIP";//real IP will be set by server;
                         var folder='.';
                         
-                        var request={taskname:"savefile",file:{name:`${filename}`,username:`${username}`,content:`${content}`,folder:`${folder}`},time:`${time}`,ip:`${ip}`};
+                        var request={taskname:"savefile",file:{filename:`${filename}`,username:`${username}`,content:`${content}`,folder:`${folder}`},time:`${time}`,ip:`${ip}`};
                         var jsonRequest=JSON.stringify(request);
                         WsAgent.send(jsonRequest);
                                                
@@ -945,7 +959,7 @@ class LoadTool extends Command{
 class AppendTabTool extends Command{
     
     execute(event){
-        this.toolManager.editor.addTab();
+        this.toolManager.editor.createTab();
     }   
 }
 ////////////////////////////////
@@ -1139,7 +1153,7 @@ class TabSheetsHeader{
       
      appendTab(scene){
           var me=this;
-          var tag=$(`<span>'${scene.name}'</span>`);
+          var tag=$(`<span>${scene.name}</span>`);
           tag.addClass("navMenuCommon");
           this.tabSheetsContainer.append(tag);
           var sheet={tabTag:tag,tabScene:scene};
@@ -1161,8 +1175,14 @@ class TabSheetsHeader{
             }
          tag.trigger("click");
       }
-      deleteTab(){
-        
+      removeAllTabs(){
+        this.tabList=new Array();
+        this.tabSheetsContainer.empty();
+        var jsContainer=this.tabSheetsContainer[0];
+        var tags=jsContainer.childNodes;
+        for(let i=0;i<tags.length;i++)
+         tags.removeChild(list.childNodes[i]);
+
       }
       
       constructor(tabContainer,editor){

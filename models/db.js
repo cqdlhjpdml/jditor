@@ -22,7 +22,7 @@ class DB{
             timestamps: false
         });
         this.file = this.sequelize.define('file', {
-            name:{type:Sequelize.STRING,primaryKey:true},
+            filename:{type:Sequelize.STRING,primaryKey:true},
             username:{type:Sequelize.STRING,primaryKey:true},
             content:Sequelize.STRING,
             ip: Sequelize.STRING,
@@ -56,7 +56,7 @@ class DB{
       try{
           await this.file.create({
             username: file.username,
-            name:file.name,
+            filename:file.filename,
             content:file.content,
             ip:file.ip,           
             timestamp:file.timestamp,
@@ -66,12 +66,21 @@ class DB{
          }catch(err){return {succeed:false,msg:err};}
     }
     async getFileList(filter)
-    { 
-        return await this.file.findAll({attributes:[['name','filename']],
+    { try{
+        return await this.file.findAll({attributes:[['filename','filename']],
             where: filter
         })
+       }catch(err){return {succeed:false,msg:"获取文件列表失败"};}
     }
-     
+   async readFile(filter) {
+       try{
+        let r= await this.file.findAll({attributes:[['content','content']],
+                                          where: filter
+                                    })
+        return {succeed:true,msg:"读取文件成功！",content:r[0].content}
+    
+       }catch(err){return {succeed:false,msg:"文件内容加载失败！"}}
+   }  
   
 }
 /*some test statements

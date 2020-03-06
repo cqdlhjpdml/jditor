@@ -51,6 +51,8 @@ JTopo.FreeLink=FreeLink;
 //////////////////////////////////
 
 /////////////////////////////////
+
+
 JTopo.loadFromJson=function(jsonStr, canvas,stage) {
   eval("var jsonObj = " + jsonStr);
   if(!stage)
@@ -77,7 +79,7 @@ JTopo.loadFromJson=function(jsonStr, canvas,stage) {
 //////////////////////////////////////
 /*从JSON文件中加载时创建NODES*/
 JTopo.Nodes_Tables={};
-JTopo.createNode=function(nodeType,properties,scene){
+JTopo.createNode=function(nodeType,properties){
  
   var createFuns={};
   createFuns["node"]=function(){

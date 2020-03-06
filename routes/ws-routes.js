@@ -68,15 +68,42 @@ class getFileList_TaskHandler extends Task_Handler{
     return response;
   }
 }
+////////////////////////////////
+class OpenFile_TaskHandler extends Task_Handler{
+  async checkvalid(file){
+     //file:{filename:`${filename}`,username:`${username}`,content:`${jsonStr}`}
+     var filter={filename:file.filename,username:file.username,folder:file.folder};
+     if(!filter.filename||!filter.username||!filter.folder) return {succeed:false,msg:"[用户名|文件名|路径]不能为空！"};
+     else return {succeed:true,msg:"[用户名|文件名|路径]满足要求！"};
+  }
+  
+  
+  async getFileContent(file){
+    var response;
+    var r= await this.checkvalid(file);
+    if(!r.succeed) {
+      response={taskname:"openfile",result:r}
+      return response;
+    }
+    
+    var r=await this.db.readFile(file);
+    return {taskname:"openfile",result:r};
+  }
 
+  async doTask(taskReq){
+    this.taskReq=taskReq;
+    var file=taskReq.file;
+    return await this.getFileContent(file);
+  }
+}
 ////////////////////////////////
 class SaveFile_TaskHandler extends Task_Handler{
   async checkvalid(file){
-    //file:{name:`${filename}`,username:`${username}`,content:`${jsonStr}`}
-    var filter={name:file.name,username:file.username,folder:file.folder};
-    if(!filter.name||!filter.username||!filter.folder) return {succeed:false,msg:"[用户名|文件名|路径]不能为空！"};
+    //file:{filename:`${filename}`,username:`${username}`,content:`${jsonStr}`}
+    var filter={filename:file.filename,username:file.username,folder:file.folder};
+    if(!filter.filename||!filter.username||!filter.folder) return {succeed:false,msg:"[用户名|文件名|路径]不能为空！"};
     
-    var r=await this.db.getFiles(filter);
+    var r=await this.db.getFileList(filter);
     if(r.length!=0)      return {succeed:false,msg:"该文件已存在！" };
     else return {succeed:true,msg:"OK！"}
   }
@@ -145,6 +172,7 @@ taskRouter.addRouter('savefile',new SaveFile_TaskHandler("default-saveFile-handl
 taskRouter.addRouter('login',new Login_Register_TaskHandller("default-login-hanler",db));
 taskRouter.addRouter('register',new Login_Register_TaskHandller("default-register-handler",db));
 taskRouter.addRouter('getFileList',new getFileList_TaskHandler("default-getFilList-handler",db));
+taskRouter.addRouter('openfile',new OpenFile_TaskHandler("default-openfile-handler",db));
 //////////////////
 ////////////////////////////////
 

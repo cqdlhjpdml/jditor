@@ -36,7 +36,7 @@ class EditorEvent{
 const USER_LOGIN_EVENT="user_login_event";
 const FILE_SAVE_EVENT ="file-save-event";
 const GET_FILELIST_EVENT="get_fieList_event"
-
+const OPEN_FILE_EVENT="open_file_event"
 class TaskEvent{
   constructor(publisher,eventname,response)//eventInfo={succeed:true|false[,detail:detailInfo]}
   {
@@ -64,14 +64,18 @@ class WS_Agent{
           break;
       case "savefile":
            var saveFileEvent=new TaskEvent(this,FILE_SAVE_EVENT,response);
-           this.eventDispatcher.dispatchEvent(getFileListEvent);
+           this.eventDispatcher.dispatchEvent(saveFileEvent);
            break;
       case "getFileList":
            var getFileListEvent=new TaskEvent(this,GET_FILELIST_EVENT,response);
            this.eventDispatcher.dispatchEvent(getFileListEvent);
            break;
-      default:
-         throw(response.taskname+":"+"未定义的操作，服务器无法执行！")
+      case "openfile":
+           var openFileEvent=new TaskEvent(this,OPEN_FILE_EVENT,response)
+           this.eventDispatcher.dispatchEvent(openFileEvent);
+           break;      
+     default:
+         throw(response.taskname+":"+"未定义的操作，服务器返回信息无法处理！")
     }
   }
   constructor(serverAdress){
