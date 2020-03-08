@@ -61,8 +61,8 @@ class Tool{
       } 
    
    }
-  
-  
+   
+   
     setProperty(name,value){
       this[name]=value;
     }
@@ -173,20 +173,43 @@ class Tool{
           var y=event.y;
           var scene=event.scene;
           var me=scene.mouseHandlerObject;
-          var textNode = new JTopo.TextNode('新文本框');
-          textNode.font = 'bold 16px 微软雅黑';
+          var textNode = new JTopo.TextBox();
+          textNode.font = '16px 宋体';
           textNode.fontColor="#303030"
           textNode.setLocation(x, y);
           scene.add(textNode);
-          var args={};
-          args.obj=textNode;
-          args.scene=scene;
-          me.toolManager.actionManager.pushUndoAction(new JTopo.AddAction(args));
-          scene.removeEventListener("click");
-          me.toolManager.refresh(TASK_END);  
-          scene.removeEventListener("click");
-          scene.removeEventListener("click");
-          scene.mouseHandlerObject.toolManager.refresh(TASK_END);
+          textNode.text='新文本框';
+          
+          me.textEditor=$(`<textarea  style="width: 287px; position: absolute; top: 262px; left: 536.805px; margin: 0px; height: 29px; display: none;"\
+                        onkeydown="if(event.keyCode==13)this.blur();" ></textarea>`);
+          document.body.appendChild(me.textEditor[0]);
+          scene.dbclick(function(event){
+                            if(event.target == null) return;
+                            var e = event.target;
+                            me.textEditor.css({
+                                top: event.pageY,
+                                left: event.pageX - e.width/2
+                            }).show().attr('value', e.text).focus().select();
+                            e.text='';
+                            me.textEditor[0].textBox = e;
+                        });
+                        
+         me.textEditor.blur(function(){
+                         
+                         me.textEditor[0].textBox.text = me.textEditor.hide().val();
+                        
+                         
+                        });              
+         
+         var args={};
+         args.obj=textNode;
+         args.scene=scene;
+         me.toolManager.actionManager.pushUndoAction(new JTopo.AddAction(args));
+         scene.removeEventListener("click");
+         me.toolManager.refresh(TASK_END);  
+         scene.removeEventListener("click");
+         scene.removeEventListener("click");
+         scene.mouseHandlerObject.toolManager.refresh(TASK_END);
            
       }  
        setSceneMouseHandler(scene){

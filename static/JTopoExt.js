@@ -1,4 +1,4 @@
-
+"use strict"
 //Connector:special node can be Linked between each other.
 function Connector(owner){
     Connector.prototype.initialize.apply(this,null);
@@ -150,4 +150,35 @@ JTopo.Element.initialize=function(){
   while(t==(new Date).getTime());
   this._id = "" + (new Date).getTime()
 }
+//////////JTopo.TextBox:to fix the bug of JTopo.TextNode
+JTopo.TextBox=function(text){
+  this.text=text;
+  this.paint=this.paint = function(a) {
+    a.save();
+    a.font=this.font;
+    var w0=this.width;
+    var h0=this.height;
+    this.width = a.measureText(this.text).width;
+    this.height = a.measureText("田").width;
+    var dx=(this.width-w0)/2;
+    var dy=(this.height-h0)/2;
+    
+    a.translate(dx,dy);//fix the bug of the JTopo.TextNode,when first caculation, wrong this.width and this.height used int scene's paint function
+    a.beginPath();
+    a.font = this.font;
+    a.strokeStyle = "rgba(" + this.fontColor + ", " + this.alpha + ")";
+    a.fillStyle = "rgba(" + this.fontColor + ", " + this.alpha + ")";
+    a.fillText(this.text, -this.width / 2, this.height / 2);
+    a.closePath();
+    a.restore();
+    this.paintBorder(a);
+    this.paintCtrl(a);
+    this.paintAlarmText(a);
+    
+}
+return this;
+}
+JTopo.TextBox.prototype=new JTopo.TextNode();
+
+
 
