@@ -233,7 +233,69 @@ static getData(url,fnWin,fnFaild){
   }
 }
 }
-   ///////////////////
+   ///////竖排文字张旭鑫////////////
 
-   
+/**reference to :
+* @author zhangxinxu(.com)
+* @licence MIT
+* @description http://www.zhangxinxu.com/wordpress/?p=7362
+*updated by dingmingliang(jditor.com),2020-03-8
+*/
+CanvasRenderingContext2D.prototype.fillTextVertical = function (text, x0, y0) {
+  var context = this;
+  context.translate(x0,y0);//dml
+  var x=0,y=0;
+  
+  var arrText = text.split('');
+  var arrWidth = arrText.map(function (letter) {
+      return context.measureText(letter).width;
+  });
+  
+  var align = context.textAlign;
+  var baseline = context.textBaseline;
+  
+  if (align == 'left') {
+      x = x + Math.max.apply(null, arrWidth) / 2;
+  } else if (align == 'right') {
+      x = x - Math.max.apply(null, arrWidth) / 2;
+  }
+  if (baseline == 'bottom' || baseline == 'alphabetic' || baseline == 'ideographic') {
+      y = y - arrWidth[0] / 2;
+  } else if (baseline == 'top' || baseline == 'hanging') {
+      y = y + arrWidth[0] / 2;
+  }
+  
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  
+  // 开始逐字绘制
+  arrText.forEach(function (letter, index) {
+      // 确定下一个字符的纵坐标位置
+      var letterWidth = arrWidth[index];
+      // 是否需要旋转判断
+      var code = letter.charCodeAt(0);
+      if (code <= 256) {
+          
+          // 英文字符，旋转90°
+          context.rotate(90 * Math.PI / 180);
+          
+      } else if (index > 0 && text.charCodeAt(index - 1) < 256) {
+          // y修正
+          y = y + arrWidth[index - 1] / 2;
+      }
+      if(code<256)context.strokeText(letter, y, 0);//英文已旋转
+      // 旋转坐标系还原成初始态
+      else context.strokeText(letter, 0, y);//中文未旋转
+      if(code<256)context.rotate(-90 * Math.PI / 180);
+      // 确定下一个字符的纵坐标位置
+      if(index==0&&code==10&&index+1<arrText.length&&text.charCodeAt(index+1>=256))y=y+arrWidth[index+1];//开始为回车时，取下一字符宽度作为增量
+      else y=y+arrWidth[index];
+  });
+  // 水平垂直对齐方式还原
+  context.textAlign = align;
+  context.textBaseline = baseline;
+};
+
+
+  
   

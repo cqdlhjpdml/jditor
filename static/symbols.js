@@ -35,7 +35,7 @@ class SvgDrawService{
   static getDrawFunc(cmd){
           var fillStyle='none';
           function setCtx2dStyle(svgEle,ctx2d){
-            fillStyle=svgEle.getAttribute('fill');
+            var fillStyle=svgEle.getAttribute('fill');
             if(fillStyle!='none')ctx2d.fillStyle=fillStyle;
             ctx2d.strokeStyle=svgEle.getAttribute('stroke');
 
@@ -108,6 +108,12 @@ class SvgDrawService{
                   ctx2d.moveTo(X,Y);
                   cx=X,cy=Y;
                   break;
+                case 'l':
+                  X=parseFloat(getdata())+cx;
+                  Y=parseFloat(getdata())+cy;
+                  ctx2d.lineTo(X,Y);
+                  cx=X,cy=Y;
+                   break;
                 case 'L':
                    X=parseFloat(getdata());
                    Y=parseFloat(getdata());
@@ -143,7 +149,7 @@ class SvgDrawService{
               }
             }
             setCtx2dStyle(this,ctx2d);
-            if(fillStyle!='none')ctx2d.fill();
+            if(this.getAttribute('fill')!='none')ctx2d.fill();
             ctx2d.stroke();
             ctx2d.restore();
           }
@@ -168,10 +174,8 @@ class SvgDrawService{
             let points=this.points;
             let ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform')); 
             let len=points.length;
-            var fillcolor=this.getAttribute('fill');
-            var strokecolor=this.getAttribute('stroke');
-            if(strokecolor=="none") strokecolor="#000000"
             ctx2d.save();
+                      
             if(ctm)
                 ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);
             ctx2d.beginPath();
@@ -186,7 +190,7 @@ class SvgDrawService{
             }
             ctx2d.closePath();
             setCtx2dStyle(this,ctx2d)
-            if(fillStyle!='none')ctx2d.fill();
+            if(this.getAttribute('fill')!='none')ctx2d.fill();
             ctx2d.stroke();
             ctx2d.restore();
 
@@ -205,7 +209,7 @@ class SvgDrawService{
             ctx2d.strokeStyle=this.attributes["stroke"];
             ctx2d.arc(x,y, r, 0, Math.PI*2);
             setCtx2dStyle(this,ctx2d);
-            if(this.fillStyle!='none')ctx2d.fill();
+            if(this.getAttribute('fill')!='none')ctx2d.fill();
             ctx2d.stroke();
             ctx2d.closePath();
             ctx2d.restore();
@@ -228,7 +232,10 @@ class SvgDrawService{
               ctx2d.strokeStyle=this.attributes["stroke"];
               ctx2d.textAlign = "left";
               setCtx2dStyle(this,ctx2d)
-              ctx2d.strokeText(text,x,y);
+              if(this.getAttribute("writing-mode")=="tb")
+                {ctx2d.fillTextVertical(text, x, y) }
+              else 
+                 {ctx2d.strokeText(text,x,y);}
               ctx2d.restore();
           }
           //-----------------
