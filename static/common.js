@@ -243,6 +243,7 @@ static getData(url,fnWin,fnFaild){
 */
 CanvasRenderingContext2D.prototype.fillTextVertical = function (text, x0, y0) {
   var context = this;
+  context.save();
   context.translate(x0,y0);//dml
   var x=0,y=0;
   
@@ -294,6 +295,7 @@ CanvasRenderingContext2D.prototype.fillTextVertical = function (text, x0, y0) {
   // 水平垂直对齐方式还原
   context.textAlign = align;
   context.textBaseline = baseline;
+  context.restore();
 };
 
 

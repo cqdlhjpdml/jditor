@@ -534,6 +534,7 @@ class OpenFileDialog extends MyDialog{
         console.log(openFileEvent);
         var fileJson=openFileEvent.response.result.content;
         this.tool.toolManager.editor.loadFileFromJson(fileJson);
+        $(`#${this.id}` ).dialog("close");
         
     }
 
