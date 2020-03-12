@@ -168,6 +168,31 @@ class SvgDrawService{
             ctx2d.stroke();
             ctx2d.restore();
           }
+          //----------
+          funcs['polyline']=function(ctx2d,drawInos){
+            let points=this.points;
+            let ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform')); 
+            let len=points.length;
+            ctx2d.save();
+                      
+            if(ctm)
+                ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);
+            ctx2d.beginPath();
+            var startX =points[0].x;
+            var startY =points[0].y;
+            
+            ctx2d.moveTo(startX, startY);
+            for(var i = 1; i < len;i++) {
+            var newX =points[i].x;
+            var newY =points[i].y;
+            ctx2d.lineTo(newX, newY);
+            }
+            
+            setCtx2dStyle(this,ctx2d)
+            if(this.getAttribute('fill')!='none')ctx2d.fill();
+            ctx2d.stroke();
+            ctx2d.restore();
+          }
           //----------line end
           funcs['polygon']=function(ctx2d,drawInfos){ 
 
@@ -603,11 +628,96 @@ class SvgSymbols extends SymbolsLoader{
       }
   }
 }
-/////////////class ParserFactory///////////////
 */
+class Node{
+  constructor(){
+    this.attributes={};
+    this.childs=new Array();
+  }
+  setAttribute(name,value){this.attributes[name]=value;}
+  addChild(child){
+    this.childs.push(child);
+  }
+  getAttribute(name){return this.attributes[name]}
+}
+////////
+let pos=0;
+let len=content.length;
+const UNKOWN_TAG=0;
+const INVALID_SIGN=1;
+const INVALID_END=2
+var root=new Node();
+function parseSvg(root,content){
+  
+  function readword(){
+    var c=[' ','=']
+    skip();
+    let word='';
+    while(!c.includes(content[pos]))word+=content[pos++];
+    return word;
+  }
+  function readvalue(){
+    skip();
+    let value='';
+    if(content[pos]=='"') pos++;
+    while(content[pos]!='"'&&pos<len) value+=content[pos++];
+    if(pos==len) return INVALID_END;
+    pos++;
+    return value;
+  }
+  function getElementType(){
+    types=['path','polygon','rect','polyline','text','svg','g','circle'];
+    let elementType=getword();
+    if(types.includes(elmentType)) return elementType;
+    else return UNKOWN_TAG;
 
-/////////////class ParserFactory///////////////
+  }
+  function skip(){
+    var c=[' ','\n','\r','\t'];
+    while(c.includes(content[pos])&&pos<len) pos++;
+  }
+  function parseContent(){
+      skip();
 
+  };
+  function parseProperties(){
+    skip();
+    while(content[pos]!='/'&&content[pos]!='>'){
+    let name=readword();
+    skip();
+    if(content[pos]=='=') let value=readvalue();
+    node.setAttribute(name,value);
+    }
+
+  }
+  //--------------
+  
+  while(pos<len){
+    let node=new Node();
+    skip();if(pos==len) return;
+    if(content[pos]!='<') return;
+    let elementType=getElementType();
+    node.setAttribute('elementType',elementType);
+    skip();
+    if(content[pos]=='>'){//读取值和子元素
+      pos++;parseContent();
+    }
+    else {
+      parseProperties();
+      
+      if(content[pos]=='/'){
+        root.addChild(node);
+        pos++;
+        if(content[pos]=='>')continue;
+        else return INVALID_SIGN;
+      }
+      else if(content[pos]=='>'){pos++;}
+        
+    }
+
+
+  }
+}
 
 
 
