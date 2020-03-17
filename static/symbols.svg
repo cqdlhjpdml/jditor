@@ -289,8 +289,8 @@
 	<path d="M1049 614L1064.557 629.5574A22 22 0 0 1 1034.685 630.7007Z" fill="#000000" stroke="#000000" />
 	<g industry="thermal" group="阀门" device="turbine-main-valve-2" caption="turbine-main-valve-2" transform="matrix(0.84,0,0,0.84,-171.395,212.845)">
 		<circle cx="837.5" cy="494.5" r="14.5" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" transform="matrix(1.55,0,0,1.55,-463.6251,-91.97499)" />
-		<circle cx="838" cy="496" r="26" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" transform="matrix(1.15,0,0,1.15,-128.7,103.6)" />
-		<path d="M1049 614L1064.557 629.5574A22 22 0 0 1 1034.685 630.7007Z" fill="#000000" stroke="#000000" transform="matrix(-1.023,0.003,-0.002,-1.241,1909.644,1435.937)" />
-		<path d="M1049 614L1064.557 629.5574A22 22 0 0 1 1034.685 630.7007Z" fill="#000000" stroke="#000000" transform="matrix(1,0,0,1,-214,62)" />
+		<circle cx="838" cy="496.1294" r="26" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" transform="matrix(1.15,0,0,1.15,-128.7,103.6)" xmlns="http://www.w3.org/2000/svg" />
+		<path d="M1049.287 614.5928L1064.678 629.1393A22 22 0 0 1 1035.124 629.3827Z" fill="#000000" stroke="#000000" transform="matrix(-1.023,0.003,-0.002,-1.241,1909.644,1435.937)" xmlns="http://www.w3.org/2000/svg" />
+		<path d="M1049 614L1064.47 628.9584A22 22 0 0 1 1034.411 630.4465Z" fill="#000000" stroke="#000000" transform="matrix(1,0,0,1,-214,62)" xmlns="http://www.w3.org/2000/svg" />
 	</g>
 </svg>

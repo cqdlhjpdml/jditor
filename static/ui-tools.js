@@ -540,7 +540,121 @@ class MyDialog{
     }
     
 }
+////////////////////
+var Property_Config=[{propname:"borderColor",caption:"边框颜色",inputtype:"select",items:["read","white","green","pink","yellow","black","blue"]},
+                     {propname:"borderStyle",caption:"线型",inputtype:"select",items:["solid","dotted","dashed","double"]},
+                     {propname:"borderWidth",caption:"线宽",inputtype:"select",items:["1","2","3","4","5","6","0"]},
+                     {propname:"borderRadius",caption:"圆角半径",inputtype:"select",items:["0","1","2","3","4","5","6"]},
+                     {propname:"fill",caption:"填充",inputtype:"select",items:["read","white","green","pink","yellow","black","blue"]},
+                     {propname:"fontFace",caption:"字体",inputtype:"select",items:["宋体","华文仿宋","魏碑","隶书","微软雅黑","serif"]},
+                     {propname:"fontSize",caption:"字号",inputtype:"select",items:["5","6","7","8","9","10","11","12","13","14","15","16","17","18"]},
+                     {propname:"textPosition",caption:"文本位置",inputtype:"select",items:["left","right","top","bottom"]},
+                     {propname:"text",caption:"文本内容",inputtype:"input"}
+                     
+                    ];
+//////////////////////////////////
+class PropPanel extends MyDialog{
+    constructor(title,elementType){
+        super(title);
+        this.elementType=elementType;
+        this.create();        
+    }
+     //overridae
+     jqDialog(){
+       
+        $(`#${this.id}` ).dialog({
+            close:false,
+            autoOpen:false,
+            resizable: false,
+            height: "auto",
+            width: "auto",
+            modal: true,
+            buttons: {
+               "open":{
+                    text: "应用",
+                    
+                    click: function() {
+                      
+                    }
+                },
+               
+              "Cancel":{ 
+                text:"退出",
+                click:function(  ){ 
+                  $(`#${this.id}` ).dialog("close");
+                  
+                },
+              }
+          }});
+          
+          var me=this;
+          $(`#${this.id}`).on( "dialogopen", function(){
 
+                            } );
+       
+   
+    }
+    //override 
+    contentBar(){
+        this.jqContentBarID=CommonUtilities.getGuid();
+        this.jqContentBar=$(`<div id=${this.jqContentBarID}></div>`);
+        this.jqContentBar.css({"display": "grid",
+        "grid-template-columns": "50% 50%",
+        
+        "grid-row-gap": "8px",
+        "grid-column-gap": "8px"});
+        var jqLabel;
+        switch(this.elementType){
+           case "SvgNode":
+           for( let i=0 ;i<Property_Config.length;i++){
+             let config=Property_Config[i];
+             switch(config.inputtype){
+                case "select":
+                    this.selectListID=CommonUtilities.getGuid();
+                    this.jqSelectList=$(`<select id=${this.selectListID}></select>`);
+                    jqLabel=$(`<lable for=${this.selectListID}>${config.caption}</label>`);
+                    this.jqContentBar.append(jqLabel);
+                    for(let j=0;j<config.items.length;j++) {
+                        let optionvalue=config.items[j];
+                        let option=$(`<option>${optionvalue}</option>`)
+                        this.jqSelectList.append(option);
+                    } 
+                    this.jqContentBar.append(this.jqSelectList);
+                    break;
+                case "input":
+                    this.inputBoxID=CommonUtilities.getGuid();
+                    this.jqInputBox=$(`<input id=${this.selectListID}></input>`);
+                    jqLabel=$(`<lable for=${this.inputBoxID}>${config.caption}</label>`);
+                    this.jqContentBar.append(jqLabel);
+                    this.jqContentBar.append(this.jqInputBox);
+                    break;
+                default:
+                    break;
+           
+             }
+           
+           }
+           default:break;
+        }        
+        return this.jqContentBar;
+   }
+}
+//////////////
+class PropPanelFactory{
+    static getPropPanelInstance(title,elementType){
+        if(this.panels) {
+            if(this.panels[elementType])
+               return this.panels[elementType];
+        }
+        else {
+            this.panels=new Array();
+            var panel=new PropPanel(title,elementType);
+            this.panels[elementType]=panel;
+            return panel;
+        }
+    }
+
+}
 //////////////////////////////////////////////////////////
 class OpenFileDialog extends MyDialog{
     resetUI(){
@@ -599,7 +713,7 @@ class OpenFileDialog extends MyDialog{
                     click: function() {
                         var username=me.tool.getUsername();
                         var filename=me.jqSelectList[0].selectedOptions[0].value;
-                        //request={taskname:[login|register|save|open],user:{name:username,pwd:password}}
+                        //request={taskname:[login|register|save|open],file:{name:username,filename:fname,folder:folder}}
                         var request={taskname:"openfile",file:{username:`${username}`,filename:`${filename}`,folder:'.'}};
                         var jsonRequest=JSON.stringify(request);
                         WsAgent.send(jsonRequest);

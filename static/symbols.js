@@ -49,7 +49,7 @@ class SvgDrawService{
             function getdata(){
               var data='';
               var ctrls=['-',',',' ','M','m','V','v','L','l','C','c',
-              'S','s','Q','q','T','t','Z','z','H','h'];
+              'S','s','Q','q','T','t','Z','z','H','h','A','a'];
               for(;pos<len;)
               {
                 if(ctrls.includes(d[pos])) {
@@ -100,8 +100,105 @@ class SvgDrawService{
             
             for(;pos<len;){
               pathCmd=d[pos++];
-             
+              
               switch(pathCmd){
+                case 'A':
+                 function  radian( ux, uy, vx, vy ) {
+                       var  dot = ux * vx + uy * vy;
+                       var  mod = Math.sqrt( ( ux * ux + uy * uy ) * ( vx * vx + vy * vy ) );
+                       var  rad = Math.acos( dot / mod );
+                       if( ux * vy - uy * vx < 0.0 ) {
+                              rad = -rad;
+                       }
+                       return rad;
+                 }
+                // svg : [A | a] (rx ry x-axis-rotation large-arc-flag sweep-flag x y)+
+                // x1 y1 rx ry φ fA fS x2 y2
+                // sample :  svgArcToCenterParam(200,200,50,50,0,1,1,300,200)
+                function svgArcToCenterParam(x1, y1, rx, ry, phi, fA, fS, x2, y2) {
+                     var cx, cy, startAngle, deltaAngle, endAngle;
+                     var PIx2 = Math.PI * 2.0;
+                     if (rx < 0) {
+                        rx = -rx;
+                     }
+                     if (ry < 0) {
+                        ry = -ry;
+                     }
+                     if (rx == 0.0 || ry == 0.0) { // invalid arguments
+                             throw Error('rx and ry can not be 0');
+                     }
+                     var s_phi = Math.sin(phi);
+                     var c_phi = Math.cos(phi);
+                     var hd_x = (x1 - x2) / 2.0; // half diff of x
+                     var hd_y = (y1 - y2) / 2.0; // half diff of y
+                     var hs_x = (x1 + x2) / 2.0; // half sum of x
+                     var hs_y = (y1 + y2) / 2.0; // half sum of y
+                     // eq.5.1
+                     var x1_ = c_phi * hd_x + s_phi * hd_y;
+                     var y1_ = c_phi * hd_y - s_phi * hd_x;
+                     // eq.6.2 Correction of out-of-range radii
+                     //   Step 3: Ensure radii are large enough
+                     var lambda = (x1_ * x1_) / (rx * rx) + (y1_ * y1_) / (ry * ry);
+                     if (lambda > 1) {
+                        rx = rx * Math.sqrt(lambda);
+                        ry = ry * Math.sqrt(lambda);
+                     }
+                     var rxry = rx * ry;
+                     var rxy1_ = rx * y1_;
+                     var ryx1_ = ry * x1_;
+                     var sum_of_sq = rxy1_ * rxy1_ + ryx1_ * ryx1_; // sum of square
+                     if (!sum_of_sq) {
+                       throw Error('start point can not be same as end point');
+                     }
+                     var coe = Math.sqrt(Math.abs((rxry * rxry - sum_of_sq) / sum_of_sq));
+                     if (fA == fS) { coe = -coe; }
+                     // eq.5.2
+                    var cx_ = coe * rxy1_ / ry;
+                    var cy_ = -coe * ryx1_ / rx;
+                    // eq.5.3
+                    cx = c_phi * cx_ - s_phi * cy_ + hs_x;
+                    cy = s_phi * cx_ + c_phi * cy_ + hs_y;
+                    var xcr1 = (x1_ - cx_) / rx;
+                    var xcr2 = (x1_ + cx_) / rx;
+                    var ycr1 = (y1_ - cy_) / ry;
+                    var ycr2 = (y1_ + cy_) / ry;
+                    // eq.5.5
+                    startAngle = radian(1.0, 0.0, xcr1, ycr1);
+                    // eq.5.6
+                    deltaAngle = radian(xcr1, ycr1, -xcr2, -ycr2);
+                    while (deltaAngle > PIx2) { deltaAngle -= PIx2; }
+                    while (deltaAngle < 0.0) { deltaAngle += PIx2; }
+                    if (fS == false || fS == 0) { deltaAngle -= PIx2; }
+                    endAngle = startAngle + deltaAngle;
+                    while (endAngle > PIx2) { endAngle -= PIx2; }
+                    while (endAngle < 0.0) { endAngle += PIx2; }
+                    var outputObj = { /* cx, cy, startAngle, deltaAngle */
+                           cx: cx,
+                           cy: cy,
+                           startAngle: startAngle,
+                           deltaAngle: deltaAngle,
+                           endAngle: endAngle,
+                           clockwise: !fS
+                     }
+                      return outputObj;
+
+                   }
+                   //rx ry x-axis-rotation large-arc-flag sweep-flag x y
+                   
+                   let rx=parseFloat(getdata());
+                   let ry=parseFloat(getdata());
+                   let phi=parseFloat(getdata());
+                   let fA=parseInt(getdata());
+                   let fS=parseInt(getdata());
+                   let xto=parseFloat(getdata());
+                   let yto=parseFloat(getdata());
+                   let out=svgArcToCenterParam(cx, cy, rx, ry, phi, fA, fS, xto, yto);
+                   
+                   //ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise)
+                   //参数的意思：(圆心x,圆心y,半径x,半径y,旋转的角度，起始角，结果角，顺时针还是逆时针)
+                   ctx2d.ellipse(out.cx,out.cy,rx,ry,phi,out.startAngle,out.endAngle,out.clockwise);
+                  
+                   break;
                 case 'M':
                   X=parseFloat(getdata());
                   Y=parseFloat(getdata());
@@ -389,248 +486,11 @@ function SvgNode(selector,text){
         
     }
     this.initialize(selector,text);
-  
+    var me=this;
+    this.dbclick(function(event){
+      var panel=PropPanelFactory.getPropPanelInstance("属性设置",me.elementType);
+      panel.show();
+    })
 }
 SvgNode.prototype=new JTopo.Node();
 JTopo.SvgNode=SvgNode;
-//////////////////////////////// 
-
-//////////////////////////////
-/*this is a native implement of SVGDraw,but not finished yet
-class SvgSymbols extends SymbolsLoader{
-  constructor(symbolSrc){
-    super(symbolSrc);
-      
-  }
-  
-  getDrawFunc(cmd){
-   var eles=new Array();
-    //<polygon points="190.25 241.75,220 231,219.75 270.5,190.25 260.75" fill="#FFFFFF" stroke="#000000" 
-    //stroke-opacity="1" stroke-width="0.25" class="turbine" transform="matrix(2.19,0,0,1.31,-239.099,-77.732)" 
-    //xmlns="http://www.w3.org/2000/svg" />
-       
-      
-       
-       
-      
-       var funcs=new Array();
-       funcs['default']=function(){
-           var f=function (){};
-           f.prototype.draw=function(){};
-           return f;
-
-       }
-       //////polygon begin  //////
-       /////call :   for(oneEle of this.svgEles){  oneEle['draw'](ctx2d);}
-      
-       funcs['polygon']=function(ctx2d,oneEle,drawInfos){ 
-           //container---container Rect's info=[center_x,center_y,width,height]
-            
-            let points=oneEle['points'].split(/[\s,]+/) ; 
-            let len=points.length;
-            let k=0;
-            for(;k<len;k++) points[k]=parseFloat(points[k]);
-            
-            ctx2d.save();
-            let transform=oneEle['transform'];
-            var transformedPoints=new Array(); 
-            var transformed=null;
-           
-               //         a  c  e
-//matrix      //          b  d  f
-               //         0  0  1
-              // transform="matrix(a,b,c,d,e,f)"        
-                var infos=transform.split("(");
-                var command=infos[0];
-                infos[1]=infos[1].slice(0,-1);
-                var datas=infos[1].split(",")
-               
-                
-                switch(command){
-                  case "matrix":
-                  transformed=true;
-                  for(k=0;k<datas.length;k++) datas[k]=parseFloat(datas[k]);
-                  
-                  for(k=0;k<points.length;)
-                  {
-                      transformedPoints[k]=datas[0]*points[k]+datas[2]*points[k+1]+datas[4]*1;
-                      transformedPoints[k+1]=datas[1]*points[k]+datas[3]*points[k+1]+datas[5]*1;
-                      k=k+2;
-                  }
-
-                 ctx2d.transform(datas[0],datas[1],datas[2],datas[3],0,0);//0,0 ---ingores the translate action,it has been
-                                                                           //fineshed by user's codes.
-                 
-                  break;
-                  default:
-                }
-                
-            
-            
-            let min_x=points[0],min_y=points[1];
-            let max_x=points[0],max_y=points[1]; 
-            k=2;
-            for(;k<len;){
-                if(points[k]<min_x) min_x=points[k];
-                if(points[k]>max_x) max_x=points[k];
-                k++;
-                if(points[k]<min_y) min_y=points[k];
-                if(points[k]>max_y) max_y=points[k];
-                k++;
-            } 
-               
-           // ctx2d.transform(zomm_scale_x,0,0,zomm_scale_y,0,0);//0,0 ---ingores the translate action,it has been
-                                                                           //fineshed by user's codes.
-           // ctx2d.transform(zomm_scale_x*datas[0],datas[1],datas[2],zomm_scale_y*datas[3],0,0);//0,0 ---ingores the translate action,it has been
-           //                                                                //fineshed by user's codes.
-            let sym_cx=(min_x+max_x)/2-min_x;
-            let sym_cy=(min_y+max_y)/2-min_y;
-            let dx=sym_cx-drawInfos.center_x,dy=sym_cy-drawInfos.center_y;
-            for(let k=0;k<len;){
-                points[k]=points[k]- min_x-dx;k++;
-                points[k]=points[k]- min_y-dy;k++
-            } 
-            
-
-            ctx2d.beginPath();
-            var startX =parseInt(points[0]);
-            var startY =parseInt(points[1]);
-            ctx2d.moveTo(startX, startY);
-            for(var i = 2; i < len;) {
-            var newX =parseInt(points[i++]);
-            var newY =parseInt(points[i++]);
-            ctx2d.lineTo(newX, newY);
-            }
-            ctx2d.closePath();
-            ctx2d.stroke();
-            ctx2d.restore();
-      }
-       /////////polygon end
-      if(funcs[cmd]) return funcs[cmd];
-      else return  funcs['default'];
-
-  }
-  /////////getDrawFunc end  ////////////////
-  parser(cmd ,srcObj){
-    var svg=new Array(); 
-    svg['cmd']=cmd;
-    for(var ch=srcObj.current();[' ','\n','\t','\r'].indexOf(ch)!=-1;srcObj.cursorForward(),ch=srcObj.current());
-     var attrname='',value='';
-     for(;;srcObj.cursorForward()){
-         if(srcObj.current()=='/'&&srcObj.getNext()=='>'){srcObj.cursorForward();srcObj.cursorForward();break;}
-         if(srcObj.current()=='>'){srcObj.cursorForward();break;}
-         if(srcObj.current()==' ')continue;
-         for(;srcObj.current()!='=';srcObj.cursorForward()) attrname=attrname+srcObj.current();
-         srcObj.cursorForward();
-         if(srcObj.current()=="'"||srcObj.current()=='"') {var quote=srcObj.current();srcObj.cursorForward();}
-         else  break;
-         for(;srcObj.current()!=quote;srcObj.cursorForward())   value=value+srcObj.current();
-        
-         svg[attrname]=value; 
-         attrname='';value='';   
-
-     }
-   
-    
-    return svg;
-    
- }
- //--------------------
- 
- //--------------------------
- genSymbols(){
-    var svgEles=new Array();
-    var srcObj={symbolSrc:this.symbolSrc,pos:0,
-              cursorForward: function(){this.pos++;},
-              cursorBackward:function(){this.pos--;},
-              current: function(){var pos=this.pos;return this.symbolSrc[pos] ;},
-              len:function(){return this.symbolSrc.length},
-              isEnd:function(){return this.pos==this.symbolSrc.length;},
-              sub:function(begin,end){var subStr='';
-                for(var i=begin;i<=end;i++) subStr+=this.symbolSrc[i] ;
-                return subStr;
-               },
-             getchar:function(position){return this.symbolSrc[position]},
-             getNext:function(){return this.symbolSrc[this.pos+1]},
-             getPosition:function(){return this.pos;}            }
-    
-    this.genSvgSymbols(svgEles,srcObj);
-    var me=this;
-    var symbolsObj={symbols:svgEles,draw:function (ctx2d,drawInfos){
-        for(let oneEle of this.symbols){
-            if(drawInfos.classSelector) if(oneEle['class']!=drawInfos.classSelector) break;
-            me.getDrawFunc(oneEle['cmd'])(ctx2d,oneEle,drawInfos);
-        }
-      }
-    }
-    this.symbolsObj=symbolsObj;
-    return symbolsObj;
- }
- //svg Sample:<polygon points="190.25 241.75,220 231,219.75 270.5,190.25 260.75" fill="#FFFFFF" 
- //stroke="#000000" stroke-opacity="1" stroke-width="0.25" class="turbine" 
- //transform="matrix(2.19,0,0,1.31,-239.099,-77.732)" />
-//	<text x="195" y="251" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12"
-// fill="#FFFFFF" stroke="#000000" stroke-opacity="1" baseline-shift="baseline" 
-//transform="matrix(1.05,0,0,0.981,-32.628,9.535)" class="turbine">
-//turbine	</text>     
-  genSvgSymbols(node,srcObj){
-           
-      for(var ch=srcObj.current();[' ','\n','\t','\r'].indexOf(ch)!=-1;srcObj.cursorForward(),ch=srcObj.current());
-      for(;!srcObj.isEnd();srcObj.cursorForward()){
-        for(ch=srcObj.current();[' ','\n','\t','\r'].indexOf(ch)!=-1;srcObj.cursorForward(),ch=srcObj.current());
-        if(srcObj.current()!='<') return null;//文法错
-        if(srcObj.current()&&srcObj.getNext()=='/') break;//task searching brother finished;
-        var cmd='';
-             srcObj.cursorForward();
-             for(;srcObj.current()!=' '&&srcObj.current()!='>';srcObj.cursorForward()){
-                 var cmd=cmd+srcObj.current();;
-            }     
-            var oneSvg=this.parser(cmd,srcObj);
-            node.push(oneSvg);
-            if(oneSvg==null) return;/////?????????
-            var k=srcObj.getPosition()-2,endWord='';
-            endWord=srcObj.sub(k,k+1);
-            if(endWord=='/>') continue;//parse brothers
-            k=srcObj.getPosition();
-            if(srcObj.getchar(k)!='/'){//not end with '/>',now to parse childs or content
-            var content='';  
-             for(ch=srcObj.current();[' ','\n','\t','\r'].indexOf(ch)!=-1;srcObj.cursorForward(),ch=srcObj.current());
-                var ch=srcObj.getNext();
-                if(ch=='/') {
-                    content=NOTHING,oneSvg['content']=content;}
-                else if(srcObj.current()=='<'){
-                    
-                    var childs=new Array();
-                    this.genSvgSymbols(childs,srcObj);
-                    oneSvg['childs']=childs;
-                }
-                   else {
-                        
-                        //some content
-                        for(srcObj.cursorBackward();srcObj.current()!='<';srcObj.cursorForward()) content=content+srcObj.current();
-                        
-        
-                        oneSvg['content']=content; 
-                       }
-               
-                               
-                for(ch=srcObj.current();[' ','\n','\t','\r'].indexOf(ch)!=-1;srcObj.cursorForward(),ch=srcObj.current());
-                
-                if(srcObj.current()!='<') return null;//语法错误
-                srcObj.cursorForward();
-                if(srcObj.current()!='/') return null;//语法错误
-                srcObj.cursorForward();
-                var k=0;
-                for(;srcObj.current()!='>';srcObj.cursorForward(),k++)  if(cmd[k]!=srcObj.current()) return null;//文法错误         
-                k++; 
-            }  
-
-      }
-  }
-}
-*/
-
-
-
-
-
