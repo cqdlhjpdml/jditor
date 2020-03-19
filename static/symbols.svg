@@ -25,39 +25,26 @@
 		</style>
 	</defs>
 	<g industry="thermal" group="汽轮机" device="single-turbine" caption="turbine">
-		<polygon points="190.25 241.75,218.8553 234.4316,218.6088 270.1148,190.25 260.75" fill="#FFFFFF" stroke="#000000" stroke-opacity="1" stroke-width="0.25" transform="matrix(2.19,-0.004,0.002,1.31,-239.434,-77.254)" class="turbine" />
-		<text x="195" y="251" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="#FFFFFF" stroke="#000000" stroke-opacity="1" baseline-shift="baseline" transform="matrix(1.05,0,0,0.981,-32.628,9.535)" class="turbine">
-		
-		turbine
-			</text>
-	</g>
-	<g industry="thermal" group="汽轮机" device="low-turbine" caption="low-turbine">
-		<g transform="matrix(1,0,0,1,10,-16)">
-			<polygon points="34 240,83 258,83 294,34 309" fill="#FFFFFF" stroke="#000000" transform="matrix(1,0,0,1,1,1)" />
-			<polygon points="133 241,83 258,83 294,133 308" fill="#FFFFFF" stroke="#000000" transform="matrix(1,0,0,1,2,1)" />
-		</g>
-		<text x="70" y="259" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="#000000" stroke="none" stroke-opacity="0" baseline-shift="baseline" transform="matrix(1,0,0,1,18,5)">
-		  低压缸</text>
-		<text x="70" y="259" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="#000000" stroke="none" stroke-opacity="0" baseline-shift="baseline" transform="matrix(1,0,0,1,-32,5)">
-		  低压缸</text>
-	</g>
+		<polygon points="190.2491 242.5535,214.8322 236.4308,214.7619 266.1283,190.5381 259.9471" fill="#FFFFFF" stroke="#000000" stroke-opacity="1" stroke-width="0.25" transform="matrix(3.482,-0.006,0.003999999,2.489,-489.326,-464.752)" class="turbine" xmlns="http://www.w3.org/2000/svg" />
+			</g>
+	<g industry="thermal" group="汽轮机" device="low-turbine" caption="low-turbine" transform="matrix(1.24,0,0,1.37,104.2,-96.015)" xmlns="http://www.w3.org/2000/svg">
+<g transform="matrix(1,0,0,1,10,-16)">
+<polygon points="34 240,83 258,83 294,34 309" fill="#FFFFFF" stroke="#000000" transform="matrix(1,0,0,1,1,1)" stroke-width="0.25" xmlns="http://www.w3.org/2000/svg" />
+<polygon points="133 241,83 258,83 294,133 308" fill="#FFFFFF" stroke="#000000" transform="matrix(1,0,0,1,2,1)" stroke-width="0.25" xmlns="http://www.w3.org/2000/svg" />
+</g>
+</g>
 	<text x="212.75" y="257.25" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="#000000" stroke="none" stroke-opacity="0" baseline-shift="baseline">
 	</text>
 	<text x="201.25" y="247" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="#000000" stroke="none" stroke-opacity="0" baseline-shift="baseline">
 	</text>
 	<ellipse cx="329.75" cy="264" rx="0" ry="0" fill="#FFFFFF" stroke="#000000" />
-	<g industry="thermal" group="发电机" device="motor" caption="motor">
-		<circle cx="277.75" cy="250.75" r="18.5" fill="#FFFFFF" stroke="#000000" transform="matrix(1.53,0,0,1.53,-106.09,-133.1)" class="motor" />
-		<text x="307" y="247.5" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="#FFFFFF" stroke="#000000" baseline-shift="baseline" class="motor" transform="matrix(2,0,0,1.56,-333.5,-129.062)">
+	<g industry="thermal" group="发电机" device="motor" caption="motor" transform="matrix(1,0,0,1,-239,0)" xmlns="http://www.w3.org/2000/svg">
+<circle cx="277.75" cy="250.75" r="18.5" fill="#FFFFFF" stroke="#000000" transform="matrix(1.53,0,0,1.53,-106.09,-133.1)" class="motor" />
+<text x="307" y="247.5" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="#FFFFFF" stroke="#000000" baseline-shift="baseline" class="motor" transform="matrix(2,0,0,1.56,-333.5,-129.062)">
 			G</text>
-	</g>
+</g>
 	<polyline points="255 128" fill="#FFFFFF" stroke="#000000" stroke-width="0.25" />
-	<g symbolType="Hello" transform="matrix(1.465,0,0,1.389,-112.252,-106.617)">
-		<circle cx="150.9922" cy="186.2738" r="18.5" fill="#FFFFFF" stroke="#000000" transform="matrix(1.53,0,0,1.53,-106.09,-133.1)" />
-		<text x="97" y="153" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="none" fill-opacity="0" stroke="#000000" baseline-shift="baseline">
-		Hello</text>
-	</g>
-	<text x="130" y="150" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="none" fill-opacity="0" stroke="#000000" baseline-shift="baseline">
+		<text x="130" y="150" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="none" fill-opacity="0" stroke="#000000" baseline-shift="baseline">
 	</text>
 	<text x="128" y="148" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="none" fill-opacity="0" stroke="#000000" baseline-shift="baseline">
 	</text>
@@ -97,35 +84,35 @@
 		<line x1="500" y1="101.5" x2="500" y2="111.25" stroke="#000000" transform="matrix(1,0,0,1,1,0)" />
 	</g>
 	<polyline points="440 72" fill="#000000" stroke="#000000" />
-	<g industry="thermal" group="加热器" device="seg1-heater" caption="seg1-heater">
-		<rect x="59" y="299" width="38" height="29" fill="none" stroke="#000000" transform="matrix(1.06,0,0,1.073,28.69496,16.58284)" />
-		<g transform="matrix(1,0,0,1,30.875,-34.625)">
-			<line x1="71" y1="403" x2="71" y2="381" stroke="#000000" transform="matrix(1.18,0,0,1.07,-14.025,-27.46606)" />
-			<line x1="71" y1="381.5" x2="79.57627" y2="400.2018" stroke="#000000" transform="matrix(1.18,0,0,1.07,-13.9,-27.46608)" />
-			<line x1="79.99999" y1="399.7346" x2="89.5339" y2="381.2766" stroke="#000000" transform="matrix(1.18,0,0,1.07,-14.4,-27.466)" />
-			<line x1="89.5" y1="380.75" x2="89.5" y2="402.75" stroke="#000000" transform="matrix(1.18,0,0,1.07,-14.4,-27.466)" />
-		</g>
-	</g>
+	<g industry="thermal" group="加热器" device="seg1-heater" caption="seg1-heater" transform="matrix(1,0,0,1,325,-58)" xmlns="http://www.w3.org/2000/svg">
+<rect x="59" y="299" width="38" height="29" fill="none" stroke="#000000" transform="matrix(1.06,0,0,1.073,28.69496,16.58284)" />
+<g transform="matrix(1,0,0,1,30.875,-34.625)">
+<line x1="71" y1="403" x2="71" y2="381" stroke="#000000" transform="matrix(1.18,0,0,1.07,-14.025,-27.46606)" />
+<line x1="71" y1="381.5" x2="79.57627" y2="400.2018" stroke="#000000" transform="matrix(1.18,0,0,1.07,-13.9,-27.46608)" />
+<line x1="79.99999" y1="399.7346" x2="89.5339" y2="381.2766" stroke="#000000" transform="matrix(1.18,0,0,1.07,-14.4,-27.466)" />
+<line x1="89.5" y1="380.75" x2="89.5" y2="402.75" stroke="#000000" transform="matrix(1.18,0,0,1.07,-14.4,-27.466)" />
+</g>
+</g>
 	<line x1="154" y1="361.75" x2="154" y2="361.75" stroke="#000000" />
-	<g industry="thermal" group="加热器" device="seg3-heater" caption="seg3-heater">
-		<rect x="145" y="338" width="93" height="30" fill="none" fill-opacity="0" stroke="#000000" transform="matrix(1,0,0,1,0,-0.125)" />
-		<line x1="171" y1="340" x2="171" y2="366.4425" stroke="#000000" transform="matrix(0.9999999,0,0,1.13,0.7499998,-46.20507)" />
-		<line x1="210" y1="340" x2="210.0002" y2="367.1884" stroke="#000000" transform="matrix(0.9999999,0,0,1.09,-2.375194,-32.61039)" />
-		<line x1="145.1586" y1="341.6962" x2="151.2215" y2="352.5974" stroke="#000000" transform="matrix(0.9299999,0,0,0.7899999,18.739,83.323)" />
-		<line x1="154.5" y1="361.5" x2="154.5" y2="344.875" stroke="#000000" transform="matrix(1,0,0,1,4.875,0)" />
-		<line x1="154.625" y1="345" x2="159.125" y2="353.875" stroke="#000000" transform="matrix(1,0,0,1,4.875,0)" />
-		<line x1="154.625" y1="345" x2="159.125" y2="353.875" stroke="#000000" transform="matrix(1,0,0,1,30,8.25)" />
-		<line x1="154.625" y1="345" x2="159.125" y2="353.875" stroke="#000000" transform="matrix(1,0,0,1,34.75,0.25)" />
-		<line x1="154.5" y1="361.5" x2="154.5" y2="344.875" stroke="#000000" transform="matrix(1,0,0,1,34.75,0.375)" />
-		<line x1="154.5" y1="361.5" x2="154.5" y2="344.875" stroke="#000000" transform="matrix(1,0,0,1,68.5,0)" />
-		<line x1="154.625" y1="345" x2="159.125" y2="353.875" stroke="#000000" transform="matrix(1,0,0,1,64.125,8.375)" />
-		<line x1="154.625" y1="345" x2="159.125" y2="353.875" stroke="#000000" transform="matrix(1,0,0,1,68.5,0.25)" />
-		<line x1="153.875" y1="353.375" x2="144.875" y2="353.375" stroke="#000000" transform="matrix(1,0,0,1,0.25,0)" />
-		<line x1="166.5" y1="353.375" x2="144.875" y2="353.375" stroke="#000000" transform="matrix(1,0,0,1,18.75,0.25)" />
-		<line x1="153.875" y1="353.375" x2="144.875" y2="353.375" stroke="#000000" transform="matrix(1,0,0,1,48.5,0.375)" />
-		<line x1="199.25" y1="334.125" x2="180.125" y2="334.125" stroke="#000000" transform="matrix(1,0,0,1,20.25,19.625)" />
-		<line x1="155.625" y1="353.375" x2="144.875" y2="353.375" stroke="#000000" transform="matrix(1,0,0,1,82.375,0.625)" />
-	</g>
+	<g industry="thermal" group="加热器" device="seg3-heater" caption="seg3-heater" transform="matrix(1,0,0,1,242,-132)" xmlns="http://www.w3.org/2000/svg">
+<rect x="145" y="338" width="93" height="30" fill="none" fill-opacity="0" stroke="#000000" transform="matrix(1,0,0,1,0,-0.125)" />
+<line x1="171" y1="340" x2="171" y2="366.4425" stroke="#000000" transform="matrix(0.9999999,0,0,1.13,0.7499998,-46.20507)" />
+<line x1="210" y1="340" x2="210.0002" y2="367.1884" stroke="#000000" transform="matrix(0.9999999,0,0,1.09,-2.375194,-32.61039)" />
+<line x1="145.1586" y1="341.6962" x2="151.2215" y2="352.5974" stroke="#000000" transform="matrix(0.9299999,0,0,0.7899999,18.739,83.323)" />
+<line x1="154.5" y1="361.5" x2="154.5" y2="344.875" stroke="#000000" transform="matrix(1,0,0,1,4.875,0)" />
+<line x1="154.625" y1="345" x2="159.125" y2="353.875" stroke="#000000" transform="matrix(1,0,0,1,4.875,0)" />
+<line x1="154.625" y1="345" x2="159.125" y2="353.875" stroke="#000000" transform="matrix(1,0,0,1,30,8.25)" />
+<line x1="154.625" y1="345" x2="159.125" y2="353.875" stroke="#000000" transform="matrix(1,0,0,1,34.75,0.25)" />
+<line x1="154.5" y1="361.5" x2="154.5" y2="344.875" stroke="#000000" transform="matrix(1,0,0,1,34.75,0.375)" />
+<line x1="154.5" y1="361.5" x2="154.5" y2="344.875" stroke="#000000" transform="matrix(1,0,0,1,68.5,0)" />
+<line x1="154.625" y1="345" x2="159.125" y2="353.875" stroke="#000000" transform="matrix(1,0,0,1,64.125,8.375)" />
+<line x1="154.625" y1="345" x2="159.125" y2="353.875" stroke="#000000" transform="matrix(1,0,0,1,68.5,0.25)" />
+<line x1="153.875" y1="353.375" x2="144.875" y2="353.375" stroke="#000000" transform="matrix(1,0,0,1,0.25,0)" />
+<line x1="166.5" y1="353.375" x2="144.875" y2="353.375" stroke="#000000" transform="matrix(1,0,0,1,18.75,0.25)" />
+<line x1="153.875" y1="353.375" x2="144.875" y2="353.375" stroke="#000000" transform="matrix(1,0,0,1,48.5,0.375)" />
+<line x1="199.25" y1="334.125" x2="180.125" y2="334.125" stroke="#000000" transform="matrix(1,0,0,1,20.25,19.625)" />
+<line x1="155.625" y1="353.375" x2="144.875" y2="353.375" stroke="#000000" transform="matrix(1,0,0,1,82.375,0.625)" />
+</g>
 	<g industry="nature" group="云朵" device="grey-cloud" caption="grey-cloud" transform="matrix(1.665,0,0,1.64,133.635,-415.219)" fill="#990000">
 		<path d="M342.235,274.75c16.542-11.613-9.099-22.903-52.929-15.806 c5.788-12.904-57.895-20.322-77.747-2.582c-4.134-10.322-81.873-8.064-72.774,5.806c-26.468-7.096-71.126,6.775-43.834,20.323 c-27.292,5.161-21.503,22.581,13.229,22.903c-5.785,7.741,14.891,18.063,59.549,11.29c0,5.482,35.563,20.967,65.337,0.967 c6.617,9.677,62.853,17.418,71.127-0.967c15.711,3.87,64.507,1.289,48.792-17.419 C367.046,297.331,391.858,277.008,342.235,274.75z" transform="matrix(0.1770213,0,0,0.4159021,415.1923,249.6881)" fill="#999999" stroke="#333333" />
 	</g>
@@ -133,18 +120,18 @@
 	</text>
 	<text x="96" y="253" xml:space="preserve" font-family="Microsoft YaHei UI" font-size="12" fill="#000000" stroke="none" stroke-opacity="0" baseline-shift="baseline">
 	</text>
-	<g industry="thermal" group="凝汽器" device="simple-condensor" caption="simple-condensor">
-		<circle cx="132.5" cy="437.5" r="20.5" fill="#FFFFFF" stroke="#000000" transform="matrix(1,0,0,1,0,1.5)" />
-		<line x1="160" y1="430.5" x2="122.5" y2="430.5" stroke="#000000" />
-		<line x1="122.5" y1="430.5" x2="146" y2="440.75" stroke="#000000" />
-		<line x1="145.75" y1="440.25" x2="122.5" y2="448" stroke="#000000" transform="matrix(1,0,0,1,0,0)" />
-		<line x1="122.5" y1="445" x2="160.5" y2="445" stroke="#000000" transform="matrix(1,0,0,1,-0.5,3.5)" />
-	</g>
-	<g industry="thermal" group="水泵" device="water-pump" caption="water-pump">
-		<circle cx="269" cy="446" r="28" fill="none" stroke="#000000" stroke-opacity="1" transform="matrix(0.468,0,0,0.468,157.47,226.634)" />
-		<line x1="562" y1="465" x2="600.5" y2="426.5" stroke="#000000" transform="matrix(0.24,0.212,-0.24,0.212,247.096,218.04)" />
-		<polygon points="592 417,619 404,613 434" fill="#000000" stroke="#000000" transform="matrix(0.216,0.232,-0.263,0.19,269.16,215.217)" />
-	</g>
+	<g industry="thermal" group="凝汽器" device="simple-condensor" caption="simple-condensor" transform="matrix(1,0,0,1,304,-59)" xmlns="http://www.w3.org/2000/svg">
+<circle cx="132.5" cy="437.5" r="20.5" fill="#FFFFFF" stroke="#000000" transform="matrix(1,0,0,1,0,1.5)" />
+<line x1="160" y1="430.5" x2="122.5" y2="430.5" stroke="#000000" />
+<line x1="122.5" y1="430.5" x2="146" y2="440.75" stroke="#000000" />
+<line x1="145.75" y1="440.25" x2="122.5" y2="448" stroke="#000000" transform="matrix(1,0,0,1,0,0)" />
+<line x1="122.5" y1="445" x2="160.5" y2="445" stroke="#000000" transform="matrix(1,0,0,1,-0.5,3.5)" />
+</g>
+	<g industry="thermal" group="水泵" device="water-pump" caption="water-pump" transform="matrix(-1.48,0,0,1.48,857.0021,-199.995)" xmlns="http://www.w3.org/2000/svg">
+<circle cx="269" cy="446" r="28" fill="none" stroke="#000000" stroke-opacity="1" transform="matrix(0.468,0,0,0.468,157.47,226.634)" />
+<line x1="562" y1="465" x2="600.5" y2="426.5" stroke="#000000" transform="matrix(0.24,0.212,-0.24,0.212,247.096,218.04)" />
+<polygon points="592 417,619 404,613 434" fill="#000000" stroke="#000000" transform="matrix(0.216,0.232,-0.263,0.19,269.16,215.217)" />
+</g>
 	<g industry="nature" group="水体" device="river" transform="matrix(1,0,0,2.381,518,-915.661)">
 		<path d="M151.714,400.815c-13.841,9.425-24.292,9.069-37.613,0 c-12.976-8.827-25.601-9.243-39.18,0c-14.323,9.743-23.771,8.714-36.572,0c-13.579-9.243-24.553-8.884-37.613,0l4.432,5.362 c10.75-7.313,18.005-7.313,28.747,0c16.138,10.981,29.299,10.981,45.438,0c10.621-7.229,19.69-7.229,30.313,0 c16.292,11.089,30.19,11.084,46.479,0c10.925-7.429,16.264-7.429,27.181,0l4.435-5.362 C174.183,391.572,165.301,391.572,151.714,400.815zM33.914,369.794c16.138,10.978,29.299,10.978,45.438,0 c10.621-7.232,19.69-7.232,30.313,0c16.292,11.085,30.19,11.085,46.479,0c10.925-7.434,16.264-7.434,27.181,0l4.435-5.362 c-13.578-9.243-22.46-9.243-36.047,0c-13.841,9.421-24.292,9.065-37.613,0c-12.976-8.827-25.601-9.243-39.18,0 c-14.323,9.743-23.771,8.71-36.572,0c-13.579-9.243-24.553-8.888-37.613,0l4.432,5.362 C15.917,362.483,23.172,362.483,33.914,369.794zM151.714,382.624c-13.841,9.42-24.292,9.065-37.613,0 c-12.976-8.827-25.601-9.243-39.18,0c-14.323,9.743-23.771,8.71-36.572,0c-13.579-9.243-24.553-8.883-37.613,0l4.432,5.362 c10.75-7.313,18.005-7.313,28.747,0c16.138,10.978,29.299,10.978,45.438,0c10.621-7.229,19.69-7.229,30.313,0 c16.292,11.085,30.19,11.085,46.479,0c10.925-7.434,16.264-7.434,27.181,0l4.435-5.362 C174.183,373.38,165.301,373.38,151.714,382.624z" transform="matrix(0.003,0.497,-0.877,0.004,816.88,420.448)" fill="#999999" stroke="#333333" />
 		<text x="510.5" y="452" xml:space="preserve" writing-mode="tb" font-family="Microsoft YaHei UI" font-size="12" fill="#999999" stroke="#333333">
@@ -157,7 +144,7 @@
 	</g>
 	<line x1="746" y1="106" x2="746" y2="106" stroke="#333333" />
 	<g industry="thermal" group="Valve" device="electric-valve-closed" caption="electric-valve-closed">
-		<g  stroke="#000000" transform="matrix(1,0,0,1,340,301)">
+		<g stroke="#000000" transform="matrix(1,0,0,1,340,301)">
 			<polygon points="180 110,220 130,220 110,180 130" fill="#000000" stroke="#000000" stroke-opacity="1" />
 		</g>
 		<g transform="matrix(0.595,0,0,0.595,96.196,354.744)">
@@ -276,21 +263,22 @@
 	</g>
 	<g>
 		<circle cx="837.5" cy="494.5" r="14.5" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" />
-		<circle cx="838" cy="496" r="26" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" transform="matrix(1,0,0,1,0,-1)" />
+		<circle cx="838" cy="496" r="26" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" transform="matrix(1,0,0,1,-1,-1)" xmlns="http://www.w3.org/2000/svg" />
 		<line x1="847.5" y1="485" x2="828.5" y2="505" stroke="#000000" stroke-width="0.25" />
 		<line x1="828" y1="484" x2="847" y2="505" stroke="#000000" stroke-width="0.25" />
 	</g>
-	<g industry="thermal" group="阀门" device="turbine-main-valve" caption="turbine-main-valve" transform="matrix(1,0,0,1,-304,208)">
-		<circle cx="837.5" cy="494.5" r="14.5" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" />
-		<circle cx="838" cy="496" r="26" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" transform="matrix(1,0,0,1,0,-1)" />
-		<line x1="847.5" y1="485" x2="828.5" y2="505" stroke="#000000" stroke-width="0.25" />
-		<line x1="828" y1="484" x2="847" y2="505" stroke="#000000" stroke-width="0.25" />
-	</g>
+	<g industry="thermal" group="阀门" device="turbine-main-valve" caption="turbine-main-valve" transform="matrix(0.71,0,0,0.71,-61.27,351.55)" xmlns="http://www.w3.org/2000/svg">
+<circle cx="837.5" cy="494.5" r="14.5" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" />
+<circle cx="838" cy="496" r="26" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" transform="matrix(1,0,0,1,-1,-1)" />
+<line x1="847.5" y1="485" x2="828.5" y2="505" stroke="#000000" stroke-width="0.25" />
+<line x1="828" y1="484" x2="847" y2="505" stroke="#000000" stroke-width="0.25" />
+</g>
 	<path d="M1049 614L1064.557 629.5574A22 22 0 0 1 1034.685 630.7007Z" fill="#000000" stroke="#000000" />
-	<g industry="thermal" group="阀门" device="turbine-main-valve-2" caption="turbine-main-valve-2" transform="matrix(0.84,0,0,0.84,-171.395,212.845)">
-		<circle cx="837.5" cy="494.5" r="14.5" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" transform="matrix(1.55,0,0,1.55,-463.6251,-91.97499)" />
-		<circle cx="838" cy="496.1294" r="26" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" transform="matrix(1.15,0,0,1.15,-128.7,103.6)" xmlns="http://www.w3.org/2000/svg" />
-		<path d="M1049.287 614.5928L1064.678 629.1393A22 22 0 0 1 1035.124 629.3827Z" fill="#000000" stroke="#000000" transform="matrix(-1.023,0.003,-0.002,-1.241,1909.644,1435.937)" xmlns="http://www.w3.org/2000/svg" />
-		<path d="M1049 614L1064.47 628.9584A22 22 0 0 1 1034.411 630.4465Z" fill="#000000" stroke="#000000" transform="matrix(1,0,0,1,-214,62)" xmlns="http://www.w3.org/2000/svg" />
-	</g>
+	<g industry="thermal" group="阀门" device="turbine-main-valve-2" caption="turbine-main-valve-2" transform="matrix(0.63,0,0,0.63,3.962,354.424)" xmlns="http://www.w3.org/2000/svg">
+<circle cx="837.5" cy="494.5" r="14.5" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" transform="matrix(1.55,0,0,1.55,-463.6251,-91.97499)" />
+<circle cx="838" cy="496.1294" r="26" fill="none" fill-opacity="0" stroke="#000000" stroke-width="0.25" transform="matrix(1.15,0,0,1.15,-128.7,103.6)" />
+<path d="M1049.287 614.5928L1064.678 629.1393A22 22 0 0 1 1035.124 629.3827Z" fill="#000000" stroke="#000000" transform="matrix(-1.023,0.003,-0.002,-1.241,1909.644,1435.937)" />
+<path d="M1049 614L1064.47 628.9584A22 22 0 0 1 1034.411 630.4465Z" fill="#000000" stroke="#000000" transform="matrix(1,0,0,1,-214,62)" />
+</g>
+<polygon points="190.25 241.75,219.4301 234.0312,219.3533 269.3535,190.25 260.75" fill="#FFFFFF" stroke="#000000" stroke-opacity="1" stroke-width="0.25" transform="matrix(-3.482,-0.006000001,-0.004000001,2.489,936.1934,-245.752)" class="turbine" xmlns="http://www.w3.org/2000/svg" />
 </svg>

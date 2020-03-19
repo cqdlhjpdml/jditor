@@ -1057,7 +1057,6 @@ class SaveDialog extends MyDialog{
 }
 //////////////////////////////////
 
-
 //////////////////////////////////
 class SaveTool extends Command{
     constructor(toolItem,toolMannager){
@@ -1222,36 +1221,7 @@ JTopo.MoveAction=MoveAction;
 JTopo.AddAction=AddAction;
 JTopo.LinkAction=LinkAction;
   ////////////////////////////////////
-  
-
-
-////////////////////
-class PopMenu{
-    appendMenu(toolItem){
-         var tool=toolItem.toolClass.getInstance(toolItem,this.toolManager)
-         this.ul.appendChild(tool.getProperty("menu"));
-
-    }
-    constructor(anchor,toolManager){
-        this.toolManager=toolManager;
-        this.anchor=anchor;
-        var ul=document.createElement("ul");
-        ul.setAttribute("class","contextmenu");
-        this.ul=ul;
-        document.body.appendChild(ul);
-        ul.visible=false;
-        anchor.onclick=function(event){
-               // 当前位置弹出菜单（div）
-               $(".contextmenu").css({
-                top: event.pageY,
-                left: event.pageX
-            }).show();	
-        }
-    }
-
-}
-
-
+ 
 //////////////////////////////////
 class TabSheetsHeader{
       construct(tabContainer){
@@ -1480,14 +1450,14 @@ class ToolManager{
     }
     /********************/
     createMenus(toolGroup){
-      var me=this;
+      /*var me=this;
       var navMenu=$("<span></span");
       var htmlStr=toolGroup.name;
       var navMenu=navMenu.html(htmlStr);
       navMenu.addClass("navMenuCommon");
             
       this.nav_bar.append(navMenu);
-      var popMenu=new PopMenu(navMenu[0]);
+      var popMenu=new PopMenu(navMenu[0],this);
            
       toolGroup.toolItems.forEach(function(toolItem) {
               
@@ -1495,7 +1465,7 @@ class ToolManager{
               
           
       })
-      
+      */
   }
     //--------create tool buttons
     createToolGroup(toolGroup){
