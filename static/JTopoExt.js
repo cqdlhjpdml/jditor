@@ -31,7 +31,13 @@ function FreeLink(nodeA,nodeZ,text){
     this.serializedProperties.push("nodeZ_id");
 
  }
-  
+this.setCenterLocation=function(x,y){
+  var x0=this.cx,y0=this.cy;
+  var dx=x-x0,dy=y-y0;
+  var a=this.nodeA,z=this.nodeZ;
+  a.setCenterLocation(a.cx+dx,a.cy+dy)
+  z.setCenterLocation(z.cx+dx,z.cy+dy)
+} 
 this.clickHandler = function(a) {
   if(this.showAZ==false){
     this.nodeA.visible=true;
@@ -163,7 +169,7 @@ JTopo.TextBox=function(text){
     var dx=(this.width-w0)/2;
     var dy=(this.height-h0)/2;
     
-    a.translate(dx,dy);//fix the bug of the JTopo.TextNode,when first caculation, wrong this.width and this.height used int scene's paint function
+    a.translate(dx,dy);//fix the bug of the JTopo.TextNode,when first caculation, get wrong this.width and this.height used int scene's paint function
     a.beginPath();
     a.font = this.font;
     a.strokeStyle = "rgba(" + this.fontColor + ", " + this.alpha + ")";
@@ -179,6 +185,8 @@ JTopo.TextBox=function(text){
 return this;
 }
 JTopo.TextBox.prototype=new JTopo.TextNode();
+///////////////////////////////////////////////
+
 
 
 

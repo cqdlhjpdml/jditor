@@ -40,7 +40,7 @@ class Page{
     /*
     var pft=this.pageFormat;
     
-    var pageBox=new this.editor.drawObj.DisplayElement();
+    var pageBox=new this.editor.jtopo.DisplayElement();
      pageBox.paint=function(cxt2d){
      cxt2d.lineWidth =1;
      cxt2d.strokeStyle = "#cccccc";//线条的颜色
@@ -57,7 +57,7 @@ class Page{
     this.pageEditRegionHeight=(this.pageFormat.height-this.pageFormat.pageUpSpace-this.pageFormat.pageDownSpace)*this.pageFormat.pageScale;
     */
     /*
-    var editRegion=new this.editor.drawObj.DisplayElement();
+    var editRegion=new this.editor.jtopo.DisplayElement();
     editRegion.paint=function(cxt2d){
         cxt2d.strokeStyle="#dddddd";
         cxt2d.lineWidth=0;
@@ -130,39 +130,30 @@ class MyEditor{
         JTopo.svgDom=svgDom;})
 
     }
-    constructor(divContainer,drawObj){   
+    constructor(workAreaID,jtopo){   
         this.eventDispatcher=new EventDispatcher();
-        this.drawObj=drawObj ;
-        this.username="dml";console.log("statement for debug");;
-        this.scenes={};
-              
-        var con=$('#'+divContainer);
-
-        this.toolManager=new ToolManager(con,this);       
-           
-        this.tabSheetsManager=new TabSheetsManager(con,this);
-
-        var contentContainer=$("<div></div>");
-        contentContainer.addClass("wrapper");
-        con.append(contentContainer);
+        this.jtopo=jtopo ;
         var canvas=$( " <canvas id='canvas' ></canvas>");
         canvas.addClass("editorCanvas");
-        contentContainer.append(canvas);
         this.canvas=$(canvas)[0]; 
         this.canvas.width=0;this.canvas.height=10;
         this.cxt2d=this.canvas.getContext('2d');
-        this.stage=new this.drawObj.Stage(this.canvas);
+        this.stage=new this.jtopo.Stage(this.canvas);
+        this.username="dml";console.log("statement for debug");;
+        this.scenes={};
+        var workArea=$('#'+workAreaID);
+        this.toolManager=new ToolManager(workArea,this);       
+        this.tabSheetsManager=new TabSheetsManager(workArea,this);
+        var canvasWrapper=$("<div></div>");
+        canvasWrapper.addClass("wrapper");
+        workArea.append(canvasWrapper);
+        canvasWrapper.append(canvas);
         this.createTab("pageScene");
         //this.stage.mode="edit"   ;// you must set stage's mode after scene added        
         this.toolManager.createTools(this.currentScene); 
         this.pages=new Array();//
         this.initilize();
-        
         this.addPage(this,"pageScene",PageFormat.DefaultPageA4);
-        
-       
-        
-        
     }
     setCursor(cursor){
         this.stage.cursor=cursor;
@@ -197,7 +188,7 @@ class MyEditor{
         for(name in this.scenes){
             if(tabname==name){ alert(`${tabname}命名冲突`); throw `${tabname}命名冲突`;return false;}
          }
-        var scene= new this.drawObj.Scene(); 
+        var scene= new this.jtopo.Scene(); 
         scene.name=tabname;
         this.scenes[tabname]=scene;
         scene.mode="edit";
