@@ -12,8 +12,12 @@ const main = (ctx) => {
   ctx.response.body = pug.renderFile(path.join(__dirname,Config.viewpath)+'/index.pug');
   console.log(ctx.response.body);
 };
-router.get("/",main);
-
+const index= (ctx) => {
+  ctx.response.body = pug.renderFile(path.join(__dirname,Config.viewpath)+'/index.html');
+  console.log(ctx.response.body);
+};
+router.get("/",index);
+router.get("/demo.html",main);
 const getDir=(ctx,next)=>{
   console.log(ctx);next();
 }

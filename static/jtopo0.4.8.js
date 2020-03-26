@@ -2025,6 +2025,96 @@ function(a) {
         ,
         this.preDelta=0;//dml,not rotated.
         this.mousedragHandler = function(a) {
+            var dx=a.dx,dy=a.dy;
+            var tx=dx*Math.cos(-this.rotate)-dy*Math.sin(-this.rotate);
+            var ty=dx*Math.sin(-this.rotate)+dy*Math.cos(-this.rotate);
+            if(this.mDragging==0) this.mDragging=1;//this line added by dml.1--begin to drag
+            else if(this.mDragging==1) this.mDragging=2;//this line added by dml. 2---in dragging process
+            if (null == this.selectedPoint) {
+                var b = this.selectedLocation.x + a.dx
+                  , c = this.selectedLocation.y + a.dy;
+                this.setLocation(b, c),
+                //dml begin,move its connectors fllowing the node being dragging
+                this.connectors.forEach(function(cn) {
+                    var b = cn.selectedLocation.x + a.dx
+                    , c = cn.selectedLocation.y + a.dy;
+                    cn.setLocation(b, c) 
+                });
+                //dml end
+                this.dispatchEvent("mousedrag", a)
+            } else {
+                
+                if ("Top_Left" == this.selectedPoint) {
+                    var d = this.selectedSize.width - tx
+                      , e = this.selectedSize.height - ty
+                      , b = this.selectedLocation.x + tx
+                      , c = this.selectedLocation.y + ty;
+                    b < this.x + this.width && (this.x = b,
+                    this.width = d),
+                    c < this.y + this.height && (this.y = c,
+                    this.height = e)
+                } else if ("Top_Center" == this.selectedPoint) {
+                    var e = this.selectedSize.height - a.dy
+                      , c = this.selectedLocation.y + a.dy;
+                    c < this.y + this.height && (this.y = c,
+                    this.height = e)
+                } else if ("Top_Right" == this.selectedPoint) {
+                    var d = this.selectedSize.width + a.dx
+                      , c = this.selectedLocation.y + a.dy;
+                    c < this.y + this.height && (this.y = c,
+                    this.height = this.selectedSize.height - a.dy),
+                    d > 1 && (this.width = d)
+                } else if ("Middle_Left" == this.selectedPoint) {
+                    var d = this.selectedSize.width - a.dx
+                      , b = this.selectedLocation.x + a.dx;
+                    b < this.x + this.width && (this.x = b),
+                    d > 1 && (this.width = d)
+                } else if ("Middle_Right" == this.selectedPoint) {
+                    var d = this.selectedSize.width + a.dx;
+                    d > 1 && (this.width = d)
+                } else if ("Bottom_Left" == this.selectedPoint) {
+                    var d = this.selectedSize.width - a.dx
+                      , b = this.selectedLocation.x + a.dx;
+                    d > 1 && (this.x = b,
+                    this.width = d);
+                    var e = this.selectedSize.height + a.dy;
+                    e > 1 && (this.height = e)
+                } else if ("Bottom_Center" == this.selectedPoint) {
+                    var e = this.selectedSize.height + a.dy;
+                    e > 1 && (this.height = e)
+                } else if ("Bottom_Right" == this.selectedPoint) {
+                    var d = this.selectedSize.width + a.dx;
+                    d > 1 && (this.width = d);
+                    var e = this.selectedSize.height + a.dy;
+                    e > 1 && (this.height = e)
+                }else if("Rotate_Handle"==this.selectedPoint){//dml begin,dragging to rotate the node
+                    if(!this.mDragging) mDragging=true;
+                    var delta=0; 
+                    console.log(a.dx,a.dy,a.offsetX,a.offsetY,"\n");
+                    var theta1=Math.atan2(a.offsetY-a.dy-this.cy,a.offsetX-a.dx-this.cx);
+                    var theta2=Math.atan2(a.offsetY-this.cy,a.offsetX-this.cx);
+                    delta=theta2-theta1;
+                    let t=delta;
+                    if(this.mDragging==2){delta=delta-this.preDelta;}
+                    this.preDelta=t;
+                    this.rotate=this.rotate+delta;
+                    var owner=this;
+                    this.connectors.forEach(function(cn) {//function to rotate the connectors when node rotating
+                        var  y1=cn.cy-owner.cy,x1=cn.cx-owner.cx,  
+                        theta1=Math.atan2(y1,x1),
+                        r=Math.sqrt(y1*y1+x1*x1),
+                        x2=r*Math.cos(theta1+delta)+owner.cx,
+                        y2=r*Math.sin(theta1+delta)+owner.cy;
+                        //console.log(owner.cy,owner.cx,r)
+                        cn.setCenterLocation(x2, y2) 
+                    });
+                    this.dispatchEvent("onRotated",delta);
+                    return;
+                }//dml end
+                this.dispatchEvent("onResize", a);//dml this line added by dml
+            }
+        }
+        /*this.mousedragHandler = function(a) {
             if(this.mDragging==0) this.mDragging=1;//this line added by dml.1--begin to drag
             else if(this.mDragging==1) this.mDragging=2;//this line added by dml. 2---in dragging process
             if (null == this.selectedPoint) {
@@ -2109,7 +2199,7 @@ function(a) {
                 }//dml end
                 this.dispatchEvent("onResize", a);//dml this line added by dml
             }
-        }
+        }*/
     }
     b.prototype = new a.Element,
     Object.defineProperties(b.prototype, {
