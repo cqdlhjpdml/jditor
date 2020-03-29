@@ -38,7 +38,7 @@ class SvgDrawService{
             var fillStyle=svgEle.getAttribute('fill');
             if(fillStyle!='none')ctx2d.fillStyle=fillStyle;
             ctx2d.strokeStyle=svgEle.getAttribute('stroke');
-
+            
           }     
           var funcs=new Array();
           funcs['default']=function(){
@@ -272,7 +272,7 @@ class SvgDrawService{
             let ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform')); 
             let len=points.length;
             ctx2d.save();
-                      
+            ctx2d.lineWidth=1.5;          
             if(ctm)
                 ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);
             ctx2d.beginPath();
@@ -382,10 +382,11 @@ class SvgDrawService{
           //----------rect end----------------------
           funcs['g']=function(ctx2d,drawInfos){
              ctx2d.save();
+             ctx2d.lineWidth=1.5;//default width
              setCtx2dStyle(this,ctx2d);         
              if(this.parentNode.nodeName!="g"){
              var box=this.getClientRects()[0];
-             ctx2d.translate(-box.x,-box.y);
+             ctx2d.translate(-box.x,-box.y);//将符号左上角定位原始坐标原点
              }
              var ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform'));
              if(ctm)
@@ -471,7 +472,7 @@ function SvgNode(selector,text){
      this.customPaint=function(ctx2d){
           ctx2d.save();
           
-          ctx2d.translate(-this.width/2,-this.height/2);
+          ctx2d.translate(-this.width/2,-this.height/2);//group符号的draw函娄中会将符号左向角定位到原始坐标原点，scene绘制符号前会将原点移到符号矩形框中心,此语句再将原点移到矩形框的左上角
           
           ctx2d.transform(this.svgScaleX,0,0,this.svgScaleY,0,0);
           for(var i=0;i<this.svgElements.length;i++){

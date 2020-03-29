@@ -1,8 +1,9 @@
+var path=require('path');
 var ENV_CONFIG={
     "connection": {
       "sqlite3": {
             "dialect": "sqlite",
-            "storage": "d:/jditor/data/test.db"
+            "storage": path.resolve(__dirname,'data/test.db')
       },
     
       "mysql": {
@@ -35,10 +36,10 @@ var ENV_CONFIG={
     "staticpath":"static",
     "viewpath":"views",
     "webSocketPort":3001,
-    "httpPort":80
+    "httpPort":3000
   }
   
   module.exports=ENV_CONFIG;
-
+console.log(ENV_CONFIG.connection.sqlite3)
 
   
