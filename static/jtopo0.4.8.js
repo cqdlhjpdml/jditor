@@ -1690,11 +1690,12 @@ function(a) {
             this
         }
         ,
-        this.getCenterLocation = function() {
-            return {
+        this.getCenterLocation = function() {  
+             return {
                 x: this.x + this.width / 2,
                 y: this.y + this.height / 2
             }
+          
         }
         ,
         this.setCenterLocation = function(a, b) {
@@ -2046,14 +2047,14 @@ function(a) {
             } else {
                 
                 if ("Top_Left" == this.selectedPoint) {
-                    var d = this.selectedSize.width - tx
-                      , e = this.selectedSize.height - ty
-                      , b = this.selectedLocation.x + tx
-                      , c = this.selectedLocation.y + ty;
+                    var d = this.selectedSize.width - a.dx
+                      , e = this.selectedSize.height -a.dy
+                      , b = this.selectedLocation.x + a.dx
+                      , c = this.selectedLocation.y + a.dy;
                     b < this.x + this.width && (this.x = b,
-                    this.width = d),
+                    this.width =d),
                     c < this.y + this.height && (this.y = c,
-                    this.height = e)
+                    this.height=e)
                 } else if ("Top_Center" == this.selectedPoint) {
                     var e = this.selectedSize.height - a.dy
                       , c = this.selectedLocation.y + a.dy;
