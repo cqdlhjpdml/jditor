@@ -2028,6 +2028,7 @@ function(a) {
             var dx=a.dx,dy=a.dy;
             var tx=dx*Math.cos(-this.rotate)-dy*Math.sin(-this.rotate);
             var ty=dx*Math.sin(-this.rotate)+dy*Math.cos(-this.rotate);
+           
             if(this.mDragging==0) this.mDragging=1;//this line added by dml.1--begin to drag
             else if(this.mDragging==1) this.mDragging=2;//this line added by dml. 2---in dragging process
             if (null == this.selectedPoint) {
@@ -2254,6 +2255,7 @@ function(a) {
         this.initialize(c),
         this.customPaint=function(ctx2d){}//this line added by dml
         this.paint = function(a) {
+            
             if(this.customPaintMode==1){this.customPaint(a); return;}//this line added by dml
             if (this.image) {
                 var b = a.globalAlpha;
