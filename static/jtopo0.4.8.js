@@ -2026,7 +2026,8 @@ function(a) {
         ,
         this.preDelta=0;//dml,not rotated.
         this.mousedragHandler = function(a) {
-            var dx=a.dx,dy=a.dy;
+            var dx=a.dx,dy=a.dy,dr=Math.sqrt(dx*dx+dy*dy);
+
             var tx=dx*Math.cos(-this.rotate)-dy*Math.sin(-this.rotate);
             var ty=dx*Math.sin(-this.rotate)+dy*Math.cos(-this.rotate);
             if(this.mDragging==0) this.mDragging=1;//this line added by dml.1--begin to drag
@@ -2046,14 +2047,47 @@ function(a) {
             } else {
                 
                 if ("Top_Left" == this.selectedPoint) {
-                    var d = this.selectedSize.width - a.dx
+                   /* var d = this.selectedSize.width - a.dx
                       , e = this.selectedSize.height -a.dy
                       , b = this.selectedLocation.x + a.dx
                       , c = this.selectedLocation.y + a.dy;
                     b < this.x + this.width && (this.x = b,
                     this.width =d),
                     c < this.y + this.height && (this.y = c,
-                    this.height=e)
+                    this.height=e)*/
+                    let theta;
+                    if(dx==0) if(dy>0) theta=Math.PI/2; else theta=Math.PI*3/2;
+                    if(dy==0) if(dx>0) theta=0;else theta=Math.PI;
+                    if(dx==0&&dy==0) return;
+                    if(dx!=0&&dy!=0)theta=Math.atan2(dy,dx);
+                    var width_n=this.selectedSize.width-dr*Math.cos(theta-this.rotate);
+                    var height_n=this.selectedSize.height-dr*Math.sin(theta-this.rotate);
+                    var xrb=this.selectedSize.width/2;
+                    var yrb=this.selectedSize.height/2;
+                    var xrb_r=xrb*Math.cos(this.rotate)-yrb*Math.sin(this.rotate);
+                    var yrb_r=xrb*Math.sin(this.rotate)+yrb*Math.cos(this.rotate);
+                    xrb_ra=xrb_r+this.selectedLocation.x+this.selectedSize.width/2;
+                    yrb_ra=yrb_r+this.selectedLocation.y+this.selectedSize.height/2;
+                    var xlt_a=a.offsetX;
+                    var ylt_a=a.offsetY;
+                    var xc_a=(xrb_ra+xlt_a)/2;
+                    var yc_a=(yrb_ra+ylt_a)/2;
+                    var da=Math.atan2(height_n,width_n)-Math.atan2(this.selectedSize.height,this.selectedSize.width);
+                    var dxlt=xlt_a-xc_a;
+                    var dylt=ylt_a-yc_a;
+                    var dxlt0=dxlt*Math.cos(-this.rotate+da)-dylt*Math.sin(-this.rotate+da);
+                    var dylt0=dxlt*Math.sin(-this.rotate+da)+dylt*Math.cos(-this.rotate+da);
+                    var xlt0_a=dxlt0+xc_a;
+                    var ylt0_a=dylt0+yc_a;
+                  
+                    if(xlt0_a< this.x + this.width){
+                       this.x = xlt0_a;
+                       this.width =width_n
+                    }
+                    if(ylt0_a < this.y + this.height){
+                        this.y = ylt0_a;
+                        this.height=height_n;
+                    }
                 } else if ("Top_Center" == this.selectedPoint) {
                     var e = this.selectedSize.height - a.dy
                       , c = this.selectedLocation.y + a.dy;
@@ -2091,7 +2125,7 @@ function(a) {
                 }else if("Rotate_Handle"==this.selectedPoint){//dml begin,dragging to rotate the node
                     if(!this.mDragging) mDragging=true;
                     var delta=0; 
-                    console.log(a.dx,a.dy,a.offsetX,a.offsetY,"\n");
+                   
                     var theta1=Math.atan2(a.offsetY-a.dy-this.cy,a.offsetX-a.dx-this.cx);
                     var theta2=Math.atan2(a.offsetY-this.cy,a.offsetX-this.cx);
                     delta=theta2-theta1;
