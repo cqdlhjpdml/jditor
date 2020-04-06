@@ -2073,14 +2073,14 @@ function(a) {
                     var ylt_a=a.offsetY;
                     var xc_a=(xrb_ra+xlt_a)/2;
                     var yc_a=(yrb_ra+ylt_a)/2;
-                    var da=Math.atan2(height_n,width_n)-Math.atan2(this.selectedSize.height,this.selectedSize.width);
+                   
                     var dxlt=xlt_a-xc_a;
                     var dylt=ylt_a-yc_a;
-                    var dxlt0=dxlt*Math.cos(-this.rotate+da)-dylt*Math.sin(-this.rotate+da);
-                    var dylt0=dxlt*Math.sin(-this.rotate+da)+dylt*Math.cos(-this.rotate+da);
+                    var dxlt0=dxlt*Math.cos(-this.rotate)-dylt*Math.sin(-this.rotate);
+                    var dylt0=dxlt*Math.sin(-this.rotate)+dylt*Math.cos(-this.rotate);
                     var xlt0_a=dxlt0+xc_a;
                     var ylt0_a=dylt0+yc_a;
-                  
+                    
                     if(xlt0_a< this.x + this.width){
                        this.x = xlt0_a;
                        this.width =width_n
