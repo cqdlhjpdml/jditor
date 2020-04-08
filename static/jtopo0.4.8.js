@@ -2024,8 +2024,101 @@ function(a) {
             return d.prototype.isInBound.apply(this, arguments)
         }
         ,
+        this.dragHandlers=new Array();
+        this.dragHandlers['Top_Left']=function(event){
+            let dx=event.dx,dy=event.dy,dr=Math.sqrt(dx*dx+dy*dy);
+            let theta;
+            if(dx==0) if(dy>0) theta=Math.PI/2; else theta=Math.PI*3/2;
+            if(dy==0) if(dx>0) theta=0;else theta=Math.PI;
+            if(dx==0&&dy==0) return;
+            if(dx!=0&&dy!=0)theta=Math.atan2(dy,dx);
+            var width_n=this.selectedSize.width-dr*Math.cos(theta-this.rotate);
+            var height_n=this.selectedSize.height-dr*Math.sin(theta-this.rotate);
+            var xrb=this.selectedSize.width/2;
+            var yrb=this.selectedSize.height/2;
+            var xrb_r=xrb*Math.cos(this.rotate)-yrb*Math.sin(this.rotate);
+            var yrb_r=xrb*Math.sin(this.rotate)+yrb*Math.cos(this.rotate);
+            xrb_ra=xrb_r+this.selectedLocation.x+this.selectedSize.width/2;
+            yrb_ra=yrb_r+this.selectedLocation.y+this.selectedSize.height/2;
+            var xlt_a=event.offsetX;
+            var ylt_a=event.offsetY;
+            var xc_a=(xrb_ra+xlt_a)/2;
+            var yc_a=(yrb_ra+ylt_a)/2;
+           
+            var dxlt=xlt_a-xc_a;
+            var dylt=ylt_a-yc_a;
+            var dxlt0=dxlt*Math.cos(-this.rotate)-dylt*Math.sin(-this.rotate);
+            var dylt0=dxlt*Math.sin(-this.rotate)+dylt*Math.cos(-this.rotate);
+            var xlt0_a=dxlt0+xc_a;
+            var ylt0_a=dylt0+yc_a;
+            
+            if(xlt0_a< this.x + this.width){
+               this.x = xlt0_a;
+               this.width =width_n
+            }
+            if(ylt0_a < this.y + this.height){
+                this.y = ylt0_a;
+                this.height=height_n;
+            }
+        };
+        this.dragHandlers["Bottom_Right"]=function(event){
+           
+            let dx=event.dx,dy=event.dy,dr=Math.sqrt(dx*dx+dy*dy);
+            let theta;
+            if(dx==0&&dy==0) return;
+            if(dx==0) if(dy>0) theta=Math.PI/2; else theta=Math.PI*3/2;
+            if(dy==0) if(dx>0) theta=0;else theta=Math.PI;
+            if(dx!=0&&dy!=0)theta=Math.atan2(dy,dx);
+            var xlt=-this.selectedSize.width/2;
+            var ylt=-this.selectedSize.height/2;
+            var xlt_r=xlt*Math.cos(this.rotate)-ylt*Math.sin(this.rotate);
+            var ylt_r=xlt*Math.sin(this.rotate)+ylt*Math.cos(this.rotate);
+            var xlt_ra=xlt_r+this.selectedLocation.x+this.selectedSize.width/2;
+            var ylt_ra=ylt_r+this.selectedLocation.y+this.selectedSize.height/2;
+            var xrb_a=event.offsetX;
+            var yrb_a=event.offsetY;
+            var xc_a=(xrb_a+xlt_ra)/2;
+            var yc_a=(yrb_a+ylt_ra)/2;
+            var dxlt=xlt_ra-xc_a;
+            var dylt=ylt_ra-yc_a;
+            var dxlt0=dxlt*Math.cos(-this.rotate)-dylt*Math.sin(-this.rotate);
+            var dylt0=dxlt*Math.sin(-this.rotate)+dylt*Math.cos(-this.rotate);
+            var xlt0_a=dxlt0+xc_a;
+            var ylt0_a=dylt0+yc_a;
+            var width_n=this.selectedSize.width+dr*Math.cos(theta-this.rotate);
+            var height_n=this.selectedSize.height+dr*Math.sin(theta-this.rotate);
+            if(width_n>1) {this.width = width_n;this.x=xlt0_a;this.y=ylt0_a;}
+            if(height_n>1) this.height = height_n;
+                
+        };
+        this.dragHandlers["Rotate_Handle"]=function(event){
+            if(!this.mDragging) mDragging=true;
+            var delta=0; 
+           
+            var theta1=Math.atan2(event.offsetY-event.dy-this.cy,event.offsetX-event.dx-this.cx);
+            var theta2=Math.atan2(event.offsetY-this.cy,event.offsetX-this.cx);
+            delta=theta2-theta1;
+            let t=delta;
+            if(this.mDragging==2){delta=delta-this.preDelta;}
+            this.preDelta=t;
+            this.rotate=this.rotate+delta;
+            var owner=this;
+            this.connectors.forEach(function(cn) {//function to rotate the connectors when node rotating
+                var  y1=cn.cy-owner.cy,x1=cn.cx-owner.cx,  
+                theta1=Math.atan2(y1,x1),
+                r=Math.sqrt(y1*y1+x1*x1),
+                x2=r*Math.cos(theta1+delta)+owner.cx,
+                y2=r*Math.sin(theta1+delta)+owner.cy;
+                //console.log(owner.cy,owner.cx,r)
+                cn.setCenterLocation(x2, y2) 
+            });
+            this.dispatchEvent("onRotated",delta);
+            return;
+        };
         this.preDelta=0;//dml,not rotated.
         this.mousedragHandler = function(a) {
+            
+            
             var dx=a.dx,dy=a.dy,dr=Math.sqrt(dx*dx+dy*dy);
 
             var tx=dx*Math.cos(-this.rotate)-dy*Math.sin(-this.rotate);
@@ -2046,49 +2139,10 @@ function(a) {
                 //dml end
                 this.dispatchEvent("mousedrag", a)
             } else {
-                
+                this.dragHandlers[this.selectedPoint].call(this,a);
                 if ("Top_Left" == this.selectedPoint) {
-                   /* var d = this.selectedSize.width - a.dx
-                      , e = this.selectedSize.height -a.dy
-                      , b = this.selectedLocation.x + a.dx
-                      , c = this.selectedLocation.y + a.dy;
-                    b < this.x + this.width && (this.x = b,
-                    this.width =d),
-                    c < this.y + this.height && (this.y = c,
-                    this.height=e)*/
-                    let theta;
-                    if(dx==0) if(dy>0) theta=Math.PI/2; else theta=Math.PI*3/2;
-                    if(dy==0) if(dx>0) theta=0;else theta=Math.PI;
-                    if(dx==0&&dy==0) return;
-                    if(dx!=0&&dy!=0)theta=Math.atan2(dy,dx);
-                    var width_n=this.selectedSize.width-dr*Math.cos(theta-this.rotate);
-                    var height_n=this.selectedSize.height-dr*Math.sin(theta-this.rotate);
-                    var xrb=this.selectedSize.width/2;
-                    var yrb=this.selectedSize.height/2;
-                    var xrb_r=xrb*Math.cos(this.rotate)-yrb*Math.sin(this.rotate);
-                    var yrb_r=xrb*Math.sin(this.rotate)+yrb*Math.cos(this.rotate);
-                    xrb_ra=xrb_r+this.selectedLocation.x+this.selectedSize.width/2;
-                    yrb_ra=yrb_r+this.selectedLocation.y+this.selectedSize.height/2;
-                    var xlt_a=a.offsetX;
-                    var ylt_a=a.offsetY;
-                    var xc_a=(xrb_ra+xlt_a)/2;
-                    var yc_a=(yrb_ra+ylt_a)/2;
                    
-                    var dxlt=xlt_a-xc_a;
-                    var dylt=ylt_a-yc_a;
-                    var dxlt0=dxlt*Math.cos(-this.rotate)-dylt*Math.sin(-this.rotate);
-                    var dylt0=dxlt*Math.sin(-this.rotate)+dylt*Math.cos(-this.rotate);
-                    var xlt0_a=dxlt0+xc_a;
-                    var ylt0_a=dylt0+yc_a;
                     
-                    if(xlt0_a< this.x + this.width){
-                       this.x = xlt0_a;
-                       this.width =width_n
-                    }
-                    if(ylt0_a < this.y + this.height){
-                        this.y = ylt0_a;
-                        this.height=height_n;
-                    }
                 } else if ("Top_Center" == this.selectedPoint) {
                     var e = this.selectedSize.height - a.dy
                       , c = this.selectedLocation.y + a.dy;
@@ -2119,33 +2173,9 @@ function(a) {
                     var e = this.selectedSize.height + a.dy;
                     e > 1 && (this.height = e)
                 } else if ("Bottom_Right" == this.selectedPoint) {
-                    var d = this.selectedSize.width + a.dx;
-                    d > 1 && (this.width = d);
-                    var e = this.selectedSize.height + a.dy;
-                    e > 1 && (this.height = e)
-                }else if("Rotate_Handle"==this.selectedPoint){//dml begin,dragging to rotate the node
-                    if(!this.mDragging) mDragging=true;
-                    var delta=0; 
                    
-                    var theta1=Math.atan2(a.offsetY-a.dy-this.cy,a.offsetX-a.dx-this.cx);
-                    var theta2=Math.atan2(a.offsetY-this.cy,a.offsetX-this.cx);
-                    delta=theta2-theta1;
-                    let t=delta;
-                    if(this.mDragging==2){delta=delta-this.preDelta;}
-                    this.preDelta=t;
-                    this.rotate=this.rotate+delta;
-                    var owner=this;
-                    this.connectors.forEach(function(cn) {//function to rotate the connectors when node rotating
-                        var  y1=cn.cy-owner.cy,x1=cn.cx-owner.cx,  
-                        theta1=Math.atan2(y1,x1),
-                        r=Math.sqrt(y1*y1+x1*x1),
-                        x2=r*Math.cos(theta1+delta)+owner.cx,
-                        y2=r*Math.sin(theta1+delta)+owner.cy;
-                        //console.log(owner.cy,owner.cx,r)
-                        cn.setCenterLocation(x2, y2) 
-                    });
-                    this.dispatchEvent("onRotated",delta);
-                    return;
+                }else if("Rotate_Handle"==this.selectedPoint){//dml begin,dragging to rotate the node
+                   
                 }//dml end
                 this.dispatchEvent("onResize", a);//dml this line added by dml
             }
