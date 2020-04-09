@@ -2091,6 +2091,82 @@ function(a) {
             if(height_n>1) this.height = height_n;
                 
         };
+        this.dragHandlers["Top_Right"]=function(event){
+            let dx=event.dx,dy=event.dy,dr=Math.sqrt(dx*dx+dy*dy);
+            let theta;
+            if(dx==0&&dy==0) return;
+            if(dx==0) if(dy>0) theta=Math.PI/2; else theta=Math.PI*3/2;
+            if(dy==0) if(dx>0) theta=0;else theta=Math.PI;
+            if(dx!=0&&dy!=0)theta=Math.atan2(dy,dx);
+            var xlb=-this.selectedSize.width/2;
+            var ylb=+this.selectedSize.height/2;
+            var xlb_r=xlb*Math.cos(this.rotate)-ylb*Math.sin(this.rotate);
+            var ylb_r=xlb*Math.sin(this.rotate)+ylb*Math.cos(this.rotate);
+            var xlb_ra=xlb_r+this.selectedLocation.x+this.selectedSize.width/2;
+            var ylb_ra=ylb_r+this.selectedLocation.y+this.selectedSize.height/2;
+            var xrt_a=event.offsetX;
+            var yrt_a=event.offsetY;
+            var xc_a=(xrt_a+xlb_ra)/2;
+            var yc_a=(yrt_a+ylb_ra)/2;
+            var xlt=-this.selectedSize.width/2;
+            var ylt=-this.selectedSize.height/2;
+            var xlt_r=xlt*Math.cos(this.rotate)-ylt*Math.sin(this.rotate);
+            var ylt_r=xlt*Math.sin(this.rotate)+ylt*Math.cos(this.rotate);
+            var dr_xlt_r=-dr*Math.sin(theta-this.rotate)*Math.cos(this.rotate-Math.PI/2);
+            var dr_ylt_r=-dr*Math.sin(theta-this.rotate)*Math.sin(this.rotate-Math.PI/2);
+            var xlt_ra=xlt_r+this.selectedLocation.x+
+                                this.selectedSize.width/2+dr_xlt_r;
+            var ylt_ra=ylt_r+this.selectedLocation.y+
+                                this.selectedSize.height/2+dr_ylt_r;
+            var dxlt=xlt_ra-xc_a;
+            var dylt=ylt_ra-yc_a;
+            var dxlt0=dxlt*Math.cos(-this.rotate)-dylt*Math.sin(-this.rotate);
+            var dylt0=dxlt*Math.sin(-this.rotate)+dylt*Math.cos(-this.rotate);
+            var xlt0_a=dxlt0+xc_a;
+            var ylt0_a=dylt0+yc_a;
+            var width_n=this.selectedSize.width+dr*Math.cos(theta-this.rotate);
+            var height_n=this.selectedSize.height-dr*Math.sin(theta-this.rotate);
+            if(width_n>1) {this.width = width_n;this.x=xlt0_a;this.y=ylt0_a;}
+            if(height_n>1) this.height = height_n; 
+        };
+        this.dragHandlers["Bottom_Left"]=function(event){
+            let dx=event.dx,dy=event.dy,dr=Math.sqrt(dx*dx+dy*dy);
+            let theta;
+            if(dx==0&&dy==0) return;
+            if(dx==0) if(dy>0) theta=Math.PI/2; else theta=Math.PI*3/2;
+            if(dy==0) if(dx>0) theta=0;else theta=Math.PI;
+            if(dx!=0&&dy!=0)theta=Math.atan2(dy,dx);
+            var xrt=this.selectedSize.width/2;
+            var yrt=-this.selectedSize.height/2;
+            var xrt_r=xrt*Math.cos(this.rotate)-yrt*Math.sin(this.rotate);
+            var yrt_r=xrt*Math.sin(this.rotate)+yrt*Math.cos(this.rotate);
+            var xrt_ra=xrt_r+this.selectedLocation.x+this.selectedSize.width/2;
+            var yrt_ra=yrt_r+this.selectedLocation.y+this.selectedSize.height/2;
+            var xlb_a=event.offsetX;
+            var ylb_a=event.offsetY;
+            var xc_a=(xrt_ra+xlb_a)/2;
+            var yc_a=(yrt_ra+ylb_a)/2;
+            var xlt=-this.selectedSize.width/2;
+            var ylt=-this.selectedSize.height/2;
+            var xlt_r=xlt*Math.cos(this.rotate)-ylt*Math.sin(this.rotate);
+            var ylt_r=xlt*Math.sin(this.rotate)+ylt*Math.cos(this.rotate);
+            var dr_xlt_r=-dr*Math.cos(theta-this.rotate)*Math.cos(this.rotate+Math.PI);
+            var dr_ylt_r=-dr*Math.cos(theta-this.rotate)*Math.sin(this.rotate+Math.PI);
+            var xlt_ra=xlt_r+this.selectedLocation.x+
+                                this.selectedSize.width/2+dr_xlt_r;
+            var ylt_ra=ylt_r+this.selectedLocation.y+
+                                this.selectedSize.height/2+dr_ylt_r;
+            var dxlt=xlt_ra-xc_a;
+            var dylt=ylt_ra-yc_a;
+            var dxlt0=dxlt*Math.cos(-this.rotate)-dylt*Math.sin(-this.rotate);
+            var dylt0=dxlt*Math.sin(-this.rotate)+dylt*Math.cos(-this.rotate);
+            var xlt0_a=dxlt0+xc_a;
+            var ylt0_a=dylt0+yc_a;
+            var width_n=this.selectedSize.width-dr*Math.cos(-theta+this.rotate);
+            var height_n=this.selectedSize.height-dr*Math.sin(-theta+this.rotate);
+            if(width_n>1) {this.width = width_n;this.x=xlt0_a;this.y=ylt0_a;}
+            if(height_n>1) this.height = height_n;  
+        }
         this.dragHandlers["Rotate_Handle"]=function(event){
             if(!this.mDragging) mDragging=true;
             var delta=0; 
@@ -2115,6 +2191,7 @@ function(a) {
             this.dispatchEvent("onRotated",delta);
             return;
         };
+       
         this.preDelta=0;//dml,not rotated.
         this.mousedragHandler = function(a) {
             
@@ -2149,11 +2226,7 @@ function(a) {
                     c < this.y + this.height && (this.y = c,
                     this.height = e)
                 } else if ("Top_Right" == this.selectedPoint) {
-                    var d = this.selectedSize.width + a.dx
-                      , c = this.selectedLocation.y + a.dy;
-                    c < this.y + this.height && (this.y = c,
-                    this.height = this.selectedSize.height - a.dy),
-                    d > 1 && (this.width = d)
+                    
                 } else if ("Middle_Left" == this.selectedPoint) {
                     var d = this.selectedSize.width - a.dx
                       , b = this.selectedLocation.x + a.dx;
@@ -2163,12 +2236,7 @@ function(a) {
                     var d = this.selectedSize.width + a.dx;
                     d > 1 && (this.width = d)
                 } else if ("Bottom_Left" == this.selectedPoint) {
-                    var d = this.selectedSize.width - a.dx
-                      , b = this.selectedLocation.x + a.dx;
-                    d > 1 && (this.x = b,
-                    this.width = d);
-                    var e = this.selectedSize.height + a.dy;
-                    e > 1 && (this.height = e)
+                 
                 } else if ("Bottom_Center" == this.selectedPoint) {
                     var e = this.selectedSize.height + a.dy;
                     e > 1 && (this.height = e)
