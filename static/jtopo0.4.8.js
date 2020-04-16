@@ -2024,150 +2024,180 @@ function(a) {
             return d.prototype.isInBound.apply(this, arguments)
         }
         ,
-        this.dragHandlers=new Array();
-        this.dragHandlers['Top_Left']=function(event){
-            let dx=event.dx,dy=event.dy,dr=Math.sqrt(dx*dx+dy*dy);
-            let theta;
-            if(dx==0) if(dy>0) theta=Math.PI/2; else theta=Math.PI*3/2;
-            if(dy==0) if(dx>0) theta=0;else theta=Math.PI;
-            if(dx==0&&dy==0) return;
-            if(dx!=0&&dy!=0)theta=Math.atan2(dy,dx);
-            var width_n=this.selectedSize.width-dr*Math.cos(theta-this.rotate);
-            var height_n=this.selectedSize.height-dr*Math.sin(theta-this.rotate);
-            var xrb=this.selectedSize.width/2;
-            var yrb=this.selectedSize.height/2;
-            var xrb_r=xrb*Math.cos(this.rotate)-yrb*Math.sin(this.rotate);
-            var yrb_r=xrb*Math.sin(this.rotate)+yrb*Math.cos(this.rotate);
-            xrb_ra=xrb_r+this.selectedLocation.x+this.selectedSize.width/2;
-            yrb_ra=yrb_r+this.selectedLocation.y+this.selectedSize.height/2;
-            var xlt_a=event.offsetX;
-            var ylt_a=event.offsetY;
-            var xc_a=(xrb_ra+xlt_a)/2;
-            var yc_a=(yrb_ra+ylt_a)/2;
-           
-            var dxlt=xlt_a-xc_a;
-            var dylt=ylt_a-yc_a;
-            var dxlt0=dxlt*Math.cos(-this.rotate)-dylt*Math.sin(-this.rotate);
-            var dylt0=dxlt*Math.sin(-this.rotate)+dylt*Math.cos(-this.rotate);
-            var xlt0_a=dxlt0+xc_a;
-            var ylt0_a=dylt0+yc_a;
+   
+        //////////////////////////////////dml begin
+        this.dragHandler=function(event){
+            function th(dx,dy){
+                let theta;
+                if(dx==0&&dy==0) return;
+                if(dx==0) if(dy>0) theta=Math.PI/2; else theta=Math.PI*3/2;
+                if(dy==0) if(dx>0) theta=0;else theta=Math.PI;
+                if(dx!=0&&dy!=0)theta=Math.atan2(dy,dx);
+                return theta;
+            }
+            function rb_a(symbol,event){//右下角绝对座标
+                var xrb=symbol.selectedSize.width/2;
+                var yrb=symbol.selectedSize.height/2;
+                var xrb_r=xrb*Math.cos(symbol.rotate)-yrb*Math.sin(symbol.rotate);
+                var yrb_r=xrb*Math.sin(symbol.rotate)+yrb*Math.cos(symbol.rotate);
+                var xrb_ra=xrb_r+symbol.selectedLocation.x+symbol.selectedSize.width/2;
+                var yrb_ra=yrb_r+symbol.selectedLocation.y+symbol.selectedSize.height/2;
+                switch(symbol.selectedPoint){
+                  case "Top_Left":
+                  case "Top_Center":
+                  case "Middle_Left":
+                    return {xrb_a:xrb_ra,yrb_a:yrb_ra};
+                  case  "Bottom_Right" :
+                    return {xrb_a:event.offsetX,yrb_a:event.offsetY};
+                  case "Bottom_Left":
+                  case "Bottom_Center":
+                     var h=dh(symbol,event);
+                     var xrb_a=xrb_ra+h*Math.cos(Math.PI/2+symbol.rotate);
+                     var yrb_a=yrb_ra+h*Math.sin(Math.PI/2+symbol.rotate);
+                     return {xrb_a:xrb_a,yrb_a:yrb_a};
+                   case "Top_Right":
+                   case "Middle_Right":
+                     var w=dw(symbol,event);
+                     var xrb_a=xrb_ra+w*Math.cos(symbol.rotate);
+                     var yrb_a=yrb_ra+w*Math.sin(symbol.rotate);
+                     return {xrb_a:xrb_a,yrb_a:yrb_a};
+                }
+            }
             
-            if(xlt0_a< this.x + this.width){
-               this.x = xlt0_a;
-               this.width =width_n
+            function lt_a(symbol,event){//左上角绝对座标
+                function lt_ra(){
+                    var xlt=-symbol.selectedSize.width/2;
+                    var ylt=-symbol.selectedSize.height/2;
+                    var xlt_r=xlt*Math.cos(symbol.rotate)-ylt*Math.sin(symbol.rotate);
+                    var ylt_r=xlt*Math.sin(symbol.rotate)+ylt*Math.cos(symbol.rotate);
+                    var xlt_ra=xlt_r+symbol.selectedLocation.x+
+                                       symbol.selectedSize.width/2;
+                    var ylt_ra=ylt_r+symbol.selectedLocation.y+
+                                       symbol.selectedSize.height/2;
+                    return {xlt_ra:xlt_ra,ylt_ra:ylt_ra};
+                }
+                var ltra=lt_ra();
+                var xlt_ra=ltra.xlt_ra;
+                var ylt_ra=ltra.ylt_ra;
+                var dr=Math.sqrt(event.dx*event.dx+event.dy*event.dy);
+                switch (symbol.selectedPoint){
+                    case "Top_Left":
+                        return {xlt_a:event.offsetX,ylt_a:event.offsetY};
+                    case "Bottom_Right":
+                        return {xlt_a:xlt_ra,ylt_a:ylt_ra};
+                    case "Top_Right":
+                        var theta=th(event.dx,event.dy);
+                        var dr_xlt_r=-dr*Math.sin(theta-symbol.rotate)*Math.cos(symbol.rotate-Math.PI/2);
+                        var dr_ylt_r=-dr*Math.sin(theta-symbol.rotate)*Math.sin(symbol.rotate-Math.PI/2);
+                        return {xlt_a:xlt_ra+dr_xlt_r,
+                                ylt_a:ylt_ra+dr_ylt_r};
+                    case "Bottom_Left":
+                        var theta=th(event.dx,event.dy);
+                        var dr_xlt_r=-dr*Math.cos(theta-symbol.rotate)*Math.cos(symbol.rotate+Math.PI);
+                        var dr_ylt_r=-dr*Math.cos(theta-symbol.rotate)*Math.sin(symbol.rotate+Math.PI);
+                        return {xlt_a:xlt_ra+dr_xlt_r,
+                                ylt_a:ylt_ra+dr_ylt_r};
+                    case "Top_Center":
+                        var alpha=th(event.dx,event.dy)-(symbol.rotate-Math.PI/2);
+                        var dh=dr*Math.cos(alpha);
+                        var dxlt=dh*Math.cos(symbol.rotate-Math.PI/2);
+                        var dylt=dh*Math.sin(symbol.rotate-Math.PI/2);
+                        return {xlt_a:xlt_ra+dxlt,ylt_a:ylt_ra+dylt};
+                    case "Bottom_Center":
+                    case "Middle_Right":    
+                        return {xlt_a:xlt_ra,ylt_a:ylt_ra};
+                    case "Middle_Left":
+                        
+                        var dwidth=dw(symbol,event);
+                        var dxlt=dwidth*Math.cos(symbol.rotate-Math.PI);
+                        var dylt=dwidth*Math.sin(symbol.rotate-Math.PI);
+                        return {xlt_a:xlt_ra+dxlt,ylt_a:ylt_ra+dylt};
+                   
+                    default:
+                        return {xlt_a:0,ylt_a:0};
+               }
             }
-            if(ylt0_a < this.y + this.height){
-                this.y = ylt0_a;
-                this.height=height_n;
+            function lt_0(symbol,event){
+             var rba=rb_a(symbol,event);
+             var xrb_a=rba.xrb_a;
+             var yrb_a=rba.yrb_a;
+             var lta=lt_a(symbol,event);
+             var xlt_a=lta.xlt_a;
+             var ylt_a=lta.ylt_a;
+             var xc_a=(xrb_a+xlt_a)/2;
+             var yc_a=(yrb_a+ylt_a)/2;
+             var offset_xlt=xlt_a-xc_a;
+             var offset_ylt=ylt_a-yc_a;
+             var dxlt0=offset_xlt*Math.cos(-symbol.rotate)-offset_ylt*Math.sin(-symbol.rotate);
+             var dylt0=offset_xlt*Math.sin(-symbol.rotate)+offset_ylt*Math.cos(-symbol.rotate);
+             var xlt0_a=dxlt0+xc_a;
+             var ylt0_a=dylt0+yc_a;
+            return{xlt0_a:xlt0_a,ylt0_a:ylt0_a};
             }
-        };
-        this.dragHandlers["Bottom_Right"]=function(event){
-           
-            let dx=event.dx,dy=event.dy,dr=Math.sqrt(dx*dx+dy*dy);
-            let theta;
-            if(dx==0&&dy==0) return;
-            if(dx==0) if(dy>0) theta=Math.PI/2; else theta=Math.PI*3/2;
-            if(dy==0) if(dx>0) theta=0;else theta=Math.PI;
-            if(dx!=0&&dy!=0)theta=Math.atan2(dy,dx);
-            var xlt=-this.selectedSize.width/2;
-            var ylt=-this.selectedSize.height/2;
-            var xlt_r=xlt*Math.cos(this.rotate)-ylt*Math.sin(this.rotate);
-            var ylt_r=xlt*Math.sin(this.rotate)+ylt*Math.cos(this.rotate);
-            var xlt_ra=xlt_r+this.selectedLocation.x+this.selectedSize.width/2;
-            var ylt_ra=ylt_r+this.selectedLocation.y+this.selectedSize.height/2;
-            var xrb_a=event.offsetX;
-            var yrb_a=event.offsetY;
-            var xc_a=(xrb_a+xlt_ra)/2;
-            var yc_a=(yrb_a+ylt_ra)/2;
-            var dxlt=xlt_ra-xc_a;
-            var dylt=ylt_ra-yc_a;
-            var dxlt0=dxlt*Math.cos(-this.rotate)-dylt*Math.sin(-this.rotate);
-            var dylt0=dxlt*Math.sin(-this.rotate)+dylt*Math.cos(-this.rotate);
-            var xlt0_a=dxlt0+xc_a;
-            var ylt0_a=dylt0+yc_a;
-            var width_n=this.selectedSize.width+dr*Math.cos(theta-this.rotate);
-            var height_n=this.selectedSize.height+dr*Math.sin(theta-this.rotate);
-            if(width_n>1) {this.width = width_n;this.x=xlt0_a;this.y=ylt0_a;}
-            if(height_n>1) this.height = height_n;
-                
-        };
-        this.dragHandlers["Top_Right"]=function(event){
-            let dx=event.dx,dy=event.dy,dr=Math.sqrt(dx*dx+dy*dy);
-            let theta;
-            if(dx==0&&dy==0) return;
-            if(dx==0) if(dy>0) theta=Math.PI/2; else theta=Math.PI*3/2;
-            if(dy==0) if(dx>0) theta=0;else theta=Math.PI;
-            if(dx!=0&&dy!=0)theta=Math.atan2(dy,dx);
-            var xlb=-this.selectedSize.width/2;
-            var ylb=+this.selectedSize.height/2;
-            var xlb_r=xlb*Math.cos(this.rotate)-ylb*Math.sin(this.rotate);
-            var ylb_r=xlb*Math.sin(this.rotate)+ylb*Math.cos(this.rotate);
-            var xlb_ra=xlb_r+this.selectedLocation.x+this.selectedSize.width/2;
-            var ylb_ra=ylb_r+this.selectedLocation.y+this.selectedSize.height/2;
-            var xrt_a=event.offsetX;
-            var yrt_a=event.offsetY;
-            var xc_a=(xrt_a+xlb_ra)/2;
-            var yc_a=(yrt_a+ylb_ra)/2;
-            var xlt=-this.selectedSize.width/2;
-            var ylt=-this.selectedSize.height/2;
-            var xlt_r=xlt*Math.cos(this.rotate)-ylt*Math.sin(this.rotate);
-            var ylt_r=xlt*Math.sin(this.rotate)+ylt*Math.cos(this.rotate);
-            var dr_xlt_r=-dr*Math.sin(theta-this.rotate)*Math.cos(this.rotate-Math.PI/2);
-            var dr_ylt_r=-dr*Math.sin(theta-this.rotate)*Math.sin(this.rotate-Math.PI/2);
-            var xlt_ra=xlt_r+this.selectedLocation.x+
-                                this.selectedSize.width/2+dr_xlt_r;
-            var ylt_ra=ylt_r+this.selectedLocation.y+
-                                this.selectedSize.height/2+dr_ylt_r;
-            var dxlt=xlt_ra-xc_a;
-            var dylt=ylt_ra-yc_a;
-            var dxlt0=dxlt*Math.cos(-this.rotate)-dylt*Math.sin(-this.rotate);
-            var dylt0=dxlt*Math.sin(-this.rotate)+dylt*Math.cos(-this.rotate);
-            var xlt0_a=dxlt0+xc_a;
-            var ylt0_a=dylt0+yc_a;
-            var width_n=this.selectedSize.width+dr*Math.cos(theta-this.rotate);
-            var height_n=this.selectedSize.height-dr*Math.sin(theta-this.rotate);
-            if(width_n>1) {this.width = width_n;this.x=xlt0_a;this.y=ylt0_a;}
-            if(height_n>1) this.height = height_n; 
-        };
-        this.dragHandlers["Bottom_Left"]=function(event){
-            let dx=event.dx,dy=event.dy,dr=Math.sqrt(dx*dx+dy*dy);
-            let theta;
-            if(dx==0&&dy==0) return;
-            if(dx==0) if(dy>0) theta=Math.PI/2; else theta=Math.PI*3/2;
-            if(dy==0) if(dx>0) theta=0;else theta=Math.PI;
-            if(dx!=0&&dy!=0)theta=Math.atan2(dy,dx);
-            var xrt=this.selectedSize.width/2;
-            var yrt=-this.selectedSize.height/2;
-            var xrt_r=xrt*Math.cos(this.rotate)-yrt*Math.sin(this.rotate);
-            var yrt_r=xrt*Math.sin(this.rotate)+yrt*Math.cos(this.rotate);
-            var xrt_ra=xrt_r+this.selectedLocation.x+this.selectedSize.width/2;
-            var yrt_ra=yrt_r+this.selectedLocation.y+this.selectedSize.height/2;
-            var xlb_a=event.offsetX;
-            var ylb_a=event.offsetY;
-            var xc_a=(xrt_ra+xlb_a)/2;
-            var yc_a=(yrt_ra+ylb_a)/2;
-            var xlt=-this.selectedSize.width/2;
-            var ylt=-this.selectedSize.height/2;
-            var xlt_r=xlt*Math.cos(this.rotate)-ylt*Math.sin(this.rotate);
-            var ylt_r=xlt*Math.sin(this.rotate)+ylt*Math.cos(this.rotate);
-            var dr_xlt_r=-dr*Math.cos(theta-this.rotate)*Math.cos(this.rotate+Math.PI);
-            var dr_ylt_r=-dr*Math.cos(theta-this.rotate)*Math.sin(this.rotate+Math.PI);
-            var xlt_ra=xlt_r+this.selectedLocation.x+
-                                this.selectedSize.width/2+dr_xlt_r;
-            var ylt_ra=ylt_r+this.selectedLocation.y+
-                                this.selectedSize.height/2+dr_ylt_r;
-            var dxlt=xlt_ra-xc_a;
-            var dylt=ylt_ra-yc_a;
-            var dxlt0=dxlt*Math.cos(-this.rotate)-dylt*Math.sin(-this.rotate);
-            var dylt0=dxlt*Math.sin(-this.rotate)+dylt*Math.cos(-this.rotate);
-            var xlt0_a=dxlt0+xc_a;
-            var ylt0_a=dylt0+yc_a;
-            var width_n=this.selectedSize.width-dr*Math.cos(-theta+this.rotate);
-            var height_n=this.selectedSize.height-dr*Math.sin(-theta+this.rotate);
-            if(width_n>1) {this.width = width_n;this.x=xlt0_a;this.y=ylt0_a;}
+            function dh(symbol,event){//高度增加值
+                var dr=Math.sqrt(event.dx*event.dx+event.dy*event.dy);
+                var alpha,theta;
+                var theta=th(event.dx,event.dy);
+                switch(symbol.selectedPoint){
+                  case "Top_Left":
+                    return -dr*Math.sin(theta-symbol.rotate);
+                  case "Bottom_Right":
+                    return dr*Math.sin(theta-symbol.rotate); 
+                  case "Bottom_Left":
+                    return -dr*Math.sin(-theta+symbol.rotate); 
+                  case "Top_Right":
+                   return -dr*Math.sin(theta-symbol.rotate);   
+                  case "Top_Center":
+                   alpha=theta-(symbol.rotate-Math.PI/2);
+                   return dr*Math.cos(alpha);
+                                   
+                  case "Bottom_Center":
+                    alpha=Math.PI/2-theta+symbol.rotate;
+                    return dr*Math.cos(alpha);
+                  case "Middle_Left":
+                  case "Middle_Right":
+                      return 0;
+                  
+                }
+               
+            }
+            function dw(symbol,event){//宽度增加值
+                var dr=Math.sqrt(event.dx*event.dx+event.dy*event.dy);
+                var alpha,theta;
+                theta=th(event.dx,event.dy) ; 
+                switch(symbol.selectedPoint){
+                    case "Top_Left":
+                     return -dr*Math.cos(theta-symbol.rotate);
+                    case "Bottom_Right":
+                     return dr*Math.cos(theta-symbol.rotate);
+                    case "Bottom_Left":
+                        return -dr*Math.cos(-theta+symbol.rotate);    
+                    case "Top_Center":
+                    case "Bottom_Center":
+                         return 0;
+                    case "Middle_Left":
+                     var alpha=-theta+symbol.rotate-Math.PI;
+                     return dr*Math.cos(alpha);
+                    case "Middle_Right":
+                     var alpha=theta-symbol.rotate;
+                     return dr*Math.cos(alpha);
+                    case "Top_Right":
+                     return dr*Math.cos(theta-symbol.rotate);
+                    default:
+                         return 0;
+            
+                  }
+                  
+            }
+            var lt0=lt_0(this,event);
+            var width_n=this.selectedSize.width+dw(this,event);
+            var height_n=this.selectedSize.height+dh(this,event);
+            if(width_n>1) {this.width = width_n;this.x=lt0.xlt0_a;this.y=lt0.ylt0_a;}
             if(height_n>1) this.height = height_n;  
-        }
-        this.dragHandlers["Rotate_Handle"]=function(event){
+
+        };
+        ////////////////////dml end
+        this.dragRotateHandler=function(event){
             if(!this.mDragging) mDragging=true;
             var delta=0; 
            
@@ -2194,13 +2224,6 @@ function(a) {
        
         this.preDelta=0;//dml,not rotated.
         this.mousedragHandler = function(a) {
-            
-            
-            var dx=a.dx,dy=a.dy,dr=Math.sqrt(dx*dx+dy*dy);
-
-            var tx=dx*Math.cos(-this.rotate)-dy*Math.sin(-this.rotate);
-            var ty=dx*Math.sin(-this.rotate)+dy*Math.cos(-this.rotate);
-           
             if(this.mDragging==0) this.mDragging=1;//this line added by dml.1--begin to drag
             else if(this.mDragging==1) this.mDragging=2;//this line added by dml. 2---in dragging process
             if (null == this.selectedPoint) {
@@ -2215,125 +2238,15 @@ function(a) {
                 });
                 //dml end
                 this.dispatchEvent("mousedrag", a)
-            } else {
-                this.dragHandlers[this.selectedPoint].call(this,a);
-                if ("Top_Left" == this.selectedPoint) {
-                   
-                    
-                } else if ("Top_Center" == this.selectedPoint) {
-                    var e = this.selectedSize.height - a.dy
-                      , c = this.selectedLocation.y + a.dy;
-                    c < this.y + this.height && (this.y = c,
-                    this.height = e)
-                } else if ("Top_Right" == this.selectedPoint) {
-                    
-                } else if ("Middle_Left" == this.selectedPoint) {
-                    var d = this.selectedSize.width - a.dx
-                      , b = this.selectedLocation.x + a.dx;
-                    b < this.x + this.width && (this.x = b),
-                    d > 1 && (this.width = d)
-                } else if ("Middle_Right" == this.selectedPoint) {
-                    var d = this.selectedSize.width + a.dx;
-                    d > 1 && (this.width = d)
-                } else if ("Bottom_Left" == this.selectedPoint) {
-                 
-                } else if ("Bottom_Center" == this.selectedPoint) {
-                    var e = this.selectedSize.height + a.dy;
-                    e > 1 && (this.height = e)
-                } else if ("Bottom_Right" == this.selectedPoint) {
-                   
-                }else if("Rotate_Handle"==this.selectedPoint){//dml begin,dragging to rotate the node
-                   
+            } else {//dragging some one handle
+                if(this.selectedPoint!="Rotate_Handle") this.dragHandler(a);
+                else if("Rotate_Handle"==this.selectedPoint){//dml begin,dragging to rotate the node
+                   this.dragRotateHandler(a);
                 }//dml end
                 this.dispatchEvent("onResize", a);//dml this line added by dml
             }
         }
-        /*this.mousedragHandler = function(a) {
-            if(this.mDragging==0) this.mDragging=1;//this line added by dml.1--begin to drag
-            else if(this.mDragging==1) this.mDragging=2;//this line added by dml. 2---in dragging process
-            if (null == this.selectedPoint) {
-                var b = this.selectedLocation.x + a.dx
-                  , c = this.selectedLocation.y + a.dy;
-                this.setLocation(b, c),
-                //dml begin,move its connectors fllowing the node being dragging
-                this.connectors.forEach(function(cn) {
-                    var b = cn.selectedLocation.x + a.dx
-                    , c = cn.selectedLocation.y + a.dy;
-                    cn.setLocation(b, c) 
-                });
-                //dml end
-                this.dispatchEvent("mousedrag", a)
-            } else {
-                if ("Top_Left" == this.selectedPoint) {
-                    var d = this.selectedSize.width - a.dx
-                      , e = this.selectedSize.height - a.dy
-                      , b = this.selectedLocation.x + a.dx
-                      , c = this.selectedLocation.y + a.dy;
-                    b < this.x + this.width && (this.x = b,
-                    this.width = d),
-                    c < this.y + this.height && (this.y = c,
-                    this.height = e)
-                } else if ("Top_Center" == this.selectedPoint) {
-                    var e = this.selectedSize.height - a.dy
-                      , c = this.selectedLocation.y + a.dy;
-                    c < this.y + this.height && (this.y = c,
-                    this.height = e)
-                } else if ("Top_Right" == this.selectedPoint) {
-                    var d = this.selectedSize.width + a.dx
-                      , c = this.selectedLocation.y + a.dy;
-                    c < this.y + this.height && (this.y = c,
-                    this.height = this.selectedSize.height - a.dy),
-                    d > 1 && (this.width = d)
-                } else if ("Middle_Left" == this.selectedPoint) {
-                    var d = this.selectedSize.width - a.dx
-                      , b = this.selectedLocation.x + a.dx;
-                    b < this.x + this.width && (this.x = b),
-                    d > 1 && (this.width = d)
-                } else if ("Middle_Right" == this.selectedPoint) {
-                    var d = this.selectedSize.width + a.dx;
-                    d > 1 && (this.width = d)
-                } else if ("Bottom_Left" == this.selectedPoint) {
-                    var d = this.selectedSize.width - a.dx
-                      , b = this.selectedLocation.x + a.dx;
-                    d > 1 && (this.x = b,
-                    this.width = d);
-                    var e = this.selectedSize.height + a.dy;
-                    e > 1 && (this.height = e)
-                } else if ("Bottom_Center" == this.selectedPoint) {
-                    var e = this.selectedSize.height + a.dy;
-                    e > 1 && (this.height = e)
-                } else if ("Bottom_Right" == this.selectedPoint) {
-                    var d = this.selectedSize.width + a.dx;
-                    d > 1 && (this.width = d);
-                    var e = this.selectedSize.height + a.dy;
-                    e > 1 && (this.height = e)
-                }else if("Rotate_Handle"==this.selectedPoint){//dml begin,dragging to rotate the node
-                    if(!this.mDragging) mDragging=true;
-                    var delta=0; 
-                    console.log(a.dx,a.dy,a.offsetX,a.offsetY,"\n");
-                    var theta1=Math.atan2(a.offsetY-a.dy-this.cy,a.offsetX-a.dx-this.cx);
-                    var theta2=Math.atan2(a.offsetY-this.cy,a.offsetX-this.cx);
-                    delta=theta2-theta1;
-                    let t=delta;
-                    if(this.mDragging==2){delta=delta-this.preDelta;}
-                    this.preDelta=t;
-                    this.rotate=this.rotate+delta;
-                    var owner=this;
-                    this.connectors.forEach(function(cn) {//function to rotate the connectors when node rotating
-                        var  y1=cn.cy-owner.cy,x1=cn.cx-owner.cx,  
-                        theta1=Math.atan2(y1,x1),
-                        r=Math.sqrt(y1*y1+x1*x1),
-                        x2=r*Math.cos(theta1+delta)+owner.cx,
-                        y2=r*Math.sin(theta1+delta)+owner.cy;
-                        //console.log(owner.cy,owner.cx,r)
-                        cn.setCenterLocation(x2, y2) 
-                    });
-                    this.dispatchEvent("onRotated",delta);
-                    return;
-                }//dml end
-                this.dispatchEvent("onResize", a);//dml this line added by dml
-            }
-        }*/
+        
     }
     b.prototype = new a.Element,
     Object.defineProperties(b.prototype, {
