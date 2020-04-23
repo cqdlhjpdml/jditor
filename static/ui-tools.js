@@ -78,7 +78,7 @@ class Tool{
   }
   const TASK_END=1;
   //////////////////////////////
-  class ToolsPanel extends Tool{
+class ToolsPanel extends Tool{
     //override, mutiple instance popup-style tools panel maybe required
     static getInstance(toolItem,toolManager){//单例模式
         
@@ -179,29 +179,7 @@ class Tool{
           textNode.setLocation(x, y);
           scene.add(textNode);
           textNode.text='新文本框';
-          
-          me.textEditor=$(`<textarea  style="width: 287px; position: absolute; top: 262px; left: 536.805px; margin: 0px; height: 29px; display: none;"\
-                        onkeydown="if(event.keyCode==13)this.blur();" ></textarea>`);
-          document.body.appendChild(me.textEditor[0]);
-          scene.dbclick(function(event){
-                            if(event.target == null) return;
-                            var e = event.target;
-                            me.textEditor.css({
-                                top: event.pageY,
-                                left: event.pageX - e.width/2
-                            }).show().attr('value', e.text).focus().select();
-                            e.text='';
-                            me.textEditor[0].textBox = e;
-                        });
-                        
-         me.textEditor.blur(function(){
-                         
-                         me.textEditor[0].textBox.text = me.textEditor.hide().val();
-                        
-                         
-                        });              
-         
-         var args={};
+          var args={};
          args.obj=textNode;
          args.scene=scene;
          me.toolManager.actionManager.pushUndoAction(new JTopo.AddAction(args));
@@ -299,7 +277,7 @@ class Tool{
     }  
      setSceneMouseHandler(scene){
         var from=null,last=null,path=[],midLinks=[];
-        var undoKeeps=[];//undoKeeps:when undo action,the connector inserted before the link shuoud be keeped.
+        var undoKeeps=[];//undoKeeps:when undo action,the connector inserted before the link shunold be keeped.
         scene.mouseHandlerObject.midLinks=midLinks;  
           function mouseclickHandler(event){
               var x=event.x;
@@ -606,6 +584,7 @@ class PropPanel extends MyDialog{
         var jqLabel;
         switch(this.elementType){
            case "SvgNode":
+          
            for( let i=0 ;i<Property_Config.length;i++){
              let config=Property_Config[i];
              switch(config.inputtype){

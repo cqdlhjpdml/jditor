@@ -103,7 +103,7 @@ JTopo.createNode=function(nodeType,properties){
     return nodes[id];;
   }
   createFuns["TextNode"]=function(){
-    var node=new JTopo.TextNode;
+    var node=new JTopo.TextBox;
     setProperyies(node,properties);
     var id=node._id;
     JTopo.Nodes_Tables[id]=node;
@@ -158,6 +158,33 @@ JTopo.Element.initialize=function(){
 }
 //////////JTopo.TextBox:to fix the bug of JTopo.TextNode
 JTopo.TextBox=function(text){
+  JTopo.TextBox.prototype.initialize.apply(this,null);
+  this.elementType="TextNode";
+  var me=this;        
+  this.dbclick(function(event){
+    /*if(!me.textEditor){
+      me.textEditor=$(`<textarea  style="width: 287px; position: absolute; top: 262px; left: 536.805px; margin: 0px; height: 29px; display: none;"\
+      onkeydown="if(event.keyCode==13)this.blur();" ></textarea>`);
+      document.body.appendChild(me.textEditor[0]);
+    
+      me.textEditor[0].value=me.text;
+      me.textEditor.blur(function(){
+       
+        me.textEditor[0].textBox.text = me.textEditor.hide().val();
+      
+       
+      });     
+    }
+    var e = event.target;
+    me.textEditor.css({
+        top: event.pageY,
+        left: event.pageX - e.width/2
+    }).show().attr('value', e.text).focus().select();
+   
+    me.textEditor[0].textBox = e;*/
+    var panel=PropPanelFactory.getPropPanelInstance("属性设置",me.elementType);
+    panel.show();
+});
   this.text=text;
   this.paint=this.paint = function(a) {
     a.save();
@@ -169,7 +196,7 @@ JTopo.TextBox=function(text){
     var dx=(this.width-w0)/2;
     var dy=(this.height-h0)/2;
     
-    a.translate(dx,dy);//fix the bug of the JTopo.TextNode,when first caculation, get wrong this.width and this.height used int scene's paint function
+    a.translate(dx,dy);//fix the bug of the JTopo.TextNode,when first caculation, get wrong this.width and this.height used in the scene's paint function
     a.beginPath();
     a.font = this.font;
     a.strokeStyle = "rgba(" + this.fontColor + ", " + this.alpha + ")";
@@ -180,6 +207,7 @@ JTopo.TextBox=function(text){
     this.paintBorder(a);
     this.paintCtrl(a);
     this.paintAlarmText(a);
+    
     
 }
 return this;

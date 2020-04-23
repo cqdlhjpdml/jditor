@@ -248,6 +248,7 @@ class SvgDrawService{
             }
             setCtx2dStyle(this,ctx2d);
             if(this.getAttribute('fill')!='none')ctx2d.fill();
+            ctx2d.setTransform(1, 0, 0, 1, 0, 0)
             ctx2d.stroke();
             ctx2d.restore();
           }
@@ -263,6 +264,7 @@ class SvgDrawService{
             ctx2d.moveTo(x1, y1);
             ctx2d.lineTo(x2, y2);
             setCtx2dStyle(this,ctx2d)
+            ctx2d.setTransform(1, 0, 0, 1, 0, 0)
             ctx2d.stroke();
             ctx2d.restore();
           }
@@ -288,6 +290,7 @@ class SvgDrawService{
             
             setCtx2dStyle(this,ctx2d)
             if(this.getAttribute('fill')!='none')ctx2d.fill();
+            ctx2d.setTransform(1, 0, 0, 1, 0, 0)
             ctx2d.stroke();
             ctx2d.restore();
           }
@@ -314,6 +317,7 @@ class SvgDrawService{
             ctx2d.closePath();
             setCtx2dStyle(this,ctx2d)
             if(this.getAttribute('fill')!='none')ctx2d.fill();
+            ctx2d.setTransform(1, 0, 0, 1, 0, 0)
             ctx2d.stroke();
             ctx2d.restore();
 
@@ -333,6 +337,7 @@ class SvgDrawService{
             ctx2d.arc(x,y, r, 0, Math.PI*2);
             setCtx2dStyle(this,ctx2d);
             if(this.getAttribute('fill')!='none')ctx2d.fill();
+            ctx2d.setTransform(1, 0, 0, 1, 0, 0)
             ctx2d.stroke();
             ctx2d.closePath();
             ctx2d.restore();
@@ -375,6 +380,7 @@ class SvgDrawService{
               ctx2d.rect(x,y, width,height);
               setCtx2dStyle(this,ctx2d); 
               if(fillStyle!='none')ctx2d.fill();
+              ctx2d.setTransform(1, 0, 0, 1, 0, 0)
               ctx2d.stroke();
               ctx2d.closePath();
               ctx2d.restore();
