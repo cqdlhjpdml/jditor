@@ -498,7 +498,7 @@ function SvgNode(selector,text){
     this.initialize(selector,text);
     var me=this;
     this.dbclick(function(event){
-      var panel=PropPanelFactory.getPropPanelInstance("属性设置",me.elementType);
+      var panel=PropPanelFactory.getPropPanelInstance("属性设置",me);
       panel.show();
     });
     this.mouseup(function(event){

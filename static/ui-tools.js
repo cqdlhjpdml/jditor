@@ -453,8 +453,8 @@ class Command extends Tool{
 
 }
 /*MyDialog:wrapper of jquery-ui dialog
- 对话框有titlbar,contentbar,buttonbar由上至下三部分组成，
- 上下有jq_ui生成，,中间contentbar基类默认生成“you's welcome”Div,
+ 对话框有titlebar,contentbar,buttonbar由上至下三部分组成，
+ 上下有jq_ui生成，,中间contentbar基类默认生成“you are welcome”Div,
  由子类重载生成具体内容
  */
 
@@ -519,13 +519,13 @@ class MyDialog{
     
 }
 ////////////////////
-var Property_Config=[{propname:"borderColor",caption:"边框颜色",inputtype:"select",items:["read","white","green","pink","yellow","black","blue"]},
+var Property_Config=[{propname:"borderColor",caption:"边框颜色",inputtype:"select",items:["red","white","green","pink","yellow","black","blue"]},
                      {propname:"borderStyle",caption:"线型",inputtype:"select",items:["solid","dotted","dashed","double"]},
                      {propname:"borderWidth",caption:"线宽",inputtype:"select",items:["1","2","3","4","5","6","0"]},
                      {propname:"borderRadius",caption:"圆角半径",inputtype:"select",items:["0","1","2","3","4","5","6"]},
-                     {propname:"fill",caption:"填充",inputtype:"select",items:["read","white","green","pink","yellow","black","blue"]},
+                     {propname:"fill",caption:"填充",inputtype:"select",items:["red","white","green","pink","yellow","black","blue"]},
                      {propname:"fontFace",caption:"字体",inputtype:"select",items:["宋体","华文仿宋","魏碑","隶书","微软雅黑","serif"]},
-                     {propname:"fontSize",caption:"字号",inputtype:"select",items:["5","6","7","8","9","10","11","12","13","14","15","16","17","18"]},
+                     {propname:"fontSize",caption:"字号",inputtype:"select",items:["12","13","14","15","16","17","18","19","20","21","22","23","24","25"]},
                      {propname:"textPosition",caption:"文本位置",inputtype:"select",items:["left","right","top","bottom"]},
                      {propname:"text",caption:"文本内容",inputtype:"input"}
                      
@@ -535,11 +535,13 @@ class PropPanel extends MyDialog{
     constructor(title,elementType){
         super(title);
         this.elementType=elementType;
+        this.element=null;
+        this.properties=new Array();
         this.create();        
     }
      //overridae
      jqDialog(){
-       
+        var me=this;
         $(`#${this.id}` ).dialog({
             close:false,
             autoOpen:false,
@@ -548,11 +550,11 @@ class PropPanel extends MyDialog{
             width: "auto",
             modal: true,
             buttons: {
-               "open":{
+               "Apply":{
                     text: "应用",
                     
                     click: function() {
-                      
+                      me.apply();
                     }
                 },
                
@@ -565,14 +567,36 @@ class PropPanel extends MyDialog{
               }
           }});
           
-          var me=this;
+          
           $(`#${this.id}`).on( "dialogopen", function(){
 
                             } );
        
    
     }
-    //override 
+    propertiesInitialize(){
+       
+    }
+    setElement(element){
+        this.element=element;
+        propertiesInitialize();
+    }
+    apply(){
+       for(let i=0;i<this.properties.length;i++){
+           switch(this.properties[i].propertyname){
+               case "borderColor":
+                   this.element.borderColor=this.properties[i].val();break;
+               case "fontFace":
+                   var fontFace=this.properties[i].val();break;
+               case "fontSize":
+                var fontSize=this.properties[i].val()+"px";break;
+               case "text":
+                   this.element.text=this.properties[i].val();break;
+           }
+       }
+       this.element.font= fontSize+ " "+ fontFace
+    } 
+    //override
     contentBar(){
         this.jqContentBarID=CommonUtilities.getGuid();
         this.jqContentBar=$(`<div id=${this.jqContentBarID}></div>`);
@@ -584,28 +608,36 @@ class PropPanel extends MyDialog{
         var jqLabel;
         switch(this.elementType){
            case "SvgNode":
-          
+           case "TextNode":
            for( let i=0 ;i<Property_Config.length;i++){
              let config=Property_Config[i];
              switch(config.inputtype){
                 case "select":
-                    this.selectListID=CommonUtilities.getGuid();
-                    this.jqSelectList=$(`<select id=${this.selectListID}></select>`);
-                    jqLabel=$(`<lable for=${this.selectListID}>${config.caption}</label>`);
+                    var selectListID=CommonUtilities.getGuid();
+                    var jqSelectList=$(`<select id=${selectListID}></select>`);
+                    jqLabel=$(`<lable for=${selectListID}>${config.caption}</label>`);
                     this.jqContentBar.append(jqLabel);
                     for(let j=0;j<config.items.length;j++) {
                         let optionvalue=config.items[j];
                         let option=$(`<option>${optionvalue}</option>`)
-                        this.jqSelectList.append(option);
+                        jqSelectList.append(option);
                     } 
-                    this.jqContentBar.append(this.jqSelectList);
+                    this.jqContentBar.append(jqSelectList);
+                    var property={propertyname:config.propname,val:function(){
+                         var t=jqSelectList;
+                         return function(){return t[0].selectedOptions[0].value;}}()}
+                    this.properties.push(property);
                     break;
                 case "input":
-                    this.inputBoxID=CommonUtilities.getGuid();
-                    this.jqInputBox=$(`<input id=${this.selectListID}></input>`);
-                    jqLabel=$(`<lable for=${this.inputBoxID}>${config.caption}</label>`);
+                    var inputBoxID=CommonUtilities.getGuid();
+                    var jqInputBox=$(`<input id=${inputBoxID}></input>`);
+                    jqLabel=$(`<lable for=${inputBoxID}>${config.caption}</label>`);
                     this.jqContentBar.append(jqLabel);
-                    this.jqContentBar.append(this.jqInputBox);
+                    this.jqContentBar.append(jqInputBox);
+                    var property={propertyname:config.propname,val:function(){
+                        var t=jqInputBox;
+                        return function(){return t[0].value;}}()}
+                   this.properties.push(property);
                     break;
                 default:
                     break;
@@ -620,17 +652,17 @@ class PropPanel extends MyDialog{
 }
 //////////////
 class PropPanelFactory{
-    static getPropPanelInstance(title,elementType){
-        if(this.panels) {
-            if(this.panels[elementType])
-               return this.panels[elementType];
+    static getPropPanelInstance(title,element){
+        if(!this.panels) this.panels=new Array();
+        if(this.panels[element.elementType]){
+               this.panels[element.elementType].element=element;
+               return this.panels[element.elementType];
         }
-        else {
-            this.panels=new Array();
-            var panel=new PropPanel(title,elementType);
-            this.panels[elementType]=panel;
-            return panel;
-        }
+        var panel=new PropPanel(title,element.elementType);
+        panel.element=element;
+        this.panels[element.elementType]=panel;
+        return panel;
+      
     }
 
 }

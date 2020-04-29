@@ -182,7 +182,7 @@ JTopo.TextBox=function(text){
     }).show().attr('value', e.text).focus().select();
    
     me.textEditor[0].textBox = e;*/
-    var panel=PropPanelFactory.getPropPanelInstance("属性设置",me.elementType);
+    var panel=PropPanelFactory.getPropPanelInstance("属性设置",me);
     panel.show();
 });
   this.text=text;
