@@ -539,9 +539,8 @@ var Text_Node_Property_Config=[
                    ];
 //////////////////////////////////
 class TextNodePropPanel extends MyDialog{
-    constructor(title,elementType){
+    constructor(title){
         super(title);
-        this.elementType=elementType;
         this.element=null;
         this.properties=new Array();
         this.create();        
@@ -576,17 +575,25 @@ class TextNodePropPanel extends MyDialog{
           
           
           $(`#${this.id}`).on( "dialogopen", function(){
+              
+            me.propertiesInitialize();
 
                             } );
        
    
     }
     propertiesInitialize(){
+        for(let i=0;i<this.properties.length;i++){
+          let control= this.properties[i].control() ;
+          control[0].value=this.element.getPropertyValue(this.properties[i].propertyname);
+           
+        }
+ 
        
     }
     setElement(element){
         this.element=element;
-        propertiesInitialize();
+       
     }
     apply(){
        for(let i=0;i<this.properties.length;i++){
@@ -628,7 +635,9 @@ class TextNodePropPanel extends MyDialog{
                         jqSelectList.append(option);
                     } 
                     this.jqContentBar.append(jqSelectList);
-                    var property={propertyname:config.propname,val:function(){
+                    var property={propertyname:config.propname,
+                        control:function(){var t=jqSelectList;return t;},
+                        val:function(){
                          var t=jqSelectList;
                          return function(){return t[0].selectedOptions[0].value;}}()}
                     this.properties.push(property);
@@ -639,7 +648,9 @@ class TextNodePropPanel extends MyDialog{
                     jqLabel=$(`<lable for=${inputBoxID}>${config.caption}</label>`);
                     this.jqContentBar.append(jqLabel);
                     this.jqContentBar.append(jqInputBox);
-                    var property={propertyname:config.propname,val:function(){
+                    var property={propertyname:config.propname,
+                        control:function(){var t=jqInputBox;return t;},
+                        val:function(){
                         var t=jqInputBox;
                         return function(){return t[0].value;}}()}
                    this.properties.push(property);
@@ -782,7 +793,14 @@ class PropPanelFactory{
                this.panels[element.elementType].element=element;
                return this.panels[element.elementType];
         }
-        var panel=new PropPanel(title,element.elementType);
+        switch(element.elementType){
+            case "TextNode":
+                var panel=new TextNodePropPanel(title);
+               break;
+            case "SvgNode":
+                var panel=new TextNodePropPanel(title);break;
+
+        }
         panel.element=element;
         this.panels[element.elementType]=panel;
         return panel;

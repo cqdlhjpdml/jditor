@@ -209,6 +209,24 @@ JTopo.TextBox=function(text){
     this.paintAlarmText(a);
     
     
+};
+this.getPropertyValue=function(propname){
+    var fontProperties=this.font.split(" ");
+    for(i=0;i<fontProperties.length;i++){
+      let prop=fontProperties[i].trim();
+    
+    }
+
+    switch(propname){
+        
+        case "fontFace":
+           break;
+        case "fontSize":
+         break;
+        case "text":
+            return this.text;
+    }
+
 }
 return this;
 }
