@@ -174,7 +174,7 @@ class ToolsPanel extends Tool{
           var scene=event.scene;
           var me=scene.mouseHandlerObject;
           var textNode = new JTopo.TextBox();
-          textNode.font = '16px 宋体';
+          textNode.font = 'normal 16px 宋体';
           textNode.fontColor="#303030"
           textNode.setLocation(x, y);
           scene.add(textNode);
@@ -524,26 +524,26 @@ var Property_Config=[{propname:"borderColor",caption:"边框颜色",inputtype:"s
                      {propname:"borderWidth",caption:"线宽",inputtype:"select",items:["1","2","3","4","5","6","0"]},
                      {propname:"borderRadius",caption:"圆角半径",inputtype:"select",items:["0","1","2","3","4","5","6"]},
                      {propname:"fill",caption:"填充",inputtype:"select",items:["red","white","green","pink","yellow","black","blue"]},
-                     {propname:"fontFace",caption:"字体",inputtype:"select",items:["宋体","华文仿宋","魏碑","隶书","微软雅黑","serif"]},
+                     {propname:"fontFamily",caption:"字体",inputtype:"select",items:["宋体","华文仿宋","魏碑","隶书","微软雅黑","serif"]},
                      {propname:"fontSize",caption:"字号",inputtype:"select",items:["12","13","14","15","16","17","18","19","20","21","22","23","24","25"]},
                      {propname:"textPosition",caption:"文本位置",inputtype:"select",items:["left","right","top","bottom"]},
                      {propname:"text",caption:"文本内容",inputtype:"input"}
                      
                     ];
-var Text_Node_Property_Config=[
-                    {propname:"fontFace",caption:"字体",inputtype:"select",items:["宋体","华文仿宋","魏碑","隶书","微软雅黑","serif"]},
-                    {propname:"fontSize",caption:"字号",inputtype:"select",items:["12","13","14","15","16","17","18","19","20","21","22","23","24","25"]},
-                    {propname:"textPosition",caption:"文本位置",inputtype:"select",items:["left","right","top","bottom"]},
+var Text_Node_Property_Config=[/* font-style, font-variant, font-weight, font-stretch, font-size, line-height, and font-famil*/
+                    {propname:"fontStyle",caption:"风格",inputtype:"select",items:["normal","italic"]},
+                    {propname:"fontSize",caption:"字号",inputtype:"select",items:["12px","13px","14px","15px","16px","17px","18px","19px","20px","21px","22px","23px","24px","25px"]},
+                    {propname:"fontFamily",caption:"字体",inputtype:"select",items:["宋体","华文仿宋","魏碑","隶书","微软雅黑","serif"]},
                     {propname:"text",caption:"文本内容",inputtype:"input"}
                     
                    ];
 //////////////////////////////////
-class TextNodePropPanel extends MyDialog{
+class PropPanel extends MyDialog{
     constructor(title){
         super(title);
         this.element=null;
         this.properties=new Array();
-        this.create();        
+               
     }
      //overridae
      jqDialog(){
@@ -572,43 +572,30 @@ class TextNodePropPanel extends MyDialog{
                 },
               }
           }});
-          
-          
-          $(`#${this.id}`).on( "dialogopen", function(){
               
+          $(`#${this.id}`).on( "dialogopen", function(){
             me.propertiesInitialize();
-
                             } );
        
    
     }
     propertiesInitialize(){
-        for(let i=0;i<this.properties.length;i++){
-          let control= this.properties[i].control() ;
-          control[0].value=this.element.getPropertyValue(this.properties[i].propertyname);
-           
-        }
- 
        
+        for(let i=0;i<this.properties.length;i++){
+            let control= this.properties[i].control();
+            control[0].value=this.element.getPropertyValue(this.properties[i].propertyname);
+             
+          }
     }
     setElement(element){
         this.element=element;
-       
     }
     apply(){
        for(let i=0;i<this.properties.length;i++){
-           switch(this.properties[i].propertyname){
-               case "borderColor":
-                   this.element.borderColor=this.properties[i].val();break;
-               case "fontFace":
-                   var fontFace=this.properties[i].val();break;
-               case "fontSize":
-                var fontSize=this.properties[i].val()+"px";break;
-               case "text":
-                   this.element.text=this.properties[i].val();break;
-           }
+         this.element.setPropertyValue(this.properties[i].propertyname,this.properties[i].val());
+         
        }
-       this.element.font= fontSize+ " "+ fontFace
+      
     } 
     //override
     contentBar(){
@@ -620,9 +607,9 @@ class TextNodePropPanel extends MyDialog{
         "grid-row-gap": "8px",
         "grid-column-gap": "8px"});
         var jqLabel;
-        
-        for( let i=0 ;i<Text_Node_Property_Config.length;i++){
-             let config=Text_Node_Property_Config[i];
+       
+        for( let i=0 ;i<this.propConfig.length;i++){
+             let config=this.propConfig[i];
              switch(config.inputtype){
                 case "select":
                     var selectListID=CommonUtilities.getGuid();
@@ -636,7 +623,7 @@ class TextNodePropPanel extends MyDialog{
                     } 
                     this.jqContentBar.append(jqSelectList);
                     var property={propertyname:config.propname,
-                        control:function(){var t=jqSelectList;return t;},
+                        control:function(){var t=jqSelectList;return function(){return t}}(),
                         val:function(){
                          var t=jqSelectList;
                          return function(){return t[0].selectedOptions[0].value;}}()}
@@ -661,130 +648,63 @@ class TextNodePropPanel extends MyDialog{
              }
            
         }
-   
+      
         return this.jqContentBar;
    }
-   
 }
-class PropPanel extends MyDialog{
-    constructor(title,elementType){
+
+     
+//////////////////////////////////
+class TextNodePropPanel extends PropPanel{
+    constructor(title){
         super(title);
-        this.elementType=elementType;
-        this.element=null;
-        this.properties=new Array();
+        this.propConfig=Text_Node_Property_Config;
         this.create();        
     }
-     //overridae
-     jqDialog(){
-        var me=this;
-        $(`#${this.id}` ).dialog({
-            close:false,
-            autoOpen:false,
-            resizable: false,
-            height: "auto",
-            width: "auto",
-            modal: true,
-            buttons: {
-               "Apply":{
-                    text: "应用",
-                    
-                    click: function() {
-                      me.apply();
-                    }
-                },
-               
-              "Cancel":{ 
-                text:"退出",
-                click:function(  ){ 
-                  $(`#${this.id}` ).dialog("close");
-                  
-                },
-              }
-          }});
-          
-          
-          $(`#${this.id}`).on( "dialogopen", function(){
-
-                            } );
-       
-   
-    }
-    propertiesInitialize(){
-       
-    }
-    setElement(element){
-        this.element=element;
-        propertiesInitialize();
-    }
     apply(){
-       for(let i=0;i<this.properties.length;i++){
-           switch(this.properties[i].propertyname){
-               case "borderColor":
-                   this.element.borderColor=this.properties[i].val();break;
-               case "fontFace":
-                   var fontFace=this.properties[i].val();break;
-               case "fontSize":
-                var fontSize=this.properties[i].val()+"px";break;
-               case "text":
-                   this.element.text=this.properties[i].val();break;
-           }
-       }
-       this.element.font= fontSize+ " "+ fontFace
-    } 
-    //override
-    contentBar(){
-        this.jqContentBarID=CommonUtilities.getGuid();
-        this.jqContentBar=$(`<div id=${this.jqContentBarID}></div>`);
-        this.jqContentBar.css({"display": "grid",
-        "grid-template-columns": "50% 50%",
-        
-        "grid-row-gap": "8px",
-        "grid-column-gap": "8px"});
-        var jqLabel;
-        switch(this.elementType){
-           case "SvgNode":
-           case "TextNode":
-           for( let i=0 ;i<Property_Config.length;i++){
-             let config=Property_Config[i];
-             switch(config.inputtype){
-                case "select":
-                    var selectListID=CommonUtilities.getGuid();
-                    var jqSelectList=$(`<select id=${selectListID}></select>`);
-                    jqLabel=$(`<lable for=${selectListID}>${config.caption}</label>`);
-                    this.jqContentBar.append(jqLabel);
-                    for(let j=0;j<config.items.length;j++) {
-                        let optionvalue=config.items[j];
-                        let option=$(`<option>${optionvalue}</option>`)
-                        jqSelectList.append(option);
-                    } 
-                    this.jqContentBar.append(jqSelectList);
-                    var property={propertyname:config.propname,val:function(){
-                         var t=jqSelectList;
-                         return function(){return t[0].selectedOptions[0].value;}}()}
-                    this.properties.push(property);
-                    break;
-                case "input":
-                    var inputBoxID=CommonUtilities.getGuid();
-                    var jqInputBox=$(`<input id=${inputBoxID}></input>`);
-                    jqLabel=$(`<lable for=${inputBoxID}>${config.caption}</label>`);
-                    this.jqContentBar.append(jqLabel);
-                    this.jqContentBar.append(jqInputBox);
-                    var property={propertyname:config.propname,val:function(){
-                        var t=jqInputBox;
-                        return function(){return t[0].value;}}()}
-                   this.properties.push(property);
-                    break;
+        var font="";
+        for(let i=0;i<this.properties.length;i++){
+            switch(this.properties[i].propertyname){
+                case "fontStyle":
+                case "fontFamily":
+                case "fontSize":
+                   font=font + " " + this.properties[i].val()
+                   break;
                 default:
-                    break;
-           
-             }
-           
-           }
-           default:break;
-        }        
-        return this.jqContentBar;
-   }
+                    this.element.setPropertyValue(this.properties[i].propertyname,this.properties[i].val());
+            }  
+          this.element.setPropertyValue("font",font);
+          
+        }
+    }
+       
+    propertiesInitialize(){
+        var fontProp=this.element.getPropertyValue("font").trim().split(" ");
+        var fontProperties=[];
+        for(let i=0;i<fontProp.length;i++){
+            fontProperties.push(fontProp[i].trim());
+        }
+
+        for(let i=0;i<this.properties.length;i++){
+            let control= this.properties[i].control();
+            switch(this.properties[i].propertyname){
+                case "fontStyle":
+                case "fontFamily":
+                case "fontSize":
+                    for(let j=0;j<fontProperties.length;j++){
+                        let k=this.propConfig[i].items.indexOf(fontProperties[j]);
+                        if(k!=-1) {control[0].value=this.propConfig[i].items[k];break;}
+                    }
+                   break;
+                default:
+                    control[0].value=this.element.getPropertyValue(this.properties[i].propertyname);
+            }
+            
+             
+          }
+    }
 }
+
 //////////////
 class PropPanelFactory{
     static getPropPanelInstance(title,element){

@@ -162,26 +162,7 @@ JTopo.TextBox=function(text){
   this.elementType="TextNode";
   var me=this;        
   this.dbclick(function(event){
-    /*if(!me.textEditor){
-      me.textEditor=$(`<textarea  style="width: 287px; position: absolute; top: 262px; left: 536.805px; margin: 0px; height: 29px; display: none;"\
-      onkeydown="if(event.keyCode==13)this.blur();" ></textarea>`);
-      document.body.appendChild(me.textEditor[0]);
-    
-      me.textEditor[0].value=me.text;
-      me.textEditor.blur(function(){
-       
-        me.textEditor[0].textBox.text = me.textEditor.hide().val();
-      
-       
-      });     
-    }
-    var e = event.target;
-    me.textEditor.css({
-        top: event.pageY,
-        left: event.pageX - e.width/2
-    }).show().attr('value', e.text).focus().select();
-   
-    me.textEditor[0].textBox = e;*/
+  
     var panel=PropPanelFactory.getPropPanelInstance("属性设置",me);
     panel.show();
 });
@@ -210,22 +191,29 @@ JTopo.TextBox=function(text){
     
     
 };
-this.getPropertyValue=function(propname){
-    var fontProperties=this.font.split(" ");
-    for(i=0;i<fontProperties.length;i++){
-      let prop=fontProperties[i].trim();
-    
-    }
 
+this.getPropertyValue=function(propname){
+  
     switch(propname){
         
-        case "fontFace":
-           break;
-        case "fontSize":
-         break;
+        case "font":
+            return this.font;
         case "text":
             return this.text;
     }
+
+}
+this.setPropertyValue=function(propname,value){
+
+
+  switch(propname){
+      
+      case "font":
+        this.font=value;break;
+      
+      case "text":
+        this.text=value;break;
+  }
 
 }
 return this;
