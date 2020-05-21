@@ -192,30 +192,7 @@ JTopo.TextBox=function(text){
     
 };
 
-this.getPropertyValue=function(propname){
-  
-    switch(propname){
-        
-        case "font":
-            return this.font;
-        case "text":
-            return this.text;
-    }
 
-}
-this.setPropertyValue=function(propname,value){
-
-
-  switch(propname){
-      
-      case "font":
-        this.font=value;break;
-      
-      case "text":
-        this.text=value;break;
-  }
-
-}
 return this;
 }
 JTopo.TextBox.prototype=new JTopo.TextNode();

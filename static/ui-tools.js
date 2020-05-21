@@ -662,6 +662,17 @@ class TextNodePropPanel extends PropPanel{
         this.create();        
     }
     apply(){
+        
+        var args={};
+        args.obj=this.element;
+        args.props={};
+        args.props.text=this.element.text;
+        args.props.font=this.element.font;
+        args.props.fontSize=this.element.fontSize;
+        var propAction=new PropertyAction(args);
+        var actionManager=this.element.scene.mouseHandlerObject.toolManager.actionManager;
+        actionManager.pushUndoAction(propAction);
+
         var font="";
         for(let i=0;i<this.properties.length;i++){
             switch(this.properties[i].propertyname){
@@ -674,7 +685,7 @@ class TextNodePropPanel extends PropPanel{
                     this.element.setPropertyValue(this.properties[i].propertyname,this.properties[i].val());
             }  
           this.element.setPropertyValue("font",font);
-          
+                 
         }
     }
        
@@ -1234,7 +1245,7 @@ class MoveAction extends Action{
 //////////////////////
 class AddAction extends Action{
     undo(){
-       
+        
         this.args.scene.remove(this.args.obj);
 
     }
@@ -1275,7 +1286,28 @@ class LinkAction extends Action{
         }      
     }
 }
-//////////////////////////////
+/////////////////////////////
+class PropertyAction extends Action{
+    
+    do(){
+        var props={};
+        for (var propname in this.args.props) {
+            props[propname]=this.args.obj.getPropertyValue(propname);
+            this.args.obj.setPropertyValue(propname,this.args.props[propname])
+        }
+        this.args.props=props;
+        
+
+    }
+    undo(){
+      this.do();
+    }
+    redo(){
+      this.do();     
+    }
+}
+///////////////////////////////
+
 class ActionManager{
     constructor(){
         this.undoStack=[];

@@ -460,6 +460,22 @@ function SvgNode(selector,text){
   this.initialize=function(selector,text){
      
     SvgNode.prototype.initialize.apply(this,null);
+    
+    this.selectedHandler = function(b) {//override
+      SvgNode.prototype.selectedHandler.apply(this,arguments);
+      
+      this.selectedLocation = {
+        x: this.x,
+        y: this.y,
+        width:this.width,
+        height:this.height,
+        svgScaleX:this.svgScaleX,
+        svgScaleY:this.svgScaleY,
+        rotate:this.rotate
+     };
+    
+     };
+  
       this.text=text;
       this.selector=selector;
       this.elementType="SvgNode";

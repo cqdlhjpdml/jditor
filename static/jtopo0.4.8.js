@@ -1229,6 +1229,7 @@ function(a) {//Scene
         ,
         this.add = function(a) {
             this.childs.push(a),
+            a.scene=this,//dml
             null == this.zIndexMap[a.zIndex] && (this.zIndexMap[a.zIndex] = [],
             this.zIndexArray.push(a.zIndex),
             this.zIndexArray.sort(function(a, b) {
@@ -1783,6 +1784,19 @@ function(a) {
             }),
             b
         }
+        ,
+        this.getPropertyValue=function(propname){//dml
+  
+            return this[propname];
+        
+        }
+        ,
+        this.setPropertyValue=function(propname,value){//dml
+        
+        
+            this[propname]=value;
+        
+        }
     }
     function c() {//InteractiveElement
         this.initialize = function() {
@@ -1824,6 +1838,7 @@ function(a) {
             this.selectedLocation = {
                 x: this.x,
                 y: this.y
+            
             }
             //dml begin
             this.connectors.forEach(function(cn) {
@@ -1856,12 +1871,19 @@ function(a) {
         this.mouseupHandler = function(e) {
             if(this.mDragging) {//dml begin
                 this.mDragging=0;
-                var args={};
+                /*var args={};
                 args.obj=e.target;
                 args.x0=e.target.selectedLocation.x;
                 args.y0=e.target.selectedLocation.y;
                 var tool=e.scene.mouseHandlerObject;
                 tool&&tool.toolManager.actionManager.pushUndoAction(new a.MoveAction(args));
+                */
+               var args={};
+               args.obj=e.target;
+               args.props=e.target.selectedLocation;
+               var propAction=new PropertyAction(args);
+               var actionManager=this.scene.mouseHandlerObject.toolManager.actionManager;
+               actionManager.pushUndoAction(propAction);
             }//dml end
             this.dispatchEvent("mouseup", e)
         }
@@ -2194,7 +2216,7 @@ function(a) {
             var height_n=this.selectedSize.height+dh(this,event);
             if(width_n>1) {this.width = width_n;this.x=lt0.xlt0_a;this.y=lt0.ylt0_a;}
             if(height_n>1) this.height = height_n;  
-
+            
         };
         ////////////////////dml end
         this.dragRotateHandler=function(event){
