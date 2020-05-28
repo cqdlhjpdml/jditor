@@ -1871,18 +1871,12 @@ function(a) {
         this.mouseupHandler = function(e) {
             if(this.mDragging) {//dml begin
                 this.mDragging=0;
-                /*var args={};
-                args.obj=e.target;
-                args.x0=e.target.selectedLocation.x;
-                args.y0=e.target.selectedLocation.y;
-                var tool=e.scene.mouseHandlerObject;
-                tool&&tool.toolManager.actionManager.pushUndoAction(new a.MoveAction(args));
-                */
+            
                var args={};
                args.obj=e.target;
                args.props=e.target.selectedLocation;
                var propAction=new PropertyAction(args);
-               var actionManager=this.scene.mouseHandlerObject.toolManager.actionManager;
+               var actionManager=e.scene.getEditor().toolManager.actionManager;
                actionManager.pushUndoAction(propAction);
             }//dml end
             this.dispatchEvent("mouseup", e)
@@ -1992,7 +1986,7 @@ function(a) {
                         cx=(d.left+d.right)/2;
                         cy=(d.top+d.bottom)/2; 
                         r=(d.right-d.left)/2;
-                        //now translate to current coordinates(center locaated at the node's bound center) 
+                        //now translate to current coordinates(center located at the node's bound center) 
                         cx=cx-this.cx;
                         cy=cy-this.cy;
                         a.lineWidth=3;

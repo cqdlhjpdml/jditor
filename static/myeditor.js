@@ -205,6 +205,7 @@ class MyEditor{
     }
     createTab(tabname){
         var scene=this.createScene(tabname);
+        scene.setEditor(this);
         this.setCurrentScene(scene);
         
         this.stage.add(scene);
@@ -230,6 +231,7 @@ class MyEditor{
         var me=this;
         scenes.forEach(function(a) {
                 var b = new JTopo.Scene(stage);
+                b.setEditor(me);
                 for (var c in a)// a is a scene
                    "childs" != c && (b[c] = a[c]),
                    "background" == c && (b.background = a[c]);

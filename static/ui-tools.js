@@ -7,9 +7,6 @@ class Tool{
         this.instance=new toolItem.toolClass(toolItem,toolManager);
         return this.instance;
     }
-    setSceneMouseHandlerObject(scene){
-          scene.mouseHandlerObject=this;
-    } 
    
     activate(active,event){
        var scene=this.toolManager.getScene();
@@ -20,8 +17,8 @@ class Tool{
            
         }
         else{
-          
-          this.setSceneMouseHandlerObject(scene);
+          scene.setTool(this);
+          //this.setSceneMouseHandlerObject(scene);
           this.setSceneMouseHandler(scene);
           this.toolBtn.style.opacity="0.5";
           this.toolBtn.style.border="1px solid red";
@@ -172,7 +169,7 @@ class ToolsPanel extends Tool{
           var x=event.x;
           var y=event.y;
           var scene=event.scene;
-          var me=scene.mouseHandlerObject;
+          var me=scene.getTool();
           var textNode = new JTopo.TextBox();
           textNode.font = 'normal 16px 宋体';
           textNode.fontColor="#303030"
@@ -187,7 +184,7 @@ class ToolsPanel extends Tool{
          me.toolManager.refresh(TASK_END);  
          scene.removeEventListener("click");
          scene.removeEventListener("click");
-         scene.mouseHandlerObject.toolManager.refresh(TASK_END);
+         scene.getTool().toolManager.refresh(TASK_END);
            
       }  
        setSceneMouseHandler(scene){
@@ -204,7 +201,7 @@ class ToolsPanel extends Tool{
           var x=event.offsetX;
           var y=event.offsetY;
           var scene=event.scene;
-          var me=scene.mouseHandlerObject;
+          var me=scene.getTool();
           CommonUtilities.popFileDialog(insertImageCallback)  ; 
           function insertImageCallback(flag,imageFile){
           if(flag=="OK"){
@@ -221,7 +218,7 @@ class ToolsPanel extends Tool{
            me.toolManager.refresh(TASK_END);  
            scene.removeEventListener("click");
            scene.removeEventListener("click");
-           scene.mouseHandlerObject.toolManager.refresh(TASK_END);
+           scene.getTool().toolManager.refresh(TASK_END);
           }
 
           
@@ -240,7 +237,7 @@ class ToolsPanel extends Tool{
           var x=event.x;
           var y=event.y;
           var scene=event.scene;
-          var me=scene.mouseHandlerObject;
+          var me=scene.getTool();
           var node=new JTopo.SvgNode(me.toolItem.symbolType,me.toolItem.text);
           node.setLocation(x,y);
           scene.add(node);
@@ -261,7 +258,7 @@ class ToolsPanel extends Tool{
    
     clearTask(){
         var scene=this.toolManager.getScene();
-        var me=scene.mouseHandlerObject;
+        var me=scene.getTool();
         let k=me.midLinks.length;
         if(k==0) return;
         if(me.midLinks[k-1].nodeZ instanceof Connector)  return;
@@ -278,16 +275,17 @@ class ToolsPanel extends Tool{
      setSceneMouseHandler(scene){
         var from=null,last=null,path=[],midLinks=[];
         var undoKeeps=[];//undoKeeps:when undo action,the connector inserted before the link shunold be keeped.
-        scene.mouseHandlerObject.midLinks=midLinks;  
-          function mouseclickHandler(event){
+        scene.getTool().midLinks=midLinks;  
+        function mouseclickHandler(event){
               var x=event.x;
               var y=event.y;
-              //console.log(x,y);
+          
               var scene=event.scene;
-              var me=scene.mouseHandlerObject;
+              var me=scene.getTool();
               
               if(!from&&scene.mouseOverelement){
-                 if(scene.mouseOverelement.elementType!="Connector") {//click a node its elementType is not "Connector"
+                scene.keyStatus.shift=1; 
+                if(scene.mouseOverelement.elementType!="Connector") {//click a node its elementType is not "Connector"
                   let owner=scene.mouseOverelement;
                   let connector=new Connector(owner);
                   connector.setCenterLocation(x,y); 
@@ -332,15 +330,16 @@ class ToolsPanel extends Tool{
                  
 
                }
-               if(from&&scene.mouseOverelement){//this is a end connector
+              if(from&&scene.mouseOverelement){//this is a end connector
                   var endConnector;
                   if(scene.mouseOverelement===tk) return;
                   if(scene.mouseOverelement.elementType!="Connector"){ 
                       let owner=scene.mouseOverelement;
                       let connector=new Connector(owner);
                       if(scene.keyStatus.shift)
-                      connector.setCenterLocation(t.cx,t.cy); 
-                      else connector.setCenterLocation(x,y); 
+                         connector.setCenterLocation(t.cx,t.cy); 
+                      else 
+                         connector.setCenterLocation(x,y); 
                       scene.add(connector);
                       endConnector=connector;
                   
@@ -356,11 +355,12 @@ class ToolsPanel extends Tool{
                   path.push({x:endConnector.cx,y:endConnector.cy});
                   midLinks.push(link);
                   from=null;last=null;
-                  scene.keyStatus.shift=0;
+                
                   me.toolManager.refresh(TASK_END); 
                   scene.removeEventListener("mousemove");
                   scene.removeEventListener("click");
                   scene.remove(t);
+                  scene.remove(cross);
                   scene.remove(tk);
                   var args={};
                   args.scene=scene;
@@ -377,39 +377,43 @@ class ToolsPanel extends Tool{
   
               }
                                                           
-          }
-          var t,tk;
-          function mousemoveHandler(event){
+        }
+        var t,tk,cross;
+        function mousemoveHandler(event){
               var x=event.x;
               var y=event.y;
               var scene=event.scene;
-              var me=scene.mouseHandlerObject;                          
+                                      
               if(!t){
                   t=new JTopo.Node();
-                  t.height=5;
-                  t.width=5;
+                  t.height=0;
+                  t.width=0;
                   t.fillColor="100,100,100";
                   t.alpha=1;
+                  t.visible=false
                   t.setCenterLocation(x,y);
-                  t.visible=false;
                   tk=new JTopo.Link(last,t);
                   scene.add(t);
                   scene.add(tk);
+                  cross=new JTopo.CrossDot();//十字架对齐线
+                  cross.setCenterLocation(x,y);
+                  scene.add(cross);
                   return;
               }
+              cross.setCenterLocation(x,y);
               if(!scene.keyStatus.shift)t.setCenterLocation(x,y);
               else{ 
                 var dx=Math.abs(x-last.cx),dy=Math.abs(y-last.cy);
                 if(dx-dy>0)//水平横向移动  
                  t.setCenterLocation(x,last.cy)
                 else //垂直纵向移动
-                   t.setCenterLocation(last.cx,y)
+                 t.setCenterLocation(last.cx,y)
               }
          
                                                
-          }
+        }
           
-          scene.addEventListener("click",mouseclickHandler);
+        scene.addEventListener("click",mouseclickHandler);
        }  
   }
   //////////////////////////////
@@ -418,7 +422,7 @@ class ToolsPanel extends Tool{
           function mouseclickHandler(event){
               var x=event.x;
               var y=event.y;
-              var me=scene.mouseHandlerObject
+              var me=scene.getTool()
               var owner=event.scene.mouseOverelement;
               if(!owner) {me.toolManager.refresh(TASK_END);return ;}
               var connector=new Connector(owner);
@@ -670,7 +674,7 @@ class TextNodePropPanel extends PropPanel{
         args.props.font=this.element.font;
         args.props.fontSize=this.element.fontSize;
         var propAction=new PropertyAction(args);
-        var actionManager=this.element.scene.mouseHandlerObject.toolManager.actionManager;
+        var actionManager=this.element.scene.getTool().toolManager.actionManager;
         actionManager.pushUndoAction(propAction);
 
         var font="";

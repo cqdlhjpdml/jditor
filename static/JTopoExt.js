@@ -3,21 +3,42 @@
 function Connector(owner){
     Connector.prototype.initialize.apply(this,null);
     this.elementType="Connector"
-    this.height=8;
-    this.width=8;
+    this.height=10;
+    this.width=10;
     this.fillColor="125,125,125";
     this.alpha=1;
     this.owner=owner;
     this.owner_id=owner._id;
     this.serializedProperties.push("owner_id");
     owner.connectors.push(this);
-
+    this.dragHandler=function(){};//disable dragging
+    
     return this;
 }
 
 
 Connector.prototype=new JTopo.Node();
 JTopo.Connector=Connector;
+/////////////////////////////////////
+function CrossDot(){//十字架
+  CrossDot.prototype.initialize.apply(this,null);
+  this.paint=function(ctx2d){
+    ctx2d.save();
+    ctx2d.strokeStyle = 'pink';
+    ctx2d.lineWidth = 0.5;
+    ctx2d.beginPath();
+    ctx2d.moveTo(this.cx, this.cy+500);// the JTopo's DisplayElement,its original point not be translated to the node's center
+    ctx2d.lineTo(this.cx, this.cy-500);
+    ctx2d.moveTo(this.cx+500, this.cy);
+    ctx2d.lineTo(this.cx-500, this.cy);
+    ctx2d.closePath();
+    ctx2d.stroke();
+    ctx2d.restore();
+  }
+  return this;
+}
+CrossDot.prototype=new JTopo.DisplayElement();
+JTopo.CrossDot=CrossDot;
 ///////////////////////////////////////////////
 function FreeLink(nodeA,nodeZ,text){
   this.initialize=function(nodeA,nodeZ,text){
@@ -197,7 +218,18 @@ return this;
 }
 JTopo.TextBox.prototype=new JTopo.TextNode();
 ///////////////////////////////////////////////
-
+JTopo.Scene.prototype.setTool=function(tool){
+  this.tool=tool;
+} 
+JTopo.Scene.prototype.getTool=function(){
+  return this.tool;
+} 
+JTopo.Scene.prototype.setEditor=function(editor){
+  this.editor=editor;
+}
+JTopo.Scene.prototype.getEditor=function(){
+  return this.editor;
+} 
 
 
 
