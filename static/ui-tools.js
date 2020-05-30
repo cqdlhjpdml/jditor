@@ -9,7 +9,7 @@ class Tool{
     }
    
     activate(active,event){
-       var scene=this.toolManager.getScene();
+       var scene=this.toolManager.getActiveScene();
        if(!active) {
             this.clearTask();
             this.toolBtn.style.border="none";
@@ -18,7 +18,7 @@ class Tool{
         }
         else{
           scene.setTool(this);
-          //this.setSceneMouseHandlerObject(scene);
+          
           this.setSceneMouseHandler(scene);
           this.toolBtn.style.opacity="0.5";
           this.toolBtn.style.border="1px solid red";
@@ -27,6 +27,7 @@ class Tool{
           this.toolManager.setCurrentTool(this);
         }
     }
+  
    getToolBtn(){return this.toolBtn}
     /**************************/
     constructor(toolItem,toolManager){
@@ -255,37 +256,55 @@ class ToolsPanel extends Tool{
   }
   ///////////////////////////////
   class LinkTool extends Tool{
-   
+    constructor(toolItem,toolManager){
+        super(toolItem,toolManager) ;
+        var me=this;
+        this.tempNode=new JTopo.Node();//临时线段起点
+        this.tempNode.height=0;
+        this.tempNode.width=0;
+        this.tempNode.fillColor="100,100,100";
+        this.tempNode.alpha=1;
+        this.tempNode.visible=false;
+        this.cross=new JTopo.CrossDot();//十字架对齐提示线;
+        this.cross.visible=false;
+        this.tempLink=null;//临时连线
+       
+    }
+  
     clearTask(){
-        var scene=this.toolManager.getScene();
+        var scene=this.toolManager.getActiveScene();
         var me=scene.getTool();
-        let k=me.midLinks.length;
+        let k=scene.midLinks.length;
         if(k==0) return;
-        if(me.midLinks[k-1].nodeZ instanceof Connector)  return;
+        if(scene.midLinks[k-1].nodeZ instanceof Connector)  return;
         
         for(let i=0;i<k;i++){
-            let link=me.midLinks[i];
+            let link=scene.midLinks[i];
             scene.remove(link);
             scene.remove(link.nodeA);
             if(i==k-1) scene.remove(link.nodeZ)
-        }   
-
+        }
+     scene.midLinks=null;   
+     scene.remove(me.tempNode);
+     me.tempLink&&scene.remove(me.tempLink);
+     scene.remove(me.cross);
         
     }  
      setSceneMouseHandler(scene){
         var from=null,last=null,path=[],midLinks=[];
         var undoKeeps=[];//undoKeeps:when undo action,the connector inserted before the link shunold be keeped.
-        scene.getTool().midLinks=midLinks;  
+        scene.midLinks=midLinks; 
+        var me=scene.getTool(); 
         function mouseclickHandler(event){
               var x=event.x;
               var y=event.y;
           
               var scene=event.scene;
-              var me=scene.getTool();
+             
               
               if(!from&&scene.mouseOverelement){
                 scene.keyStatus.shift=1; 
-                if(scene.mouseOverelement.elementType!="Connector") {//click a node its elementType is not "Connector"
+                if(scene.mouseOverelement.elementType!="Connector") {//click a node its elementType is not "Connector",then create a connector first
                   let owner=scene.mouseOverelement;
                   let connector=new Connector(owner);
                   connector.setCenterLocation(x,y); 
@@ -301,6 +320,9 @@ class ToolsPanel extends Tool{
                  path.push({x:scene.mouseOverelement.cx,y:scene.mouseOverelement.cy});
                  undoKeeps.push(from);//here from is a existed connector
                  }
+                 scene.add(me.tempNode);//表示鼠标移动的临时节点
+                 me.cross.visbile=true;
+                 scene.add(me.cross);
                  scene.addEventListener("mousemove",mousemoveHandler);
                  return;
   
@@ -312,7 +334,7 @@ class ToolsPanel extends Tool{
                    midnode.height=5;
                    midnode.width=5;
                    midnode.fillColor="125,125,125";
-                   midnode.cx=t.cx,midnode.cy=t.cy;
+                   midnode.cx=me.tempNode.cx,midnode.cy=me.tempNode.cy;
                    let link=new FreeLink(last,midnode);
                    link.strokeColor="128,128,128"
                    midnode.visible=true;
@@ -322,9 +344,7 @@ class ToolsPanel extends Tool{
                    last=midnode;
                    path.push({x:midnode.cx,y:midnode.cy});
                    midLinks.push(link);
-                   scene.remove(tk);
-                   tk=new JTopo.Link(last,t);
-                   scene.add(tk);
+                 
                    return; 
                   
                  
@@ -332,12 +352,12 @@ class ToolsPanel extends Tool{
                }
               if(from&&scene.mouseOverelement){//this is a end connector
                   var endConnector;
-                  if(scene.mouseOverelement===tk) return;
+                  if(scene.mouseOverelement===me.tempLink) return;
                   if(scene.mouseOverelement.elementType!="Connector"){ 
                       let owner=scene.mouseOverelement;
                       let connector=new Connector(owner);
                       if(scene.keyStatus.shift)
-                         connector.setCenterLocation(t.cx,t.cy); 
+                         connector.setCenterLocation(me.tempNode.cx,me.tempNode.cy); 
                       else 
                          connector.setCenterLocation(x,y); 
                       scene.add(connector);
@@ -359,9 +379,10 @@ class ToolsPanel extends Tool{
                   me.toolManager.refresh(TASK_END); 
                   scene.removeEventListener("mousemove");
                   scene.removeEventListener("click");
-                  scene.remove(t);
-                  scene.remove(cross);
-                  scene.remove(tk);
+                  me.cross.visible=false;
+                  me.tempLink&&scene.remove(me.tempLink);
+                  scene.remove(me.cross);
+                  scene.remove(me.tempNode);
                   var args={};
                   args.scene=scene;
                   args.links=midLinks;
@@ -378,37 +399,26 @@ class ToolsPanel extends Tool{
               }
                                                           
         }
-        var t,tk,cross;
+      
         function mousemoveHandler(event){
               var x=event.x;
               var y=event.y;
               var scene=event.scene;
-                                      
-              if(!t){
-                  t=new JTopo.Node();
-                  t.height=0;
-                  t.width=0;
-                  t.fillColor="100,100,100";
-                  t.alpha=1;
-                  t.visible=false
-                  t.setCenterLocation(x,y);
-                  tk=new JTopo.Link(last,t);
-                  scene.add(t);
-                  scene.add(tk);
-                  cross=new JTopo.CrossDot();//十字架对齐线
-                  cross.setCenterLocation(x,y);
-                  scene.add(cross);
-                  return;
-              }
-              cross.setCenterLocation(x,y);
-              if(!scene.keyStatus.shift)t.setCenterLocation(x,y);
+                      
+              if(!scene.keyStatus.shift)me.tempNode.setCenterLocation(x,y);
               else{ 
                 var dx=Math.abs(x-last.cx),dy=Math.abs(y-last.cy);
                 if(dx-dy>0)//水平横向移动  
-                 t.setCenterLocation(x,last.cy)
+                 me.tempNode.setCenterLocation(x,last.cy)
                 else //垂直纵向移动
-                 t.setCenterLocation(last.cx,y)
-              }
+                 me.tempNode.setCenterLocation(last.cx,y)
+              }  
+              if(me.tempLink){scene.remove(me.tempLink)}
+              me.tempLink=new JTopo.Link(last,me.tempNode);
+              scene.add(me.tempLink);
+             
+              me.cross.setCenterLocation(x,y);
+              me.cross.visible=true; 
          
                                                
         }

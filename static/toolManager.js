@@ -97,8 +97,7 @@ class ToolManager{
         var previousScene=event.preScene;
         previousScene&&previousScene.removeAllEventListener();
         this.setSceneKeyEventHandler(newScene);
-
-    }
+   }
     constructor(jqContainer,editor){
         this.editor=editor;
         this.jqContainer=jqContainer;
@@ -134,7 +133,7 @@ class ToolManager{
            
         }
     }
-    getScene(){
+    getActiveScene(){
         return this.editor.getCurrentScene();
     }
     setCursor(cursor){
@@ -204,9 +203,11 @@ class ToolManager{
             if(toolsContainer===con) con.style.display="block";
             else con.style.display="none"} )     }
     }
+    
+    
     //******************************//
    setSceneKeyEventHandler(scene){
-      
+      var me=this;
       scene.keyStatus={shift:0}//0-element间自由连线，1－element间元素间水平或竖直连线
       scene.addEventListener("keydown",function(event){
        var ele=scene.currentElement;
@@ -240,6 +241,18 @@ class ToolManager{
            case "Shift":
                scene.keyStatus.shift=!scene.keyStatus.shift;
                break;
+           case "Escape":
+            if(me.ctool instanceof LinkTool==false) retrurn;
+            me.ctool.clearTask();
+            if(me.ctool.tempLink) scene.remove(me.ctool.tempLink);
+            me.ctool.tempLink=null;
+            me.ctool.cross.visible=false;
+            scene.removeEventListener("click");
+            scene.removeEventListener("mousemove");
+            scene.removeEventListener("mouseup") ;
+            me.setCursor("crosshair" );//：十字标 
+            me.ctool.setSceneMouseHandler(scene);  
+            break;
     
            default:    
 

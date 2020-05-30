@@ -206,8 +206,6 @@ class MyEditor{
     createTab(tabname){
         var scene=this.createScene(tabname);
         scene.setEditor(this);
-        this.setCurrentScene(scene);
-        
         this.stage.add(scene);
         this.tabSheetsManager.appendTab(scene)
 

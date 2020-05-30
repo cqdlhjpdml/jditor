@@ -220,7 +220,8 @@ JTopo.TextBox.prototype=new JTopo.TextNode();
 ///////////////////////////////////////////////
 JTopo.Scene.prototype.setTool=function(tool){
   this.tool=tool;
-} 
+}
+
 JTopo.Scene.prototype.getTool=function(){
   return this.tool;
 } 
