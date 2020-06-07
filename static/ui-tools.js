@@ -1267,6 +1267,17 @@ class AddAction extends Action{
        this.args.scene.add(this.args.obj); 
     }
 }
+/////////////////////////////////
+class RemoveAction extends Action{
+    undo(){
+        
+        this.args.scene.add(this.args.obj);
+
+    }
+    redo(){
+       this.args.scene.remove(this.args.obj); 
+    }
+}
 //////////////////////////////
 class LinkAction extends Action{
     undo(){

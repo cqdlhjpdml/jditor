@@ -71,12 +71,43 @@ this.clickHandler = function(a) {
   this.showAZ=!this.showAZ;
   this.dispatchEvent("click", a)
 }
-  this.initialize(nodeA,nodeZ,text) 
+this.initialize(nodeA,nodeZ,text) ;
+
 }
 FreeLink.prototype=new JTopo.Link;
 JTopo.FreeLink=FreeLink;
 //////////////////////////////////
-
+JTopo.GraphLinks=function(scene){
+  this.scene=scene;
+  this.links=[];
+  this.undoKeeps=[];//如果起止点是单独画的Connector，则起止Ｃonnector要被保留
+  var me=this;
+  this.paint=function(ctx2d){
+    for(let i=0;i<me.links.length;i++){
+     links[i].paint(ctx2d)
+   }
+  }
+  this.isInBound = function(b, c) {
+    for(let i=0;i<me.links.length;i++){
+      links[i].isInBound(b, c);
+ }
+ this.removeFromScene=function(){
+  for(let i=0;i<me.links.length;i++){
+    this.scene.remove(linkme.links[i]);
+    if(this.undoKeeps.indexOf(link[i].nodeA)==-1)scene.remove(link[i].nodeA);
+    if(i==k-1&&this.undoKeeps.indexOf(link[i].nodeZ)==-1)scene.remove(link[i].nodeZ);
+  }
+ }
+ this.paintCtrl = function(a) {
+  for(let i=0;i<me.links.length;i++){
+   me.links[i].nodeA.visible=true;
+  }
+  me.links[i].nodeZ.visible=true;
+ }
+ this.addMidLink=function(link){this.links.push(link)};
+ this.addundoKeeps=function(connector){this.undoKeeps.push(connector)};
+}
+JTopo.MidLinks.prototype=new JTopo.InteractiveElement();
 /////////////////////////////////
 
 
@@ -212,11 +243,20 @@ JTopo.TextBox=function(text){
     
     
 };
-
+this.setPopmenu=function(popmenu){this.popmenu=popmenu;}
+this.setPopmenu(Node_PopMenu);
+this.mouseup(function(event){
+  me.popmenu.setTargetEvent(event)
+  if(event.button == 2){// 右键
+    if(me.popmenu) me.popmenu.showAt(event.pageX,event.pageY);
+ 
+ }
+});
 
 return this;
 }
 JTopo.TextBox.prototype=new JTopo.TextNode();
+
 ///////////////////////////////////////////////
 JTopo.Scene.prototype.setTool=function(tool){
   this.tool=tool;

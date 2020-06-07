@@ -271,5 +271,8 @@ class ToolManager{
        this.navMenusList[0].trigger("click");
      
     }
-    
+  /****************************/
+  addUndoAction(undoAction){
+      this.actionManager.pushUndoAction(undoAction);
+  }  
 }

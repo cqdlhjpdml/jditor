@@ -42,7 +42,14 @@ class PopMenu{
 }
 function deleteCallback(targetEvent){
     var scene=targetEvent.scene;
-    scene.remove(targetEvent.target);
+    if(!targetEvent.target) return;
+    var target=targetEvent.target;
+    args={};args.obj=target;
+    args.scene=scene;
+    var revmoveAction=new RemoveAction(args);
+    global_editor.toolManager.addUndoAction(revmoveAction)
+    scene.remove(target);
+
    }
 var Node_PopMenu_Config=[{caption:"删除",icon:"delete.png",tooltips:"删除",handler:deleteCallback}]
 var Node_PopMenu=new PopMenu(Node_PopMenu_Config);
