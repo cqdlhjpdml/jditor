@@ -450,7 +450,7 @@ function SvgNode(selector,text){
           if(box.right>wrapBox.right) wrapBox.right=box.right;
           if(box.bottom>wrapBox.bottom) wrapBox.bottom=box.bottom;
       }
-      this.setPopmenu(Node_PopMenu);
+    
       wrapBox.x=wrapBox.left;wrapBox.y=wrapBox.top;
       wrapBox.width=wrapBox.right-wrapBox.left;
       wrapBox.height=wrapBox.bottom-wrapBox.top;
@@ -510,22 +510,14 @@ function SvgNode(selector,text){
         this.svgScaleY=this.getSize().height/this.originalSize.height;
         
     }
-    this.setPopmenu=function(popmenu){this.popmenu=popmenu;}
+   
     this.initialize(selector,text);
     var me=this;
     this.dbclick(function(event){
       var panel=PropPanelFactory.getPropPanelInstance("属性设置",me);
       panel.show();
     });
-    this.mouseup(function(event){
-      me.popmenu.setTargetEvent(event)
-      if(event.button == 2){// 右键
-        if(me.popmenu) me.popmenu.showAt(event.pageX,event.pageY);
-     
-     }
-    });
-   
-
+    this.setPopmenu(Node_PopMenu);
 }
 SvgNode.prototype=new JTopo.Node();
 JTopo.SvgNode=SvgNode;

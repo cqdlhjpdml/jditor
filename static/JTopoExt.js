@@ -9,9 +9,8 @@ function Connector(owner){
     this.alpha=1;
     this.owner=owner;
     this.owner_id=owner._id;
+    this.setPopmenu(Node_PopMenu);
     this.serializedProperties.push("owner_id");
-    owner.connectors.push(this);
-    this.dragHandler=function(){};//disable dragging
     
     return this;
 }
@@ -19,6 +18,7 @@ function Connector(owner){
 
 Connector.prototype=new JTopo.Node();
 JTopo.Connector=Connector;
+
 /////////////////////////////////////
 function CrossDot(){//十字架
   CrossDot.prototype.initialize.apply(this,null);
@@ -41,17 +41,21 @@ CrossDot.prototype=new JTopo.DisplayElement();
 JTopo.CrossDot=CrossDot;
 ///////////////////////////////////////////////
 function FreeLink(nodeA,nodeZ,text){
+  FreeLink.prototype.initialize.apply(this,arguments);
   this.initialize=function(nodeA,nodeZ,text){
-    FreeLink.prototype.initialize.apply(this,arguments);
+    
     this.showAZ=true;
     this.elementType="FreeLink";
     this.nodeA_id=nodeA._id;
     this.nodeZ_id=nodeZ._id;
     this.text=text;
+    this.setPopmenu(Node_PopMenu);
     this.serializedProperties.push("nodeA_id");
     this.serializedProperties.push("nodeZ_id");
 
  }
+this.setPreLink=function(link){this.preLink=link;}
+this.setFollowLink=function(link){this.followLink=link;}
 this.setCenterLocation=function(x,y){
   var x0=this.cx,y0=this.cy;
   var dx=x-x0,dy=y-y0;
@@ -71,46 +75,28 @@ this.clickHandler = function(a) {
   this.showAZ=!this.showAZ;
   this.dispatchEvent("click", a)
 }
+this.removeFromScene=function(scene){//this function not used now
+  let preLink=this.preLink;
+  let followLink=this.followLink;
+  scene.remove(this);
+  while(preLink){
+     let pre=preLink.preLink;
+     scene.remove(preLink);
+     preLink=pre;
+  }
+  while(followLink){
+    let follow=followLink.followLink;
+    scene.remove(followLink);
+    followLink=follow;
+ }
+}
+
 this.initialize(nodeA,nodeZ,text) ;
 
 }
 FreeLink.prototype=new JTopo.Link;
 JTopo.FreeLink=FreeLink;
-//////////////////////////////////
-JTopo.GraphLinks=function(scene){
-  this.scene=scene;
-  this.links=[];
-  this.undoKeeps=[];//如果起止点是单独画的Connector，则起止Ｃonnector要被保留
-  var me=this;
-  this.paint=function(ctx2d){
-    for(let i=0;i<me.links.length;i++){
-     links[i].paint(ctx2d)
-   }
-  }
-  this.isInBound = function(b, c) {
-    for(let i=0;i<me.links.length;i++){
-      links[i].isInBound(b, c);
- }
- this.removeFromScene=function(){
-  for(let i=0;i<me.links.length;i++){
-    this.scene.remove(linkme.links[i]);
-    if(this.undoKeeps.indexOf(link[i].nodeA)==-1)scene.remove(link[i].nodeA);
-    if(i==k-1&&this.undoKeeps.indexOf(link[i].nodeZ)==-1)scene.remove(link[i].nodeZ);
-  }
- }
- this.paintCtrl = function(a) {
-  for(let i=0;i<me.links.length;i++){
-   me.links[i].nodeA.visible=true;
-  }
-  me.links[i].nodeZ.visible=true;
- }
- this.addMidLink=function(link){this.links.push(link)};
- this.addundoKeeps=function(connector){this.undoKeeps.push(connector)};
-}
-JTopo.MidLinks.prototype=new JTopo.InteractiveElement();
-/////////////////////////////////
-
-
+////////////////////////////////////////
 JTopo.loadFromJson=function(jsonStr, canvas,stage) {
   eval("var jsonObj = " + jsonStr);
   if(!stage)
@@ -243,15 +229,8 @@ JTopo.TextBox=function(text){
     
     
 };
-this.setPopmenu=function(popmenu){this.popmenu=popmenu;}
+
 this.setPopmenu(Node_PopMenu);
-this.mouseup(function(event){
-  me.popmenu.setTargetEvent(event)
-  if(event.button == 2){// 右键
-    if(me.popmenu) me.popmenu.showAt(event.pageX,event.pageY);
- 
- }
-});
 
 return this;
 }

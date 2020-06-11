@@ -48,8 +48,10 @@ function deleteCallback(targetEvent){
     args.scene=scene;
     var revmoveAction=new RemoveAction(args);
     global_editor.toolManager.addUndoAction(revmoveAction)
+    //if(target.removeFromScene) target.removeFromScene(scene);
+    
+    //else scene.remove(target);
     scene.remove(target);
-
    }
 var Node_PopMenu_Config=[{caption:"删除",icon:"delete.png",tooltips:"删除",handler:deleteCallback}]
 var Node_PopMenu=new PopMenu(Node_PopMenu_Config);

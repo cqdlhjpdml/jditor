@@ -11,8 +11,10 @@
         ,
         this.distroy = function() {}
         ,
-        this.removeHandler = function() {}
-        ,
+        this.removeHandler = function() {},
+        this.addHandler=function(){},//dml
+        this.canDelete=function(){return true;},
+        
         this.attr = function(a, b) {
             if (null != a && null != b)
                 this[a] = b;
@@ -1235,7 +1237,8 @@ function(a) {//Scene
             this.zIndexArray.sort(function(a, b) {
                 return a - b
             })),
-            this.zIndexMap["" + a.zIndex].push(a)
+            this.zIndexMap["" + a.zIndex].push(a),
+            a.addHandler();
         }
         ,
         this.remove = function(b) {
@@ -1937,6 +1940,17 @@ function(a) {
                 null != b ? this.addEventListener(a, b) : this.dispatchEvent(a)
             }
         })
+        
+        ,//dml begin
+        this.setPopmenu=function(popmenu){this.popmenu=popmenu;}
+        ,
+       
+        this.mouseup(function(event){
+            event.target.popmenu.setTargetEvent(event)
+            if(event.button == 2){// 右键
+              if(event.target.popmenu) event.target.popmenu.showAt(event.pageX,event.pageY);
+        }})//dml end
+
     }
     function d() {//EditableElement
         this.initialize = function() {
@@ -2471,7 +2485,9 @@ function(a) {
             })
             //dml end
         }
+        
     }
+       
     function c() {
         c.prototype.initialize.apply(this, arguments)
     }
@@ -2702,7 +2718,7 @@ function(a) {
         if (null == a || null == b)
             return c;
         if (a && b && a.outLinks && b.inLinks)
-            for (var d = 0; d < a.outLinks.length; d++)
+          for (var d = 0; d < a.outLinks.length; d++)
                 for (var e = a.outLinks[d], f = 0; f < b.inLinks.length; f++) {
                     var g = b.inLinks[f];
                     e === g && c.push(g)
@@ -2784,6 +2800,11 @@ function(a) {
             })
         }
         ,
+        this.addHandler=function(){//function added by dml
+            if(this.nodeA.outLinks.indexOf(this)==-1)this.nodeA.outLinks.push(this);
+            if(this.nodeZ.inLinks.indexOf(this)==-1)this.nodeZ.inLinks.push(this);
+        }//dml
+        ,
         this.getStartPosition = function() {
             var a = {
                 x: this.nodeA.cx,
@@ -2809,8 +2830,8 @@ function(a) {
             if (this.nodeA === this.nodeZ)
                 return [b, c];
             var d = e(this.nodeA, this.nodeZ);
-            if (1 == d)
-                return [b, c];
+            if(1==d)
+               return [b, c];
             var f = Math.atan2(c.y - b.y, c.x - b.x)
               , g = {
                 x: b.x + this.bundleOffset * Math.cos(f),

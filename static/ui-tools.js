@@ -258,7 +258,6 @@ class ToolsPanel extends Tool{
   class LinkTool extends Tool{
     constructor(toolItem,toolManager){
         super(toolItem,toolManager) ;
-        var me=this;
         this.tempNode=new JTopo.Node();//临时线段起点
         this.tempNode.height=0;
         this.tempNode.width=0;
@@ -343,8 +342,10 @@ class ToolsPanel extends Tool{
                    scene.add(link);
                    last=midnode;
                    path.push({x:midnode.cx,y:midnode.cy});
+                   let len=midLinks.length;
+                   if(len>0){midLinks[len-1].setFollowLink(link);link.setPreLink(midLinks[len-1]);}
+                   else link.setPreLink(null);
                    midLinks.push(link);
-                 
                    return; 
                   
                  
@@ -373,6 +374,10 @@ class ToolsPanel extends Tool{
                   link.strokeColor="128,128,128"
                   scene.add(link);
                   path.push({x:endConnector.cx,y:endConnector.cy});
+                  let len=midLinks.length;
+                  link.setFollowLink(null);
+                  if(len>0){link.setPreLink(midLinks[len-1]);midLinks[len-1].setFollowLink(link)}
+                  else link.setPreLink(null);
                   midLinks.push(link);
                   from=null;last=null;
                 
@@ -414,7 +419,7 @@ class ToolsPanel extends Tool{
                  me.tempNode.setCenterLocation(last.cx,y)
               }  
               if(me.tempLink){scene.remove(me.tempLink)}
-              me.tempLink=new JTopo.Link(last,me.tempNode);
+              me.tempLink=new JTopo.FreeLink(last,me.tempNode);
               scene.add(me.tempLink);
              
               me.cross.setCenterLocation(x,y);
@@ -427,7 +432,7 @@ class ToolsPanel extends Tool{
        }  
   }
   //////////////////////////////
-  class ConnectorTool extends Tool {
+class ConnectorTool extends Tool {
        setSceneMouseHandler(scene){
           function mouseclickHandler(event){
               var x=event.x;
