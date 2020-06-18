@@ -8,6 +8,10 @@ const ws  = require('./routes/ws-routes.js');
 const app = new Koa();
 
 app.use(staicServer(path.join(__dirname,Config.staticpath)));
+const editordemo = (ctx) => {
+  ctx.response.body = pug.renderFile(path.join(__dirname,Config.viewpath)+'/editordemo.pug');
+  console.log(ctx.response.body);
+};
 const main = (ctx) => {
   ctx.response.body = pug.renderFile(path.join(__dirname,Config.viewpath)+'/index.pug');
   console.log(ctx.response.body);
@@ -18,6 +22,7 @@ const index= (ctx) => {
 };
 router.get("/",index);
 router.get("/demo.html",main);
+router.get("/editordemo.html",editordemo);
 const getDir=(ctx,next)=>{
   console.log(ctx);next();
 }
