@@ -1,0 +1,18 @@
+xtends layout
+append css
+     link(rel='stylesheet', href='stylesheets/myEditor.css')
+     link(rel="stylesheet", href='lib/jquery-ui-1.12.1/jquery-ui.css')
+     link(rel="stylesheet", href="lib/jstree/themes/default/style.min.css")
+block content
+  
+  div(id="headerBar" class="fullRow")="ditor-user1-未命名.sg."
+  
+  div(id="workArea")
+  
+  
+  footer(id="FooterBar" style="border:solid 1px;text-algin:center;background-color:#c0c0c0")
+    span(style="text-align:center")="欢迎光临 @联系作者"  
+    
+  <div class="svgContainer"><object class="svgClass" style="visibility:hidden;" id="svgObject" data="symbols.svg" type="image/svg+xml" height="0" width="0"></div>
+  block scripts
+     script( src="./dist/scripts.js")
