@@ -21,6 +21,13 @@ router.get("/demo.html",main);
 const getDir=(ctx,next)=>{
   console.log(ctx);next();
 }
+
+const jmain = (ctx) => {
+  ctx.response.body = pug.renderFile(path.join(__dirname,Config.viewpath)+'/jdemo.pug');
+  console.log(ctx.response.body);
+};
+router.get("/jdemo.html",jmain);
+
 var port=Config.httpPort;
 app.use(getDir);
 app.use(router.routes());
