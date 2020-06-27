@@ -1,6 +1,6 @@
  ///////////////////////////////////
  import {EventDispatcher,CommonUtilities,WsAgent,FILE_SAVE_EVENT,USER_LOGIN_EVENT, GET_FILELIST_EVENT, OPEN_FILE_EVENT} from './common.js'
- import{JTopo} from'./jtopo0.4.8.js'
+ 
 ////////////////////////////////
 class Tool{
     static getInstance(toolItem,toolManager){//单例模式
@@ -1357,5 +1357,5 @@ JTopo.MoveAction=MoveAction;
 JTopo.AddAction=AddAction;
 JTopo.LinkAction=LinkAction;
 export { SaveTool,OpenFileTool, AppendTabTool,UndoTool,RedoTool,TextBoxTool,ImageTool,ToolsPanel,LinkTool,ConnectorTool,LoginTool}; 
-export {PropertyAction}
+export {PropertyAction,PropPanelFactory}
  

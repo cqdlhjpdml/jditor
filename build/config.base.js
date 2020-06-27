@@ -4,7 +4,8 @@ const { SRC, DIST, ASSETS } = require('./paths')
 
 module.exports = {
   entry: {
-    scripts: path.resolve(SRC, 'js', 'index.js')
+    scripts: path.resolve(SRC, 'js', 'index.js'),
+    jtopo: path.resolve(SRC, 'js', 'jtopo0.4.8.js'),
   },
   plugins: [
     new webpack.ProvidePlugin({
@@ -12,7 +13,11 @@ module.exports = {
         jQuery: "jquery",
         "window.jQuery": "jquery"
     })
-],
+  ],
+
+  externals:[{
+      JTopo:"./jtopo0.4.8.js"
+  }] ,
   output: {
     // Put all the bundled stuff in your dist folder
     path: DIST,

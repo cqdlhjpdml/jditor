@@ -1,4 +1,3 @@
-import {PropertyAction} from './ui-tools.js'
 !function(window) {
     function Element() {
         this.initialize = function() {
@@ -4478,3 +4477,4 @@ function(a) {
     j.scale = f,
     a.Logo = j
 }(window);
+

@@ -1,5 +1,6 @@
 "use strict"
 import{Node_PopMenu} from './menu.js'
+import{PropPanelFactory} from './ui-tools.js'
 //Connector:special node can be Linked between each other.
 function Connector(owner){
     Connector.prototype.initialize.apply(this,null);
