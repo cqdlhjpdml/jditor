@@ -13,10 +13,11 @@ module.exports = {
         jQuery: "jquery",
         "window.jQuery": "jquery"
     })
+    
   ],
 
   externals:[{
-      JTopo:"./jtopo0.4.8.js"
+      JTopo:"./jtopo.js"
   }] ,
   output: {
     // Put all the bundled stuff in your dist folder

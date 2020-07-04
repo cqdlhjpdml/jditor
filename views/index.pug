@@ -29,11 +29,10 @@ block content
      script( src="lib/jstree/jstree.js")
      
   script.
-     var global_editor=null;
      $(document).ready(function(){ 
     
         
-       global_editor=new MyEditor("workArea",JTopo); 
+       JTopo.editor=new MyEditor("workArea",JTopo); 
         
           
      });
