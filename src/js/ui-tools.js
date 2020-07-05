@@ -330,10 +330,8 @@ class ToolsPanel extends Tool{
   
               if(from&&!scene.mouseOverelement){
                   
-                   let midnode=new JTopo.EditorNode();
-                   midnode.height=5;
-                   midnode.width=5;
-                   midnode.fillColor="125,125,125";
+                   let midnode=new JTopo.MidNode();
+                 
                    midnode.cx=me.tempNode.cx,midnode.cy=me.tempNode.cy;
                    let link=new JTopo.FreeLink(last,midnode);
                    link.strokeColor="128,128,128"
@@ -772,9 +770,10 @@ class OpenFileDialog extends MyDialog{
     }
 
     wsNotifyFileLoadHandler(openFileEvent){
-        console.log(openFileEvent);
+        //console.log(openFileEvent);
         var fileJson=openFileEvent.response.result.content;
         this.tool.toolManager.editor.loadFileFromJson(fileJson);
+        $('#headerBar').innerHTML=me.tool.getUsername()+'-'+me.jqSelectList[0].selectedOptions[0].value;
         $(`#${this.id}` ).dialog("close");
         
     }
@@ -817,7 +816,7 @@ class OpenFileDialog extends MyDialog{
                     click: function() {
                         var username=me.tool.getUsername();
                         var filename=me.jqSelectList[0].selectedOptions[0].value;
-                        //request={taskname:[login|register|save|open],file:{name:username,filename:fname,folder:folder}}
+                       
                         var request={taskname:"openfile",file:{username:`${username}`,filename:`${filename}`,folder:'.'}};
                         var jsonRequest=JSON.stringify(request);
                         WsAgent.send(jsonRequest);
@@ -833,7 +832,7 @@ class OpenFileDialog extends MyDialog{
               }
           }});
           
-          var me=this;
+          var me=this;//dialog self
           $(`#${this.id}`).on( "dialogopen", function(){
                                  var taskreq={taskname:"getFileList",filter:{username:`${me.tool.getUsername()}`,folder:`.`}}
                                  var jsonReq=JSON.stringify(taskreq)

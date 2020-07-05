@@ -1,4 +1,4 @@
-import './lib/jquery-ui-1.12.1/jquery-ui.js'
+require('jquery-ui-bundle');
 
 import './JTopoExt.js'
 

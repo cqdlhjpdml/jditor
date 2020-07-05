@@ -101,8 +101,21 @@ JTopo.Connector=function (owner){
 
 
 JTopo.Connector.prototype=new JTopo.EditorNode();
+//////////////////////////JTopo.MidNode////////////////////////
+JTopo.MidNode=function (){
+  JTopo.MidNode.prototype.initialize.apply(this,null);
+    this.elementType="MidNode"
+    this.height=10;
+    this.width=10;
+    this.fillColor="125,125,125";
+    this.alpha=1;
+   
+    this.setPopmenu(Node_PopMenu);
+    return this;
+}
 
 
+JTopo.MidNode.prototype=new JTopo.EditorNode();
 /////////////////////////////////////
 JTopo.CrossDot=function(){//十字架
   JTopo.CrossDot.prototype.initialize.apply(this,null);
@@ -258,6 +271,14 @@ JTopo.createNode=function(nodeType,properties){
     var id=node._id;
     JTopo.Nodes_Tables[id]=node;
     return node;
+  }
+  createFuns["MidNode"]=function(){
+    
+    var node=new JTopo.MidNode();
+    setProperyies(node,properties);
+    var id=node._id;
+    JTopo.Nodes_Tables[id]=node;
+    return node;  
   }
   function setProperyies(node,properties){
     for (var e in properties)

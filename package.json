@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "jquery": "^3.5.1",
+    "jquery-ui-bundle": "^1.12.1-migrate",
     "koa": "^2.11.0",
     "koa-router": "^8.0.8",
     "koa-static": "^5.0.0",
