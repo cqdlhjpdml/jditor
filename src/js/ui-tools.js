@@ -773,7 +773,7 @@ class OpenFileDialog extends MyDialog{
         //console.log(openFileEvent);
         var fileJson=openFileEvent.response.result.content;
         this.tool.toolManager.editor.loadFileFromJson(fileJson);
-        $('#headerBar').innerHTML=me.tool.getUsername()+'-'+me.jqSelectList[0].selectedOptions[0].value;
+        $('#headerBar').html(this.tool.getUsername()+'-'+this.jqSelectList[0].selectedOptions[0].value);
         $(`#${this.id}` ).dialog("close");
         
     }
