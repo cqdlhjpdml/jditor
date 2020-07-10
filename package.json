@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "author": "",
+  "license": "ISC",
   "scripts": {
     "dev": "webpack --config build/config.development.js",
     "prod": "webpack --config build/config.production.js"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "jquery": "^3.5.1",
     "jquery-ui-bundle": "^1.12.1-migrate",

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>前端笔记</title>
+    <style>
+        h4{color:blue;}
+        body{color:#8b8686}
+    </style>    
+</head>
+
+<body>
+    <h3>前端编程笔记一：用“路由器”封装多分支程序</h3>
+    <h5>   程序里某一模块处理各种不同的情况，用if else语句或swith case语句来应对，我们早已熟悉得犹如吃饭、睡觉一般，一种条件反射而已，下面就是他们长的样子：</h5>
+    <h4>function scheduler(){<br>
+    if(a==v1){f1()}<br>
+      else if(a==v2){f2()}<br>
+        else if(a==v3){f3()}<br>
+       …..<br>
+        else if(a==vn){fn()}<br>
+           else doDefault()<br>
+    }<br>
+    ///////////////
+    function taskScheduler (){<br>
+      switch(a){<br>
+        case v1: f1();break;<br>
+        case v2:f2();break;<br>
+        case v3:f3();break;<br>
+        …..<br>
+       case vn:fn();break;<br>
+       default:<br>
+       doDault();<br>
+      }<br>
+    }<br></h4>
+    <h5>随着程序规模的扩大，你会发现if、switch语句模块会变得越来庞大，面临失控的感觉扑面而来。每增加一个分支，都得去令人望而生畏的if、switch模块，说不定一个不小心，该动阑尾却碰到了盲肠，程序停摆了…，多来两次，你肯定会有改造程序的冲动。接下来，聪明的你会这样想，能不能将每一个分支当成一个任务？上面的if和switch模块可以看作是一个任务调度模块，v1,v2,v3,…,vn可以理解为任务名，把所有分支处理函数f1,f2,..fn放入一个数组，用v1,v2,v3,…,vn作为各分支处理函数的下标。于是，上面的程序可能会变成下面的样子：</h5><br>
+<h4>tasks[v1]=function f1(arg){/**/};<br>
+    tasks[v2]=function f2(arg){}<br>
+    tasks[v3]=function f3(arg){};<br>
+    …
+    tasks[vn]=function fn(arg){};<br>
+    tasks[‘default’]=function doDefault(){};<br>
+    ///////////////////////<br>
+    function taskScheduler(arg){<br>
+    if(tasks[a])  tasks[a](arg);<br>
+    else tasks[‘default’]();<br>
+    }<br>
+</h4>
+    <h5>在这里的tasks数组不就是一个简单的路由器吗？根据不同的任务，选择（路由）了不同的处理函数。现在是该路由器这个角色粉墨登场了，这篇文章里的路由器是借用了Node EXPRESS,NOD KOA框架的概念，先看看KOA路由器的用法吧：</h5>
+   <h4> const Koa = require('koa');<br>
+    const router = require('koa-router')();<br>
+    const app = new Koa();<br>
+    
+    const main = (ctx) => {<br>
+      ctx.response.body = pug.renderFile(path.join(__dirname,Config.viewpath)+'/index.pug');<br>
+      console.log(ctx.response.body);<br>
+    };
+    router.get("/",main);//加入一个路由<br>
+    
+    const r1=(ctx,next)=>{<br>
+      console.log(ctx);next();<br>
+    }
+    app.use(r1);//加入一个路由<br>
+    app.use(router.routes());<br>
+    ...<br></h4>
+    <h5>上面代码片断，KOA中加入路由路径有两种方式：<br>
+    方式一：<br></h5>
+    <h4>app.use(r1);//KOA原生方式加入一个路由</h4>
+    <h5>方式二：</h5><br>
+    <h4>router.get("/",main);<br>
+    app.use(router.routes());//路由器方式加入一个路由</h4><br>
+    <h5>第一种方式得自己解析ctx，其中的next()，留在后面交待，我们重点关注方式二吧，这是典型的路由，如果我们把上面的路径"/"看作任务名的话，是不是和你前面写的task任务调度思路差不多呢？
+    用task数组方式实现的任务路由，思路清晰，简单易懂，但是嘛，显得不够高大上，怎样也得封装几个类吧？再体现一下依赖抽象的理念吧？于是，你写的任务路由器会来个大整容，朝着KOA中的样子去整，你以为她是个大美女，其实她就是整容后的小芳task。<br> 
+    </h5>
+     <h4>  class Task{//任务接口<br>
+        constructor(){ }<br>
+        finishTask(arg){//*各具体任务的代码<br>
+        }<br>
+       }<br>
+    /////////////////////////////<br>
+    class Task0 extends Task{<br>
+        constructor(){<br>
+            super();<br>
+            this.taskname=0;<br>
+        } <br>
+        f0(arg){console.log("task0 arg="+arg); }<br>
+        finishTask(arg){this.f0(arg);}<br>
+     }<br>
+     ////////////////////////////<br>
+    class Task1 extends Task{<br>
+       constructor(){<br>
+           super();<br>
+           this.taskname=1;<br>
+       } <br>
+       f1(arg){console.log("task1 arg="+arg); }<br>
+       finishTask(arg){this.f1(arg);}<br>
+    }<br>
+    //////////////////////<br>
+    class Task2 extends Task{<br>
+       constructor(){<br>
+            super();<br>
+            this.taskname=2;<br>
+        } <br>
+       f2(arg){console.log("task2 arg="+arg)};<br>
+       
+       finishTask(arg){this.f2(arg);}<br>
+    }
+    ///////////////////////////////   
+    class Router{<br>
+       constructor(){<br>
+        this.taskHandlers=new Array();<br>
+       }<br>
+       doTask(taskname,arg){<br>
+        if(this.taskHandlers[taskname])<br>
+           this.taskHandlers[taskname].finishTask(arg);<br>
+        else return -1;<br>
+       }<br>
+       addTaskHandler(taskHandler){<br>
+        var taskname=taskHandler.taskname;<br>
+        this.taskHandlers[taskname]=taskHandler;<br>
+       }<br>
+    }<br>
+    ////////////////////////////<br>
+    (function taskScheduler(){//模拟任务生成10个任务<br>
+           var args=['jim','jack','hebby','messi'];<br>
+           var router=new Router();<br>
+           router.addTaskHandler(new Task0());<br>
+           router.addTaskHandler(new Task1());<br>
+           router.addTaskHandler(new Task2());<br>
+           var count=0; <br>
+           var gen=setInterval(() => {<br>
+                var taskname=Math.ceil(Math.random()*10)%3;<br>
+                var argIndex=Math.ceil(Math.random()*10)%4;<br>
+                var arg=args[argIndex]<br>
+                router.doTask(taskname,arg);<br>
+                count++;if(count==10) clearInterval(gen);<br>
+            },2000);<br>
+    })()</h4><br>
+    <h5>这段代码是可执行的，大家可以用node跑一下，在taskScheduler函数中，用setInterval每隔两秒钟生成一个任务，任务执行后会输出任务名和接收的参数。任务名和任务参数用随机函数模拟任务的随机生成。现在，我们的小芳tasks已经不能一眼瞧见了，她已经被隐藏在Router类中的taskHandlers了，而Router类中除了taskHandlers外，还有addTaskHandler函数。要增加任务处理器，你不会需要直接找小芳了，调用Router的addTaskHandler就可以了。Router的doTask和Task的finishTask，都可以看成是抽象接口函数的理念，上层的任务调度器taskScheduler只需要调用Router的doTask函数，而Router的doTask只需要调用下层task的finishTask来完成任务，doTask，finishTask具体是怎样实现的，需不需要调用其他函数（实际项目中大概率需要），上层的是用不着关心的。
+    在我自己项目中的路由器大抵就是这个样子了，与KOA框架中router有所不同，我是在taskScheduler中直接router.doTask(taskname,arg)的方式的方式来执行任务，至于原因嘛，我需要在taskScheduler中处理doTask函数的返回值。但是，在KOA中的路由方式二中，我们看到的是这种形式：
+    <br>方式二：</h5><br>
+    <h4>const main = (ctx) => {<br>
+    ctx.response.body = pug.renderFile(path.join(__dirname,Config.viewpath)+'/index.pug');<br>
+    };<br>
+    router.get("/",main);//加入任务处理器<br>
+    app.use(router.routes());</h4><br>
+    <h5>很明显的差异，没有类似直接调用router的doTask的语句，取而代之的是他的router中有个routes函数，当任务到来时，将会自动调用对应的处理器，比如当访问127.0.0.1/，定义的main函数将被自动调用，这种处理方式，app对象已成甩手掌柜，任务处理函数承包了全部工作，app也不关心你的返回值，考虑app在KOA框架中的作用，这种设计是合理的，app对象地位太高，基层怎样做他不需要关心，也不应该关心。但既然是和KOA框架的路由器对比，读者和我一样可能会感兴趣KOA中的router是如何自动处理任务以支持app当甩手掌柜的呢？这其中奥秘，无疑隐藏在router的routes函数中，接下来，我们就来对标KOA的router，为我们前面的Router加上一个routes函数，实现任务的自动执行。基本的思路是这样的：为Router类加上一个任务队列，当有任务到达时，就推入队列中；每隔一定的时间，检查任务队列，有任务取出执行。这样的话，Router还需要增加一个任务入队的方法queue，这个方法供app给新任务排队，思路有了，就可以动手写代码了。
+    </h5><br>
+    <h4>class Task{//任务接口<br>
+        constructor(){ }<br>
+        finishTask(arg){//*各具体任务的代码<br>
+        }<br>
+       }<br>
+    /////////////////////////////<br>
+    class Task0 extends Task{<br>
+        constructor(){<br>
+            super();<br>
+            this.taskname=0;<br>
+        }<br> 
+        f0(arg){console.log("task0 arg="+arg); }<br>
+        finishTask(arg){this.f0(arg);}<br>
+     }<br>
+     ////////////////////////////<br>
+    class Task1 extends Task{<br>
+       constructor(){<br>
+           super();<br>
+           this.taskname=1;<br>
+       }<br> 
+       f1(arg){console.log("task1 arg="+arg); }<br>
+       finishTask(arg){this.f1(arg);}<br>
+    }<br>
+    //////////////////////<br>
+    class Task2 extends Task{<br>
+       constructor(){<br>
+            super();<br>
+            this.taskname=2;<br>
+        }<br> 
+       f2(arg){console.log("task2 arg="+arg)};<br>
+       
+       finishTask(arg){this.f2(arg);}<br>
+    }
+    /////////////////////////////// <br>  
+    class Router{<br>
+       constructor(){<br>
+       this.taskHandlers=new Array();<br>
+       this.taskQueue=new Array();<br>
+       }<br>
+       queue(task){<br>
+        this.taskQueue.push(task);<br>
+       }<br>
+       doTask(){<br>
+        var task=this.taskQueue.shift();<br>
+        if(task)<br>
+        {  var taskname=task.taskname;<br>
+           if(this.taskHandlers[taskname])<br>
+           this.taskHandlers[taskname].finishTask(task.arg);<br>
+        }<br>
+        var self=this;<br>
+        setTimeout(function(){self.routes()},500);<br>
+       }<br>
+    
+       addTaskHandler(handler){<br>
+        var name=handler.taskname;<br>
+        this.taskHandlers[name]=handler;<br>
+       }<br>
+      
+       routes(){<br>
+        this.doTask();<br>
+        return this;<br>
+        
+      }<br>
+    }<br>
+    ////////////////////////////<br>
+    router=new Router();<br>
+    router.addTaskHandler(new Task0());<br>
+    router.addTaskHandler(new Task1());<br>
+    router.addTaskHandler(new Task2());<br>
+    ////////////////////<br>
+    class App{<br>
+        
+        use(router){<br>
+          this.router=router;<br>
+        }<br>
+        
+        queue(task){<br>
+            this.router.queue(task);<br>
+        }
+    }
+    const app=new App();<br>
+    app.use(router.routes());<br>
+    
+    (function taskGenerator(){//模拟任务生成10个任务<br>
+           var args=['jim','jack','hebby','messi'];<br>
+           var count=0; <br>
+           var gen=setInterval(() => {<br>
+                var taskname=Math.ceil(Math.random()*10)%3;<br>
+                var argIndex=Math.ceil(Math.random()*10)%4;<br>
+                var arg=args[argIndex]<br>
+                var task={taskname:taskname,arg:arg}<br>
+                app.queue(task);<br>
+                count++;if(count==10) clearInterval(gen);<br>
+            },100);<br>
+    })() <br>  
+</h4>
+<h3>前端编程笔记二：js语言的class真的仅仅是一颗语法糖吗</h3>
+<h5>前言：本人高龄，想重拾n年前一个被耽搁的梦想：用js开发一款web编辑器，核心功能定位于能支持图形符号的插入、连接、公式输入。结果掉入了js早就为我挖好的prototye原型继承机制大坑之中，几经折腾，本以为阮一峰大师已为我打通任督二脉，于是兴致勃勃重入coding世界，恰道是好事多磨......，于是有了这篇文章，也许会成系列文章，以铭记js带给我的这些伤痛...
+
+    先看看我开发中遇到的一个场景：A对应于一个图形符号的基类，C是A的派生类---某个具体的图形符号类（比如圆）。图形符号的connector作为起止点，用于画符号间的连接线，另有一个函数f负责向C的实例对象中加入connector。我写下了类似的代码：</h5>
+    <br><h4>function A(){<br>
+     this.connectors=[];<br>
+     return this;<br>
+    } <br> 
+    function C(name){<br>
+     this.name=name;<br>
+     return this; <br>
+    }<br> 
+    C.prototype=new A() ;<br>
+    function f(owner,cn){<br>
+     owner.connectors.push(cn);<br>
+     return this;<br>
+    } <br> 
+     c1=new C('c1');<br>
+     c2=new C('c2');<br>
+     f(c1,1);<br>
+     f(c1,2);<br>
+     f(c2,3);<br>
+     f(c2,4);<br>
+     f(c2,5);<br>
+     console.log("c1.connectors:")<br>
+     c1.connectors.forEach(function(t){console.log(t)})//会在控制台输出1，2,3,4,5<br>
+     console.log("c2.connectors:")<br>
+     c2.connectors.forEach(function(t){console.log(t)})//会在控制台输出1,2,3,4，5</h4><br>
+    <h5>但是，你会发现c1,c2对象的connectors中的内容完全相同，都是1，2，3，4，5，这不是我想要的结果，按C++继承机制，我想要的结果是c1的connectors的内容为1，2；c2的connector的内容为3，4，5。高手们可能已经看出问题之所在，这是原型继承的坑！语句C.prototype=new A() 采用是原型继承，C函数的所有实例访问的都是同一个A的实例中的connectors，所以你得不到C++继承机制的结果!
+    如何才能得到想要的结果呢？用ES6的class类来重写上面的代码，你会得到你想要的结果。你会发现，class不仅仅是一个语法糖，而是确实提供了一种直观的、类似C++、JAVA的面向对象的编程方式：</h5>
+    <br> <h4>class A{<br>
+     constructor(){<br>
+     this.connectors=[];<br>
+     return this;<br>
+        }<br>
+    } <br>
+    class C extends A{<br>
+     constructor(name){<br>
+     super();<br>
+     this.name=name;<br>
+     return this;<br>
+      } <br>
+    } <br>
+    function f(owner,cn){<br>
+     owner.connectors.push(cn);<br>
+     return this;<br>
+    } <br> 
+     c1=new C('c1');<br>
+     c2=new C('c2');<br>
+     f(c1,1);<br>
+     f(c1,2);<br>
+     f(c2,3);<br>
+     f(c2,4);<br>
+     f(c2,5);<br>
+     console.log("c1.connectors:")<br>
+     c1.connectors.forEach(function(t){console.log(t)})//会在控制台输出1，2<br>
+     console.log("c2.connectors:")<br>
+     c2.connectors.forEach(function(t){console.log(t)})//会在控制台输出3，4，5<br>
+     </h4><br>
+    <h5>也就意味着在class继承方式，c1,c2中的connectors是两个不同的对象，而这正是我想要的结果，所以es6的class不仅仅是一颗语法糖，对初学者可大大减小js面向对象编程的学习成本。
+    当然，要不用class而实现同样的效果，大神早已找到了方法，那就是apply调用，但是，如下代码中，你还能直观看出C与A的继承关系吗？
+    </h5>
+    <h4><br>
+    function A(){<br>
+     this.connectors=[];<br>
+     return this;<br>
+    }<br>  
+    function C(name){<br>
+     A.apply(this, arguments);<br>
+     this.name=name;<br>
+     return this;<br> 
+    } <br>
+    function f(owner,cn){<br>
+     owner.connectors.push(cn);<br>
+     return this;<br>
+    }<br>  
+    c1=new C('c1');<br>
+     c2=new C('c2');<br>
+     f(c1,1);<br>
+     f(c1,2);<br>
+     f(c2,3);<br>
+     f(c2,4);<br>
+     f(c2,5);<br>
+     console.log("c1.connectors:")<br>
+     c1.connectors.forEach(function(t){console.log(t)})//会在控制台输出1，2<br>
+     console.log("c2.connectors:")<br>
+     c2.connectors.forEach(function(t){console.log(t)})//会在控制台输出3,4，5<br>
+     </h4><br>
+    <h5>看来es6引入class的面向对象编程方式不仅仅是安慰婴儿的语法糖，从降低学习成本、提高代码的可读性、可维护性都有现实意义，遗憾的是，我们不得不站在巨人的肩膀上，不得不面对一坨坨充满prototype继承的遗留代码，你不得不用prototype去继承遗产，你不得不学习prototype。！那么，可不可以用class去继承一个函数呢？从而可以引入一个中间class来包装旧函数，以达到阻断prototype无限传播的目的。答案是肯定的，在下面的代码中，构造函数A先被class Wrapper封装，class C再通过对class Wrapper的继承，实现了对构造函数A的继承。</h5>
+    <br> <h4>   function A(){<br>
+       
+        this.connectors=[];<br>
+       
+    } <br> 
+    /***class C: a wrapper of function A*******/<br>
+    class Wrapper {<br>
+      constructor(){<br>
+       A.apply(this,arguments)<br>
+      return this;<br>
+      }<br> 
+    }<br>
+    
+    class C extends Wrapper{<br>
+      constructor(name){<br>
+      super()<br>
+      this.name=name;<br>
+      return this;<br>
+      } <br>
+    }<br>
+    function f(owner,cn){<br>
+        owner.connectors.push(cn);<br>
+        return this;<br>
+    }<br>  
+    
+    c1=new C('c1');<br>
+      c2=new C('c2');
+      f(c1,1);<br>
+      f(c1,2);<br>
+      f(c2,3);<br>
+      f(c2,4);<br>
+      f(c2,5);<br>
+      console.log("c1.connectors:")<br>
+      c1.connectors.forEach(function(t){console.log(t)})//会在控制台输出1，2<br>
+      console.log("c2.connectors:")<br>
+      c2.connectors.forEach(function(t){console.log(t)})//会在控制台输出3,4，5 <br>
+      </h4> <br>   
+    <h5>重点：通过Wrapper类对遗留代码中的作为基类的某个函数（比如A）的封装，可以完全用ES6的class语法来创建A的派生类，Wrapper类阻断了函数式继承中prototype的无限传播。
+    也许在你的项目组中，将来只需要1~2个搞清prototype的程序员去封装遗留代码，其他程序员可以抛开prototype，用class去就创作一个新世界！
+    </h5>
+    <h2>渝ICP备20001686号</h2>
+</body>
+</html>
