@@ -127,10 +127,17 @@ class MyEditor{
       this.pagesCount=new Array();
       
       var sObject = document.getElementById("svgObject");
-      sObject.addEventListener("load",function() {
+      $('#svgObject').ready(function() {
+
         var svgDom = sObject.contentDocument;
         SvgService.setSvgDomDrawFunc(svgDom);
-        JTopo.svgDom=svgDom;})
+        JTopo.svgDom=svgDom;
+
+    });
+      /* sObject.addEventListener("load",function() {
+        var svgDom = sObject.contentDocument;
+        SvgService.setSvgDomDrawFunc(svgDom);
+        JTopo.svgDom=svgDom;})*/
 
     }
     constructor(workAreaID,jtopo){   

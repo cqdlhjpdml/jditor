@@ -17,7 +17,7 @@ app.use(async (ctx, next) => {
   if (ctx.request.path.indexOf('.js')!=-1) { // get js files
     ctx.response.body = fs.readFileSync(path.join(__dirname,srcpath,ctx.request.path), 'utf8');
     ctx.response.status = 200
-    ctx.response.type="text/plain"
+    ctx.response.type="text/javascript"
     console.log('js file sent')
     console.log(ctx)
   } else 
@@ -29,7 +29,7 @@ app.use(async (ctx, next) => {
   } else {
     ctx.throw(404, 'Not found') // 404
   }
-//await next()
+await next()
 })
 
 var port=Config.httpPort;
