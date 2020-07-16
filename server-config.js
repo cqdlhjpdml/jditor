@@ -35,8 +35,9 @@ var ENV_CONFIG={
     
     "staticpath":"static",
     "viewpath":"views",
+    "SeerverIP":"111.229.239.244",
     "webSocketPort":3001,
-    "httpPort":3000
+    "httpPort":80
   }
   
   module.exports=ENV_CONFIG;

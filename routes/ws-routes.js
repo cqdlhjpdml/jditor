@@ -179,6 +179,7 @@ taskRouter.addRouter('openfile',new OpenFile_TaskHandler("default-openfile-handl
 
 ///////////////
 wss.on('connection', function connection(ws) {
+   console.log(ws);
     ws.on('message', async function incoming(message) {
       var taskreq=JSON.parse(message);
       var taskname=taskreq.taskname;
