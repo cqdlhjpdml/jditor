@@ -92,7 +92,7 @@ class WS_Agent{
     this.eventDispatcher.publish(event);  
   }
 }
-var WsAgent=new WS_Agent("ws://localhost:3001");
+var WsAgent=new WS_Agent("ws://111.229.239.244:3001");
 //class CommonUtilities---public utilites
    class CommonUtilities
    {   
