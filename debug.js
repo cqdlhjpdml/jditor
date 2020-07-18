@@ -23,7 +23,7 @@ app.use(async (ctx, next) => {
   } else 
   if (ctx.request.path === '/debug.html') { // 列表页
     ctx.response.status = 200;
-    ctx.response.type="string";
+    ctx.response.type="text/html";
     ctx.response.body = fs.readFileSync(path.join(__dirname,viewspath,ctx.request.path), 'utf8');
     console.log(ctx)
   } else {

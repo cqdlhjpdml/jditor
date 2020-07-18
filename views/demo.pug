@@ -10,10 +10,11 @@ block content
   div(id="workArea")
   
   
-  footer(id="FooterBar" style="border:solid 1px;text-algin:center;background-color:#c0c0c0")
+  footer(id="FooterBar" style="border:solid 1px;text-align:center;background-color:#c0c0c0")
     span(style="text-align:center")="欢迎光临 @联系作者"  
     
-  <div class="svgContainer"><object class="svgClass" style="visibility:hidden;" id="svgObject" data="symbols.svg" type="image/svg+xml" height="0" width="0"></div>
+  div(class="svgContainer")
+    object(class="svgClass" style="visibility:hidden;" id="svgObject" data="symbols.svg" type="image/svg+xml" height="0" width="0")
   block scripts
      script( src="./dist/jtopo.js")
      script( src="./dist/scripts.js")
