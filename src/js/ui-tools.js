@@ -555,6 +555,13 @@ var Text_Node_Property_Config=[/* font-style, font-variant, font-weight, font-st
                     {propname:"text",caption:"文本内容",inputtype:"input"}
                     
                    ];
+var Svg_NODE_Property_Config=[
+     {propname:"color",caption:"颜色",inputtype:"select",items:["red","green","blue","black","yellow","canyon","grey"]},
+     {propname:"style",caption:"线型",inputtype:"select",items:["solid","dot","14px","15px","16px","17px","18px","19px","20px","21px","22px","23px","24px","25px"]},
+     {propname:"fontFamily",caption:"字体",inputtype:"select",items:["宋体","华文仿宋","魏碑","隶书","微软雅黑","serif"]},
+     {propname:"text",caption:"文本内容",inputtype:"input"},
+     {propname:"textPosition",caption:"wenbenweizhi"}
+                   ];
 //////////////////////////////////
 class PropPanel extends MyDialog{
     constructor(title){
@@ -733,7 +740,68 @@ class TextNodePropPanel extends PropPanel{
           }
     }
 }
+///////////////////////////////
+class SvgNodePropPanel extends PropPanel{
+    constructor(title){
+        super(title);
+        this.propConfig=Text_Node_Property_Config;
+        this.create();        
+    }
+   
+    apply(){
+        
+        var args={};
+        args.obj=this.element;
+        args.props={};
+        args.props.text=this.element.text;
+        args.props.font=this.element.font;
+        args.props.fontSize=this.element.fontSize;
+        var propAction=new PropertyAction(args);
+        var actionManager=this.element.scene.getTool().toolManager.actionManager;
+        actionManager.pushUndoAction(propAction);
 
+        var font="";
+        for(let i=0;i<this.properties.length;i++){
+            switch(this.properties[i].propertyname){
+                case "fontStyle":
+                case "fontFamily":
+                case "fontSize":
+                   font=font + " " + this.properties[i].val()
+                   break;
+                default:
+                    this.element.setPropertyValue(this.properties[i].propertyname,this.properties[i].val());
+            }  
+          this.element.setPropertyValue("font",font);
+                 
+        }
+    }
+    propertiesInitialize(){
+        var fontProp=this.element.getPropertyValue("font").trim().split(" ");
+        var fontProperties=[];
+        for(let i=0;i<fontProp.length;i++){
+            fontProperties.push(fontProp[i].trim());
+        }
+
+        for(let i=0;i<this.properties.length;i++){
+            let control= this.properties[i].control();
+            switch(this.properties[i].propertyname){
+                case "fontStyle":
+                case "fontFamily":
+                case "fontSize":
+                    for(let j=0;j<fontProperties.length;j++){
+                        let k=this.propConfig[i].items.indexOf(fontProperties[j]);
+                        if(k!=-1) {control[0].value=this.propConfig[i].items[k];break;}
+                    }
+                   break;
+                default:
+                    control[0].value=this.element.getPropertyValue(this.properties[i].propertyname);
+            }
+            
+             
+          }
+    }
+
+}
 //////////////
 class PropPanelFactory{
     static getPropPanelInstance(title,element){
