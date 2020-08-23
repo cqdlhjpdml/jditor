@@ -461,7 +461,10 @@ function SvgNode(selector,text){
   this.initialize=function(selector,text){
      
     SvgNode.prototype.initialize.apply(this,null);
-    
+    this.lineColor="black";
+    this.lineWidth=1;
+    this.font="12 宋体"
+    this.fontColor="grey"
     this.selectedHandler = function(b) {//override
       SvgNode.prototype.selectedHandler.apply(this,arguments);
       
@@ -476,8 +479,9 @@ function SvgNode(selector,text){
      };
     
      };
-  
-      this.text=text;
+      if(text) this.text=text;
+      else this.text="未命名";
+      this.lineColor="black";
       this.selector=selector;
       this.elementType="SvgNode";
       var properties="svgScaleX,svgScaleY,selector".split(",");

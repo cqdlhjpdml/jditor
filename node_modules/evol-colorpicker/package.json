@@ -1,0 +1,71 @@
+{
+  "_from": "evol-colorpicker",
+  "_id": "evol-colorpicker@3.4.2",
+  "_inBundle": false,
+  "_integrity": "sha1-GEEbyrRBE9WQ+OAbtrfY+/uI/xs=",
+  "_location": "/evol-colorpicker",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "evol-colorpicker",
+    "name": "evol-colorpicker",
+    "escapedName": "evol-colorpicker",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npm.taobao.org/evol-colorpicker/download/evol-colorpicker-3.4.2.tgz",
+  "_shasum": "18411bcab44113d590f8e01bb6b7d8fbfb88ff1b",
+  "_spec": "evol-colorpicker",
+  "_where": "D:\\jditor",
+  "author": {
+    "name": "Olivier Giulieri",
+    "url": "https://evoluteur.github.io/"
+  },
+  "bugs": {
+    "url": "https://github.com/evoluteur/colorpicker/issues"
+  },
+  "bundleDependencies": false,
+  "copyright": "(c) 2020 Olivier Giulieri",
+  "dependencies": {
+    "jquery": "~3.5.1",
+    "jquery-ui": "~1.12.1"
+  },
+  "deprecated": false,
+  "description": "jQuery UI widget for web color picking which looks like the one in Microsoft Office 2010.",
+  "devDependencies": {
+    "grunt": "1.0.4",
+    "grunt-contrib-jshint": "2.1.0",
+    "grunt-contrib-less": "2.0.0",
+    "grunt-contrib-uglify": "4.0.1"
+  },
+  "homepage": "http://evoluteur.github.io/colorpicker/",
+  "keywords": [
+    "colorpicker",
+    "color",
+    "picker",
+    "palette",
+    "input",
+    "widget",
+    "jquery",
+    "jquery-ui",
+    "ui",
+    "web",
+    "form",
+    "office",
+    "jquery-plugin"
+  ],
+  "license": "MIT",
+  "main": "js/evol-colorpicker.js",
+  "name": "evol-colorpicker",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/evoluteur/colorpicker.git"
+  },
+  "version": "3.4.2"
+}

@@ -10,6 +10,7 @@
     "prod": "webpack --config build/config.production.js"
   },
   "dependencies": {
+    "evol-colorpicker": "^3.4.2",
     "jquery": "^3.5.1",
     "jquery-ui-bundle": "^1.12.1-migrate",
     "koa": "^2.11.0",

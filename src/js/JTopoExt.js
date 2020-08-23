@@ -26,7 +26,7 @@ JTopo.InteractiveElement.prototype.setPopmenu=function(popmenu){this.popmenu=pop
 //////////////////JTopo.EditNode/////////////////////
 JTopo.EditorNode=function(){
   JTopo.EditorNode.prototype.initialize.apply(this,null);
- 
+   
 }
 JTopo.EditorNode.prototype=new JTopo.Node()
 //////////JTopo.TextBox:to fix the bug of JTopo.TextNode
