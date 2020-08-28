@@ -520,7 +520,7 @@ function SvgNode(selector,text){
     var me=this;
     this.dbclick(function(event){
       var panel=PropPanelFactory.getPropPanelInstance("属性设置",me);
-      panel.show();
+      panel.show(event);
     });
     
     this.setPopmenu(Node_PopMenu);

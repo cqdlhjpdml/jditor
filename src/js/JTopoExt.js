@@ -32,12 +32,12 @@ JTopo.EditorNode.prototype=new JTopo.Node()
 //////////JTopo.TextBox:to fix the bug of JTopo.TextNode
 JTopo.TextBox=function(text){
   JTopo.TextBox.prototype.initialize.apply(this,null);
-  this.elementType="TextNode";
+  this.elementType="TextBox";
   var me=this;        
   this.dbclick(function(event){
   
     var panel=PropPanelFactory.getPropPanelInstance("属性设置",me);
-    panel.show();
+    panel.show(event);
 });
   this.text=text;
   this.mouseup(function(e){
@@ -52,11 +52,11 @@ JTopo.TextBox=function(text){
      actionManager.pushUndoAction(propAction);
   }
   })
-  this.paint=this.paint = function(a) {
+  this.paint= function(a) {
     a.save();
-    a.font=this.font;
     var w0=this.width;
     var h0=this.height;
+    a.font = this.font;
     this.width = a.measureText(this.text).width;
     this.height = a.measureText("田").width;
     var dx=(this.width-w0)/2;
@@ -64,7 +64,7 @@ JTopo.TextBox=function(text){
     
     a.translate(dx,dy);//fix the bug of the JTopo.TextNode,when first caculation, get wrong this.width and this.height used in the scene's paint function
     a.beginPath();
-    a.font = this.font;
+   
     a.strokeStyle = "rgba(" + this.fontColor + ", " + this.alpha + ")";
     a.fillStyle = "rgba(" + this.fontColor + ", " + this.alpha + ")";
     a.fillText(this.text, -this.width / 2, this.height / 2);

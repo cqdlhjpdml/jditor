@@ -172,12 +172,12 @@ class ToolsPanel extends Tool{
           var y=event.y;
           var scene=event.scene;
           var me=scene.getTool();
-          var textNode = new JTopo.TextBox();
+          var textNode = new JTopo.TextBox('新文本框');
           textNode.font = 'normal 16px 宋体';
-          textNode.fontColor="#303030"
+          textNode.fontColor="48,48,48"
           textNode.setLocation(x, y);
           scene.add(textNode);
-          textNode.text='新文本框';
+          
           var args={};
          args.obj=textNode;
          args.scene=scene;
@@ -485,7 +485,12 @@ class MyDialog{
         
     }
     
-    show(){$( `#${this.id}` ).dialog("open")};
+    show(ofEle){
+        var position= { my: "left top", at: "left bottom", of: ofEle }
+        $( `#${this.id}` ).dialog( "option", "position", position )
+        $( `#${this.id}` ).dialog("open")
+       
+    };
     hide(){$( `#${this.id}` ).dialog("hide")}
     //overridable 
     contentBar(){
@@ -630,8 +635,8 @@ class PropPanel extends MyDialog{
     contentBar(){
         this.jqContentBarID=CommonUtilities.getGuid();
         this.jqContentBar=$(`<div id=${this.jqContentBarID}></div>`);
-        this.jqContentBar.css({"display": "grid","min-width":"150px",
-        "grid-template-columns": "25% 75% ",
+        this.jqContentBar.css({"font-family":"宋体","display": "grid","min-width":"200px",
+        "grid-template-columns": "35% 65% ",
         "grid-row-gap": "8px",
         "grid-column-gap": "8px"});
         var jqLabel;
@@ -641,7 +646,7 @@ class PropPanel extends MyDialog{
              switch(config.inputtype){
                 case "select":
                     var selectListID=CommonUtilities.getGuid();
-                    var jqSelectList=$(`<select id=${selectListID}></select>`);
+                    var jqSelectList=$(`<select id=${selectListID}></select>`).css({"width":"100px"});;;
                     jqLabel=$(`<lable for=${selectListID}>${config.caption}</label>`);
                     this.jqContentBar.append(jqLabel);
                     for(let j=0;j<config.items.length;j++) {
@@ -659,7 +664,7 @@ class PropPanel extends MyDialog{
                     break;
                 case "input":
                     var inputBoxID=CommonUtilities.getGuid();
-                    var jqInputBox=$(`<input id=${inputBoxID}></input>`);
+                    var jqInputBox=$(`<input id=${inputBoxID}></input>`).css({"width":"100px"});;;
                     jqLabel=$(`<lable for=${inputBoxID}>${config.caption}</label>`);
                     this.jqContentBar.append(jqLabel);
                     this.jqContentBar.append(jqInputBox);
@@ -673,7 +678,7 @@ class PropPanel extends MyDialog{
                 case "colorPicker":
                     function f (self) {
                         var inputBoxID=CommonUtilities.getGuid();
-                        var jqInputBox=$(`<input id=${inputBoxID}></input>`);
+                        var jqInputBox=$(`<input id=${inputBoxID}></input>`).css({"width":"100px"});;
                         
                         jqLabel=$(`<lable for=${inputBoxID}>${config.caption}</label>`);
                         self.jqContentBar.append(jqLabel);
@@ -681,7 +686,7 @@ class PropPanel extends MyDialog{
                         
                         jqInputBox.ready(function(){
                             
-                            jqInputBox.colorpicker()
+                           
                             jqInputBox.colorpicker({
                                 showOn: "button"
                             })
@@ -691,7 +696,12 @@ class PropPanel extends MyDialog{
                             control:function(){var t=jqInputBox;return t;},
                             val:function(){
                             var t=jqInputBox;
-                            return function(){t.colorpicker("val");}}()
+                            return function(){
+                                var hex=t.colorpicker("val");
+                                var RGB = parseInt("0x" + hex.slice(1, 3)) + "," 
+                                　　　　　　　+ parseInt("0x" + hex.slice(3, 5)) + "," + parseInt( "0x" + hex.slice(5, 7)) ;
+                                
+                                return RGB;}}()
                         }
                         self.properties.push(property);
                     }
@@ -753,7 +763,7 @@ class SvgNodePropPanel extends PropPanel{
         }
 
         for(let i=0;i<this.properties.length;i++){
-            let control= this.properties[i].control();
+            let control= this.properties[i].control();//control is a jquery object
             switch(this.properties[i].propertyname){
                 case "fontStyle":
                 case "fontFamily":
@@ -763,6 +773,15 @@ class SvgNodePropPanel extends PropPanel{
                         if(k!=-1) {control[0].value=this.propConfig[i].items[k];break;}
                     }
                    break;
+                case "fontColor":
+                case "fillColor":
+                    var rgb = this.element.getPropertyValue(this.properties[i].propertyname).split(',');
+                    var r = parseInt(rgb[0]);
+                    var g = parseInt(rgb[1]);
+                    var b = parseInt(rgb[2]);
+                    var hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                    control[0].value=hex;
+                    break;
                 default:
                     control[0].value=this.element.getPropertyValue(this.properties[i].propertyname);
             }
@@ -774,7 +793,7 @@ class SvgNodePropPanel extends PropPanel{
 
 }     
 //////////////////////////////////
-class TextNodePropPanel extends PropPanel{
+class TextBoxPropPanel extends PropPanel{
     constructor(title){
         super(title);
         this.propConfig=Text_Node_Property_Config;
@@ -804,7 +823,7 @@ class TextNodePropPanel extends PropPanel{
                     this.element.setPropertyValue(this.properties[i].propertyname,this.properties[i].val());
             }  
           this.element.setPropertyValue("font",font);
-                 
+                         
         }
     }
        
@@ -826,6 +845,15 @@ class TextNodePropPanel extends PropPanel{
                         if(k!=-1) {control[0].value=this.propConfig[i].items[k];break;}
                     }
                    break;
+                case "fontColor":
+                case "fillColor":
+                        var rgb = this.element.getPropertyValue(this.properties[i].propertyname).split(',');
+                        var r = parseInt(rgb[0]);
+                        var g = parseInt(rgb[1]);
+                        var b = parseInt(rgb[2]);
+                        var hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                        control[0].value=hex;
+                        break;
                 default:
                     control[0].value=this.element.getPropertyValue(this.properties[i].propertyname);
             }
@@ -844,8 +872,8 @@ class PropPanelFactory{
                return this.panels[element.elementType];
         }
         switch(element.elementType){
-            case "TextNode":
-                var panel=new TextNodePropPanel(title);
+            case "TextBox":
+                var panel=new TextBoxPropPanel(title);
                break;
             case "SvgNode":
                 var panel=new SvgNodePropPanel(title);break;

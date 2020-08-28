@@ -2287,7 +2287,7 @@ function(a) {
     a.EditableElement = d
 }(JTopo),
 function(a) {
-    function b(c) {//node---dml
+    function b(c) {//Node---dml
         this.initialize = function(c) {
             b.prototype.initialize.apply(this, arguments),
             this.elementType = "node",
