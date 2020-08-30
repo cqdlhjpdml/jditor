@@ -88,6 +88,7 @@ $.widget( "evol.colorpicker", {
 	_create: function() {
 		var that=this;
 		var color=this.options.color;
+		
 		this._paletteIdx=this.options.defaultPalette=='theme'?1:2;
 		this._id='evo-cp'+_idx++;
 		this._enabled=true;
@@ -108,7 +109,16 @@ $.widget( "evol.colorpicker", {
 				if(color===transColor){
 					css+=' evo-transparent';
 				}else{
-					style=(color!==null)?('background-color:'+color):'';
+					if(color){
+						rgb=color.split(',');
+						if(rgb.length==3){
+							r = parseInt(rgb[0]);
+							g = parseInt(rgb[1]);
+							b = parseInt(rgb[2]);
+							hexcolor = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+						  }
+				   }
+					style=(color!==null)?('background-color:'+hexcolor):'';
 				}
 				e.addClass('colorPicker '+this._id)
 					.wrap('<div style="width:'+(this.options.hideButton?this.element.width():this.element.width()+32)+'px;'+
@@ -441,22 +451,31 @@ $.widget( "evol.colorpicker", {
 	},
 
 	val: function(value) {
+		
 		if (typeof value=='undefined') {
-			return this.options.color;
+			
+			return this.options.color;;
 		}else{
-			this._setValue(value);
+             this._setValue(value);
 			return this;
 		}
 	},
 
 	_setValue: function(c, noHide) {
 		c = c.replace(/ /g,'');
-		this.options.color=c;
+		hex=c.slice(1,7);//dem begin
+		r=parseInt('0x'+hex.slice(0,2));
+		g=parseInt('0x'+hex.slice(2,4));
+		b=parseInt('0x'+hex.slice(4,6));
+		rgb=r.toString()+','+g.toString()+','+b.toString();
+			
+		this.options.color=rgb;//dml end
 		if(this._isPopup){
 			if(!noHide){
 				this.hidePalette();
 			}
-			this._setBoxColor(this.element.val(c).change().next(), c);
+			//this._setBoxColor(this.element.val(c).change().next(), c);//ommited by dml
+			this._setBoxColor(this.element.val(rgb).change().next(), c);//dml
 		}else{
 			this._setColorInd(c,1);
 		}

@@ -435,6 +435,7 @@ class SvgService{
 function SvgNode(selector,text){
   this.selector=selector;
   this.text=text;
+  this.lineColor="#000000"
   this.getSvgElementsBox=function(){
       var wrapBox={},box;
       if(this.svgElements.length==0) return null;

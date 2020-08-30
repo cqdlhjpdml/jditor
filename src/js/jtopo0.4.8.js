@@ -2314,7 +2314,7 @@ function(a) {
         this.initialize(c),
         this.customPaint=function(ctx2d){}//this line added by dml
         this.paint = function(a) {
-            
+           
             if(this.customPaintMode==1){this.customPaint(a); return;}//this line added by dml
             if (this.image) {
                 var b = a.globalAlpha;
@@ -2333,6 +2333,7 @@ function(a) {
             this.paintCtrl(a),
             this.paintAlarmText(a),
             this.customPaint(a);//this line added by dml
+            a.restore();
             
         }
         ,
@@ -2372,8 +2373,9 @@ function(a) {
         this.paintText = function(a) {
             var b = this.text;
             if (null != b && "" != b) {
-                a.beginPath(),
-                a.font = this.font;
+                a.beginPath();
+                //a.font = this.font;//ommitted by dml
+                a.font=this.fontStyle+' '+ this.fontSize+'px'+' '+this.fontFamily;//added by dml
                 var c = a.measureText(b).width
                   , d = a.measureText("田").width;
                 a.fillStyle = "rgba(" + this.fontColor + ", " + this.alpha + ")";
@@ -3269,7 +3271,8 @@ function(a) {
             var b = this.text;
             if (null != b && "" != b) {
                 a.beginPath(),
-                a.font = this.font;
+                //a.font = this.font;//ommitted by dml
+                a.font=this.fontFamily+' '+this.fontStyle+' '+ this.fontSize+'px';//added by dml
                 var c = a.measureText(b).width
                   , d = a.measureText("田").width;
                 a.fillStyle = "rgba(" + this.fontColor + ", " + this.alpha + ")";

@@ -26,13 +26,24 @@ JTopo.InteractiveElement.prototype.setPopmenu=function(popmenu){this.popmenu=pop
 //////////////////JTopo.EditNode/////////////////////
 JTopo.EditorNode=function(){
   JTopo.EditorNode.prototype.initialize.apply(this,null);
-   
+  
+  this.caculateTextSize=function(){
+    
+    this.ctx2d.save();
+    this.ctx2d.font =this.fontStyle+' '+ this.fontSize+'px'+' '+this.fontFamily;
+    this.width = this.ctx2d.measureText(this.text).width+5;
+    this.height =this.ctx2d.measureText("田").width+10;
+    this.ctx2d.restore();
+    
+
+  }
 }
 JTopo.EditorNode.prototype=new JTopo.Node()
 //////////JTopo.TextBox:to fix the bug of JTopo.TextNode
-JTopo.TextBox=function(text){
+JTopo.TextBox=function(text,ctx2d){
   JTopo.TextBox.prototype.initialize.apply(this,null);
-  this.elementType="TextBox";
+  this.elementType="TextNode";
+  this.textPosition = 'Middle_Center';// 文字居中
   var me=this;        
   this.dbclick(function(event){
   
@@ -40,6 +51,8 @@ JTopo.TextBox=function(text){
     panel.show(event);
 });
   this.text=text;
+  this.ctx2d=ctx2d;
+  this.caculateTextSize();
   this.mouseup(function(e){
     if(this.mDragging) {
       this.mDragging=0;
@@ -52,6 +65,12 @@ JTopo.TextBox=function(text){
      actionManager.pushUndoAction(propAction);
   }
   })
+  this.configProperties=function(propertiesConfigArray){
+    for(let i=0;i<propertiesConfigArray.length;i++){
+      this.setPropertyValue(propertiesConfigArray[i].propertyName,value)
+    }
+  }
+  /*
   this.paint= function(a) {
     a.save();
     var w0=this.width;
@@ -76,12 +95,13 @@ JTopo.TextBox=function(text){
     
     
 };
+*/
 
 this.setPopmenu(Node_PopMenu);
 
 return this;
 }
-JTopo.TextBox.prototype=new JTopo.TextNode();
+JTopo.TextBox.prototype=new JTopo.EditorNode();
 //Connector:special node can be Linked between each other.
 JTopo.Connector=function (owner){
   JTopo.Connector.prototype.initialize.apply(this,null);
