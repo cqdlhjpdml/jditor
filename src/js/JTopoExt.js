@@ -65,11 +65,7 @@ JTopo.TextBox=function(text,ctx2d){
      actionManager.pushUndoAction(propAction);
   }
   })
-  this.configProperties=function(propertiesConfigArray){
-    for(let i=0;i<propertiesConfigArray.length;i++){
-      this.setPropertyValue(propertiesConfigArray[i].propertyName,value)
-    }
-  }
+  
   /*
   this.paint= function(a) {
     a.save();

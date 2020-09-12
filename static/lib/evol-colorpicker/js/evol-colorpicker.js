@@ -463,7 +463,7 @@ $.widget( "evol.colorpicker", {
 
 	_setValue: function(c, noHide) {
 		c = c.replace(/ /g,'');
-		hex=c.slice(1,7);//dem begin
+		hex=c.slice(1,7);//dml begin
 		r=parseInt('0x'+hex.slice(0,2));
 		g=parseInt('0x'+hex.slice(2,4));
 		b=parseInt('0x'+hex.slice(4,6));

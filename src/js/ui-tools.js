@@ -245,6 +245,9 @@ class ToolsPanel extends Tool{
           var scene=event.scene;
           var me=scene.getTool();
           var node=new JTopo.SvgNode(me.toolItem.symbolType,me.toolItem.text);
+          for(let i=0;i<Svg_Node_Property_Config.length;i++){
+            node.setPropertyValue(Svg_Node_Property_Config[i].propname,Svg_Node_Property_Config[i].defaultValue)
+          }
           node.setLocation(x,y);
           scene.add(node);
           var args={};
@@ -546,28 +549,32 @@ class MyDialog{
     
 }
 ////////////////////
-var Property_Config=[{propname:"borderColor",caption:"边框颜色",inputtype:"colorPicker",defaultValue:"100,0,0",dataType: typeof "str"},
+var Text_Node_Property_ConfigArray=[{propname:"borderColor",caption:"边框颜色",inputtype:"colorPicker",defaultValue:"100,0,0",dataType: typeof "str"},
                      //{propname:"borderStyle",caption:"线型",inputtype:"select",items:["solid","dotted","dashed","double"],default:"solid"},
                      {propname:"borderWidth",caption:"边框线宽",inputtype:"select",items:[1,2,3,4,5,6,0],defaultValue:1,dataType:typeof 10},
                      {propname:"borderRadius",caption:"圆角半径",inputtype:"select",items:[0,1,2,3,4,5,6],defaultValue:3,dataType:typeof 10},
                      {propname:"fillColor",caption:"填充颜色",inputtype:"colorPicker",defaultValue:"255,255,255",dataType: typeof "str"},
                      
                      {propname:"text",caption:"文本内容",inputtype:"input",defaultValue:"新文本框",dataType: typeof "str"},
-                     {propname:"fontColor",caption:"文本颜色",inputtype:"colorPicker",defaultValue:"10,10,10"},
+                     {propname:"fontColor",caption:"文本颜色",inputtype:"colorPicker",defaultValue:"10,10,10",dataType: typeof "str"},
                      {propname:"fontStyle",caption:"文本风格",inputtype:"select",items:["Normal","Italic"],defaultValue:"Normal",dataType: typeof "str"},
                      {propname:"fontFamily",caption:"字体",inputtype:"select",items:["宋体","华文仿宋","魏碑","隶书","微软雅黑","serif"],defaultValue:"宋体",dataType: typeof "str"},
-                     {propname:"fontSize",caption:"字号",inputtype:"select",items:["12","13","14","15","16","17","18","19","20","21","22","23","24","25"],defaultValue:"16",dataType: typeof "str"},
-                     {propname:"textPosition",caption:"文本位置",items:["Top_Left", "Top_Center", "Top_Right", "Middle_Left", "Middle_Right", "Middle_Center",
-                                                                                       "Bottom_Left", "Bottom_Center", "Bottom_Right"],defaultValue:"Middle_Center",dataType: typeof "str"}
+                     {propname:"fontSize",caption:"字号",inputtype:"select",items:["12","13","14","15","16","17","18","19","20","21","22","23","24","25"],defaultValue:"16",dataType: typeof "str"}
+                   
                     ];
-var Text_Node_Property_ConfigArray=Property_Config;
-var Svg_Node_Property_Config=[];
-Object.assign(Svg_Node_Property_Config,Text_Node_Property_ConfigArray)
-Svg_Node_Property_Config.unshift(
-     
-     {propname:"lineWidth",caption:"线宽",inputtype:"select",items:[1,2,3,4,5,6,7,8,9,10,12,14,16]},
-     {propname:"lineColor",caption:"线条颜色",inputtype:"colorPicker"}
-     );
+
+var Svg_Node_Property_Config=[
+
+{propname:"text",caption:"文本内容",inputtype:"input",defaultValue:"",dataType: typeof "str"},
+{propname:"fontColor",caption:"文本颜色",inputtype:"colorPicker",defaultValue:"10,10,10",dataType: typeof "str"},
+{propname:"fontStyle",caption:"文本风格",inputtype:"select",items:["Normal","Italic"],defaultValue:"Normal",dataType: typeof "str"},
+{propname:"fontFamily",caption:"字体",inputtype:"select",items:["宋体","华文仿宋","魏碑","隶书","微软雅黑","serif"],defaultValue:"宋体",dataType: typeof "str"},
+{propname:"fontSize",caption:"字号",inputtype:"select",items:["12","13","14","15","16","17","18","19","20","21","22","23","24","25"],defaultValue:"16",dataType: typeof "str"},
+{propname:"textPosition",caption:"文本位置",inputtype:"select",items:["Top_Left", "Top_Center", "Top_Right", "Middle_Left", "Middle_Right", "Middle_Center",
+                                                                  "Bottom_Left", "Bottom_Center", "Bottom_Right"],defaultValue:"Bottom_Center",dataType: typeof "str"}
+];
+
+
             
 //////////////////////////////////
 class PropPanel extends MyDialog{
@@ -617,6 +624,15 @@ class PropPanel extends MyDialog{
         for(let i=0;i<this.properties.length;i++){
             let control= this.properties[i].control();
             control[0].value=this.element.getPropertyValue(this.properties[i].propertyname);
+            if(this.properties[i].inputtype=="colorPicker"){
+                control.ready(function(){
+                            
+                    control.colorpicker({
+                    showOn: "button"
+                })
+             
+            });
+            }
              
           }
          this.customPropertiesInitialize();
@@ -624,6 +640,7 @@ class PropPanel extends MyDialog{
     setElement(element){
         this.element=element;
     }
+    customApply(){}
     apply(){
        for(let i=0;i<this.properties.length;i++){
         let value=this.properties[i].val();
@@ -631,7 +648,7 @@ class PropPanel extends MyDialog{
              value=parseInt(value);
         this.element.setPropertyValue(this.properties[i].propertyname,value);
         }
-        this.element.caculateTextSize();
+       this.customApply();
       
     } 
     //override
@@ -663,7 +680,8 @@ class PropPanel extends MyDialog{
                         val:function(){
                          var t=jqSelectList;
                          return function(){return t[0].selectedOptions[0].value;}}(),
-                         dataType:config.dataType
+                         dataType:config.dataType,
+                         inputtype:config.inputtype
                         }
                     this.properties.push(property);
                     break;
@@ -678,7 +696,8 @@ class PropPanel extends MyDialog{
                         val:function(){
                         var t=jqInputBox;
                         return function(){return t[0].value;}}(),
-                        dataType:config.dataType
+                        dataType:config.dataType,
+                        inputtype:config.inputtype
                     }
                    this.properties.push(property);
                     break;
@@ -691,14 +710,7 @@ class PropPanel extends MyDialog{
                         self.jqContentBar.append(jqLabel);
                         self.jqContentBar.append(jqInputBox);
                         
-                        jqInputBox.ready(function(){
-                            
-                           
-                            jqInputBox.colorpicker({
-                                showOn: "button"
-                            })
-                         
-                        });
+                       
                         var property={propertyname:config.propname,
                             control:function(){var t=jqInputBox;return t;},
                             val:function(){
@@ -708,7 +720,8 @@ class PropPanel extends MyDialog{
                                
                                 
                                 return RGB;}}(),
-                            dataType:config.dataType
+                            dataType:config.dataType,
+                            inputtype:config.inputtype
                 
                         }
                         
@@ -737,67 +750,10 @@ class SvgNodePropPanel extends PropPanel{
         this.propConfig=Svg_Node_Property_Config;
         this.create();        
     }
-    apply(){
-        
-        var args={};
-        args.obj=this.element;
-        args.props={};
-        args.props.text=this.element.text;
-        args.props.font=this.element.font;
-        args.props.fontSize=this.element.fontSize;
-        var propAction=new PropertyAction(args);
-        var actionManager=this.element.scene.getTool().toolManager.actionManager;
-        actionManager.pushUndoAction(propAction);
-
-        var font="";
-        for(let i=0;i<this.properties.length;i++){
-            switch(this.properties[i].propertyname){
-                case "fontStyle":
-                case "fontFamily":
-                case "fontSize":
-                   font=font + " " + this.properties[i].val()
-                   break;
-                default:
-                    this.element.setPropertyValue(this.properties[i].propertyname,this.properties[i].val());
-            }  
-          this.element.setPropertyValue("font",font);
-                 
-        }
-    }
-    propertiesInitialize(){
-        var fontProp=this.element.getPropertyValue("font").trim().split(" ");
-        var fontProperties=[];
-        for(let i=0;i<fontProp.length;i++){
-            fontProperties.push(fontProp[i].trim());
-        }
-
-        for(let i=0;i<this.properties.length;i++){
-            let control= this.properties[i].control();//control is a jquery object
-            switch(this.properties[i].propertyname){
-                case "fontStyle":
-                case "fontFamily":
-                case "fontSize":
-                    for(let j=0;j<fontProperties.length;j++){
-                        let k=this.propConfig[i].items.indexOf(fontProperties[j]);
-                        if(k!=-1) {control[0].value=this.propConfig[i].items[k];break;}
-                    }
-                   break;
-                case "fontColor":
-                case "fillColor":
-                    var rgb = this.element.getPropertyValue(this.properties[i].propertyname).split(',');
-                    var r = parseInt(rgb[0]);
-                    var g = parseInt(rgb[1]);
-                    var b = parseInt(rgb[2]);
-                    var hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-                    control[0].value=hex;
-                    break;
-                default:
-                    control[0].value=this.element.getPropertyValue(this.properties[i].propertyname);
-            }
-            
-             
-          }
-    } 
+   customApply(){
+       
+   }
+  
  
 
 }     
@@ -808,7 +764,9 @@ class TextNodePropPanel extends PropPanel{
         this.propConfig=Text_Node_Property_ConfigArray;
         this.create();        
     }
-  
+    customApply(){
+        this.element.caculateTextSize();
+    }
        
   
 }

@@ -432,10 +432,11 @@ class SvgService{
  
 }
 //////////////////////////////////
-function SvgNode(selector,text){
+function SvgNode(selector,text,ctx2d){
   this.selector=selector;
   this.text=text;
-  this.lineColor="#000000"
+  this.lineColor="#000000";
+  this.ctx2d=ctx2d;
   this.getSvgElementsBox=function(){
       var wrapBox={},box;
       if(this.svgElements.length==0) return null;
