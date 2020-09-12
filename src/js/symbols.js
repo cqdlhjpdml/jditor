@@ -2,7 +2,7 @@
 
 const NOTHING=null;
 import{Node_PopMenu} from './menu.js'
-import{PropPanelFactory,PropertyAction} from './ui-tools.js'
+import{PropPanelFactory} from './property.js'
 /////////////////////////
 class SvgDrawService{
   static svgMatrixToArray(svgMatrix){
@@ -500,9 +500,7 @@ function SvgNode(selector,text,ctx2d){
   }
      this.customPaint=function(ctx2d){
           ctx2d.save();
-          
           ctx2d.translate(-this.width/2,-this.height/2);//group符号的draw函娄中会将符号左向角定位到原始坐标原点，scene绘制符号前会将原点移到符号矩形框中心,此语句再将原点移到矩形框的左上角
-          
           ctx2d.transform(this.svgScaleX,0,0,this.svgScaleY,0,0);
           for(var i=0;i<this.svgElements.length;i++){
              var oneEle = this.svgElements[i];

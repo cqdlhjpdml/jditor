@@ -1,4 +1,5 @@
-import  { SaveTool,OpenFileTool, AppendTabTool,UndoTool,RedoTool,TextBoxTool,ImageTool,ToolsPanel,LinkTool,ConnectorTool,LoginTool} from './ui-tools.js'
+import  { TextBoxTool,ImageTool,ToolsPanel,LinkTool,ConnectorTool} from './ui-tools.js'
+import{SaveTool,OpenFileTool, AppendTabTool,UndoTool,RedoTool,LoginTool} from './command-tools.js'
 import  {CURRENT_SCENE_CHANGE} from './common.js'
 var tools_config=[
     {name:"开始",caption:"开始",toolItems:[ 
