@@ -2,7 +2,7 @@
 
 const NOTHING=null;
 import{Node_PopMenu} from './menu.js'
-import{PropPanelFactory} from './property.js'
+import{PropPanelFactory} from './ui-property.js'
 /////////////////////////
 class SvgDrawService{
   static svgMatrixToArray(svgMatrix){

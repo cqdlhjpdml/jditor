@@ -1,5 +1,5 @@
 import{Tool} from './ui-base-Tools.js'
-import{Svg_Node_Property_Config,Text_Node_Property_ConfigArray} from './property.js'
+import{Svg_Node_Property_Config,Text_Node_Property_ConfigArray} from './ui-property.js'
 const TASK_END=1;
   //////////////////////////////
 class ToolsPanel extends Tool{

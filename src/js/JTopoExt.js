@@ -1,7 +1,7 @@
 "use strict"
 import{Node_PopMenu} from './menu.js'
 import{PropertyAction} from './undo-redo-action.js'
-import{PropPanelFactory} from './property.js'
+import{PropPanelFactory} from './ui-property.js'
 ///////////////JTopo.InteractiveElement extended//////////////////
 JTopo.editor = null;
 JTopo.InteractiveElement.prototype.setPopmenu=function(popmenu){this.popmenu=popmenu;
