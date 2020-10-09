@@ -125,21 +125,49 @@ class MyEditor{
       this.pageBorderWidth=1;
       this.spaceBetweenPages=50;
       this.pagesCount=new Array();
-      
-      var sObject = document.getElementById("svgObject");
-      $('#svgObject').ready(function() {
+     /* var jqSvgContainer=$('<div class="svgClass"></div>');
+      var thermalSvgObject=$('<object class="svgClass" style="visibility:hidden;" id="svgThermalObject" data="thermal.svg" type="image/svg+xml" height="0" width="0"></object>');
+      var samaSvgObject=$('<object class="svgClass" style="visibility:hidden;" id="svgSamaObject" data="sama.svg" type="image/svg+xml" height="0" width="0"> </object>');
+      jqSvgContainer.append(thermalSvgObject);
+      jqSvgContainer.append(samaSvgObject);
+      $(document.body).append(jqSvgContainer);
+      JTopo.svgDoms=[];
+      thermalSvgObject.ready(function(){
+        JTopo.svgDoms['thermal']=thermalSvgObject[0].contentDocument;
+        SvgService.setSvgDomDrawFunc(thermalSvgObject[0].contentDocument); 
+      });
+      samaSvgObject.ready(function(){
+        JTopo.svgDoms['sama']=samaSvgObject[0].contentDocument;
+        SvgService.setSvgDomDrawFunc(samaSvgObject[0].contentDocument); 
+      })
+      */
+     
+      var svgThermalObject = document.getElementById("svgThermalObject");
+      var svgSamaObject = document.getElementById("svgSamaObject");
+      JTopo.svgDoms=[];
+      $('#svgThermalObject').ready(function() {
 
-        var svgDom = sObject.contentDocument;
-        SvgService.setSvgDomDrawFunc(svgDom);
-        JTopo.svgDom=svgDom;
+        var svgThermalDom = svgThermalObject.contentDocument;
+        
+        SvgService.setSvgDomDrawFunc(svgThermalDom);
+        JTopo.svgDoms['thermal']=svgThermalDom;
+        
 
-    });
-      /* sObject.addEventListener("load",function() {
-        var svgDom = sObject.contentDocument;
-        SvgService.setSvgDomDrawFunc(svgDom);
-        JTopo.svgDom=svgDom;})*/
+     });
+     
+     $('#svgSamaObject').ready(function() {
 
+        var svgSamaDom = svgSamaObject.contentDocument;
+        
+        SvgService.setSvgDomDrawFunc(svgSamaDom);
+        JTopo.svgDoms['sama']=svgSamaDom;
+        
+
+     });
+     
+     
     }
+    
     constructor(workAreaID,jtopo){   
         this.eventDispatcher=new EventDispatcher();
         this.jtopo=jtopo ;

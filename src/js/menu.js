@@ -1,6 +1,6 @@
 "use strict"
 import{CommonUtilities} from './common.js'
-import{MyDialog} from './ui-base-tools.js'
+import{MyDialog} from './ui-base.js'
 import{RemoveAction} from './undo-redo-action.js'
 var AlertMsg={disableToDelete_Title_CN:"警告",disableToDelete_CN:"不能删除包含连接端口的符号"}
 class AlertDialog extends MyDialog{

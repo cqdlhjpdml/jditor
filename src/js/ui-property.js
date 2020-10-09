@@ -1,4 +1,4 @@
-import { MyDialog } from './ui-base-tools.js'
+import { MyDialog } from './ui-base.js'
 import { CommonUtilities } from './common.js'
 import{PropertyAction} from './undo-redo-action.js'
 var Text_Node_Property_ConfigArray = [

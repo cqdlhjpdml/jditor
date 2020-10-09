@@ -1,4 +1,4 @@
-import{Tool} from './ui-base-Tools.js'
+import{Tool} from './ui-base.js'
 import{Svg_Node_Property_Config,Text_Node_Property_ConfigArray} from './ui-property.js'
 const TASK_END=1;
   //////////////////////////////
@@ -37,7 +37,8 @@ class ToolsPanel extends Tool{
        {
            var industry=toolItem.industry;
            var selector=`[industry='${industry}']`;
-           var svgElements=JTopo.svgDom.querySelectorAll(selector);
+           var domName=toolItem.symbolfile.split('.')[0];
+           var svgElements=JTopo.svgDoms[domName].querySelectorAll(selector);
            var toolgroups={};
            
            for(let i=0;i<svgElements.length;i++){
@@ -52,6 +53,7 @@ class ToolsPanel extends Tool{
                   toolItem.icon=devicename+".png";
                   toolItem.tooltips=caption;
                   toolItem.toolClass=SvgNodeTool;
+                  toolItem.svgDom=JTopo.svgDoms[domName];
                   
                   let tool=new SvgNodeTool(toolItem,this.toolManager);
                   toolgroups[groupname].push(tool);
@@ -169,7 +171,7 @@ class ToolsPanel extends Tool{
           var y=event.y;
           var scene=event.scene;
           var me=scene.getTool();
-          var node=new JTopo.SvgNode(me.toolItem.symbolType,me.toolItem.text);
+          var node=new JTopo.SvgNode(me.toolItem.symbolType,me.toolItem.text,me.toolItem.svgDom);
           for(let i=0;i<Svg_Node_Property_Config.length;i++){
             node.setPropertyValue(Svg_Node_Property_Config[i].propname,Svg_Node_Property_Config[i].defaultValue)
           }

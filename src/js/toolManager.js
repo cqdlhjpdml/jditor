@@ -1,6 +1,8 @@
 import  { TextBoxTool,ImageTool,ToolsPanel,LinkTool,ConnectorTool} from './ui-tools.js'
 import{SaveTool,OpenFileTool, AppendTabTool,UndoTool,RedoTool,LoginTool} from './command-tools.js'
 import  {CURRENT_SCENE_CHANGE} from './common.js'
+import {SvgService} from './symbols.js'
+var tools_group_map=[{name:"热力系统",filename:"symbols.svg"},{name:"热工符号",filename:"sama.svg"}];
 var tools_config=[
     {name:"开始",caption:"开始",toolItems:[ 
                                            {  caption:"保存",
@@ -46,12 +48,22 @@ var tools_config=[
                                              icon:"thermal.png", 
                                              industry:"thermal",
                                              tooltips:"热力系统",
+                                             symbolfile:"thermal.svg",
                                              toolClass:ToolsPanel
                                             },
+                                            
+                                            {caption:"SAMA图符",
+                                            icon:"tc.png", 
+                                            industry:"SAMA",
+                                            tooltips:"SAMA图符",
+                                            symbolfile:"sama.svg",
+                                            toolClass:ToolsPanel
+                                           },
                                             {caption:"自然",
                                             icon:"nature.png", 
                                             industry:"nature",
                                             tooltips:"自然",
+                                            symbolfile:"thermal.svg",
                                             toolClass:ToolsPanel
                                            }, 
                                             //one toolItem
@@ -120,7 +132,27 @@ class ToolManager{
         this.navMenusList=new Array();
         this.toolsContainerList=new Array();
         this.editor.addEventListener(this,CURRENT_SCENE_CHANGE,this.currentSceneChangeEventHandler);
+        //this.loadSvgSymbols();
           
+    }
+    loadSvgSymbols(){
+        JTopo.svgDoms=[]
+        var jqSvgContainer=$('<div class="svgContainer"></div>');
+        //var jqSvgSamaObject=$('<object class="svgClass" style="visibility:hidden;" id="svgObject" data="sama.svg" type="image/svg+xml" height="0" width="0"></object>');
+        var jqSvgThermalObject=$('<object class="svgClass" style="visibility:hidden;" id="svgObject" data="thermal.svg" type="image/svg+xml" height="0" width="0"></object>');
+        //jqSvgContainer.append(jqSvgSamaObject);
+        jqSvgContainer.append(jqSvgThermalObject);
+        $(document.body).append(jqSvgContainer[0]);
+       // jqSvgSamaObject.ready(function(){
+       //   var svgSamaDom=jqSvgSamaObject[0].contentDocument;
+       //   SvgService.setSvgDomDrawFunc(svgSamaDom);
+       //   JTopo.svgDoms.sama=svgSamaDom;
+       // }) ;
+        jqSvgThermalObject.ready(function(){
+            var svgThermalDom=jqSvgThermalObject[0].contentDocument;
+            SvgService.setSvgDomDrawFunc(svgThermalDom);
+            JTopo.svgDoms['thermal']=svgThermalDom;
+          }) ;
     }
     setCurrentTool(tool){
         this.ctool=tool;

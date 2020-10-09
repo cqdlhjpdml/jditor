@@ -10,6 +10,29 @@ class SvgDrawService{
     var ctmArray=[svgMatrix.a,svgMatrix.b,svgMatrix.c,svgMatrix.d,svgMatrix.e,svgMatrix.f]
     return ctmArray;
   }
+  static getTransform(ts,pos){
+     var s=ts.toLowerCase();
+     var i=pos;
+     for(i=0;i<s.length;i++){
+       switch(s.charAt(i)){
+         case m:
+           if(s.charAt(++i)!='a') throw("transform string sytax error");
+           if(s.charAt(++i)!='r') throw("transform string sytax error");
+           if(s.charAt(++i)!='t') throw("transform string sytax error");
+           if(s.charAt(++i)!='r') throw("transform string sytax error");
+           if(s.charAt(++i)!='i') throw("transform string sytax error");
+           if(s.charAt(++i)!='x') throw("transform string sytax error");
+           for(;i<s.length&&s.charAt(i)!='(';i++) continue;
+           if(i==s.length) throw("transform string sytax error");
+           var ctmstr='';
+           for(;i<s.length&&s.charAt(i)!=')';i++)
+              ctmstr=ctmstr + s.charAt(i)
+           if(charAt(i)==')') ctmstr=ctmstr + s.charAt(i) ;
+           else throw("transform string sytax error");
+           break;
+       }
+     }
+  }
   static matrixStringToArray(matrixString){
       if(!matrixString) return null;
       var infos=matrixString.split("("); 
@@ -199,7 +222,7 @@ class SvgDrawService{
                    //anticlockwise的定义与SVG的arc中的fS逻辑定义相反
                    //参数的意思：(圆心x,圆心y,半径x,半径y,旋转的角度，起始角，结果角，顺时针还是逆时针)
                    ctx2d.ellipse(out.cx,out.cy,rx,ry,phi,out.startAngle,out.endAngle,!fS);
-                  
+                   cx=xto;cy=yto;
                    break;
                 case 'M':
                   X=parseFloat(getdata());
@@ -398,6 +421,9 @@ class SvgDrawService{
              var ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform'));
              if(ctm)
                ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);
+             var trans;
+            
+
              
              for(var i=0;i<this.childNodes.length;i++){
               this.childNodes[i].draw(ctx2d,drawInfos);
@@ -432,11 +458,12 @@ class SvgService{
  
 }
 //////////////////////////////////
-function SvgNode(selector,text,ctx2d){
+function SvgNode(selector,text,svgDom){
   this.selector=selector;
   this.text=text;
   this.lineColor="#000000";
-  this.ctx2d=ctx2d;
+  //this.ctx2d=ctx2d;
+  this.svgDom=svgDom
   this.getSvgElementsBox=function(){
       var wrapBox={},box;
       if(this.svgElements.length==0) return null;
@@ -490,7 +517,7 @@ function SvgNode(selector,text,ctx2d){
       this.serializedProperties=this.serializedProperties.concat(properties);
       this.toFill=false;//not to fill the node's background
       this.borderwidth=0;//not to draw the border;
-      this.svgElements=JTopo.svgDom.querySelectorAll(selector);
+      this.svgElements=this.svgDom.querySelectorAll(selector);
       var svgElementsBox=this.getSvgElementsBox();
       this.setSize(svgElementsBox.width,svgElementsBox.height);
       this.originalSize=this.getSize();
@@ -498,7 +525,7 @@ function SvgNode(selector,text,ctx2d){
       this.svgScaleX=1;
       this.svgScaleY=1;
   }
-     this.customPaint=function(ctx2d){
+  this.customPaint=function(ctx2d){
           ctx2d.save();
           ctx2d.translate(-this.width/2,-this.height/2);//group符号的draw函娄中会将符号左向角定位到原始坐标原点，scene绘制符号前会将原点移到符号矩形框中心,此语句再将原点移到矩形框的左上角
           ctx2d.transform(this.svgScaleX,0,0,this.svgScaleY,0,0);
@@ -508,22 +535,22 @@ function SvgNode(selector,text,ctx2d){
              oneEle.draw(ctx2d,drawInfos);
           }
           ctx2d.restore();
-     }
-    this.onResizeHandler=function(event){
+  }
+  this.onResizeHandler=function(event){
        
         this.svgScaleX=this.getSize().width/this.originalSize.width;
         this.svgScaleY=this.getSize().height/this.originalSize.height;
         
-    }
+  }
    
-    this.initialize(selector,text);
-    var me=this;
-    this.dbclick(function(event){
+  this.initialize(selector,text);
+  var me=this;
+  this.dbclick(function(event){
       var panel=PropPanelFactory.getPropPanelInstance("属性设置",me);
       panel.show(event);
-    });
+  });
     
-    this.setPopmenu(Node_PopMenu);
+  this.setPopmenu(Node_PopMenu);
 }
 SvgNode.prototype=new JTopo.EditorNode();
 JTopo.SvgNode=SvgNode;

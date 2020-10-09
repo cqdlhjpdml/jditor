@@ -25,11 +25,11 @@
 		</style>
 	</defs>
 	<g industry="thermal" group="汽轮机" device="single-turbine" caption="turbine">
-		<polygon points="190.2491 242.5535,214.8322 236.4308,214.7619 266.1283,190.5381 259.9471" fill="#FFFFFF" stroke="#000000" stroke-opacity="1" stroke-width="0.25" transform="matrix(3.482,-0.006,0.003999999,2.489,-489.326,-464.752)" class="turbine" xmlns="http://www.w3.org/2000/svg" />
+		<polygon points="190.2491 242.5535,214.8322 236.4308,214.7619 266.1283,190.3269 260.4823" fill="#FFFFFF" stroke="#000000" stroke-opacity="1" stroke-width="0.25" transform="matrix(3.482,-0.006,0.003999999,2.489,-489.326,-464.752)" class="turbine" xmlns="http://www.w3.org/2000/svg" />
 			</g>
 	<g industry="thermal" group="汽轮机" device="low-turbine" caption="low-turbine" transform="matrix(1.24,0,0,1.37,104.2,-96.015)" xmlns="http://www.w3.org/2000/svg">
 <g transform="matrix(1,0,0,1,10,-16)">
-<polygon points="34 240,83 258,83 294,34 309" fill="#FFFFFF" stroke="#000000" transform="matrix(1,0,0,1,1,1)" stroke-width="0.25" xmlns="http://www.w3.org/2000/svg" />
+<polygon points="34 240,83.96774 258,83.96774 294,34 309" fill="#FFFFFF" stroke="#000000" transform="matrix(1,0,0,1,1,1)" stroke-width="0.25" xmlns="http://www.w3.org/2000/svg" />
 <polygon points="133 241,83 258,83 294,133 308" fill="#FFFFFF" stroke="#000000" transform="matrix(1,0,0,1,2,1)" stroke-width="0.25" xmlns="http://www.w3.org/2000/svg" />
 </g>
 </g>

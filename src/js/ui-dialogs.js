@@ -1,4 +1,4 @@
-import{MyDialog} from './ui-base-tools.js'
+import{MyDialog} from './ui-base.js'
 import {CommonUtilities,WsAgent,FILE_SAVE_EVENT,USER_LOGIN_EVENT, GET_FILELIST_EVENT, OPEN_FILE_EVENT} from './common.js'
 class OpenFileDialog extends MyDialog{
     resetUI(){

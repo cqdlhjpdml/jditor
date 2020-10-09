@@ -1,5 +1,5 @@
 import {FILE_SAVE_EVENT,USER_LOGIN_EVENT} from './common.js'
-import{Command} from './ui-base-tools.js'
+import{Command} from './ui-base.js'
 import{LoginDialog,SaveDialog,OpenFileDialog} from './ui-dialogs.js'
 class LoginTool extends Command{
     constructor(toolItem,toolMannager){
