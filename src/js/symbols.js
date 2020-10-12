@@ -10,43 +10,63 @@ class SvgDrawService{
     var ctmArray=[svgMatrix.a,svgMatrix.b,svgMatrix.c,svgMatrix.d,svgMatrix.e,svgMatrix.f]
     return ctmArray;
   }
-  static getTransform(ts,pos){
-     var s=ts.toLowerCase();
-     var i=pos;
-     for(i=0;i<s.length;i++){
-       switch(s.charAt(i)){
-         case m:
-           if(s.charAt(++i)!='a') throw("transform string sytax error");
-           if(s.charAt(++i)!='r') throw("transform string sytax error");
-           if(s.charAt(++i)!='t') throw("transform string sytax error");
-           if(s.charAt(++i)!='r') throw("transform string sytax error");
-           if(s.charAt(++i)!='i') throw("transform string sytax error");
-           if(s.charAt(++i)!='x') throw("transform string sytax error");
-           for(;i<s.length&&s.charAt(i)!='(';i++) continue;
-           if(i==s.length) throw("transform string sytax error");
-           var ctmstr='';
-           for(;i<s.length&&s.charAt(i)!=')';i++)
-              ctmstr=ctmstr + s.charAt(i)
-           if(charAt(i)==')') ctmstr=ctmstr + s.charAt(i) ;
-           else throw("transform string sytax error");
-           break;
+  static getTransform(ts){
+    var trans=[] ,k=0;
+    var ctm;
+    var ts=ts.toLowerCase();
+     var length=ts.length;
+     var state='cmd';
+     for(let i=0;i<length||state=='record';i++)
+     { 
+       switch(state){
+         case 'cmd':
+          ctm=new Object();
+          ctm.command='';
+          for(;i<length;i++)
+           if(ts.charAt(i)!='(' ){  if(ts.charAt(i)!=' '&&ts.charAt(i)!='\t') ctm.command=ctm.command+ts.charAt(i)}
+           else break;
+          if(i==length) throw("transform string sytax error! ");
+          state='content';
+          break;
+        case 'content':
+          ctm.content='';
+          for(;i<length;i++) 
+            if(ts.charAt(i)!=')') ctm.content=ctm.content+ts.charAt(i);
+            else break;
+          state='record';
+          break;
+        case 'record':
+          trans[k++]=ctm;
+          state='cmd';
+          break;
+        default:
+          break;    
        }
-     }
-  }
-  static matrixStringToArray(matrixString){
-      if(!matrixString) return null;
-      var infos=matrixString.split("("); 
-      var command=infos[0];
-      infos[1]=infos[1].slice(0,-1);
-      var ctmArray=infos[1].split(",")
-     
+       //////////////////////
       
-      switch(command){
-        case "matrix":
-        for(let k=0;k<ctmArray.length;k++) ctmArray[k]=parseFloat(ctmArray[k]);
-        return ctmArray;
-      } 
-      return null;
+     }
+ 
+     return trans;
+  }
+  static handlTransforms(transformStr,ctx2d){
+      if(!transformStr) return null;
+      var trans=SvgDrawService.getTransform(transformStr)
+      for(let i=0;i<trans.length;i++){
+        var ctmArray=trans[i].content.split(",");
+        switch(trans[i].command){
+          case "matrix":
+            for(let k=0;k<ctmArray.length;k++) ctmArray[k]=parseFloat(ctmArray[k]);
+            ctx2d.transform(ctmArray[0],ctmArray[1],ctmArray[2],ctmArray[3],ctmArray[4],ctmArray[5]);
+            break;
+           case 'translate': 
+            var tx=parseFloat(ctmArray[0]);
+            var ty=parseFloat(ctmArray[1]);
+            ctx2d.translate(tx,ty);
+           break;
+           default:
+             break;
+        }
+      }
   }
   static transform(point,ctm){
       var x=point.x;
@@ -115,12 +135,11 @@ class SvgDrawService{
             //c15.711,3.87,64.507,1.289,48.792-17.419 
             //C367.046,297.331,391.858,277.008,342.235,274.75
             //z"
-            let ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform'));
+            
             var cx,cy,X,Y;
             ctx2d.save();
             ctx2d.beginPath();
-            if(ctm)
-                ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);
+            SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
             
             for(;pos<len;){
               pathCmd=d[pos++];
@@ -280,10 +299,8 @@ class SvgDrawService{
           funcs['line']=function(ctx2d,drawInfos){
             let x1=this.x1.baseVal.value,y1=this.y1.baseVal.value,
             x2=this.x2.baseVal.value,y2=this.y2.baseVal.value;
-            let ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform'));
             ctx2d.save();
-            if(ctm)
-                ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);
+            SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
             ctx2d.beginPath();
             ctx2d.moveTo(x1, y1);
             ctx2d.lineTo(x2, y2);
@@ -295,12 +312,11 @@ class SvgDrawService{
           //----------
           funcs['polyline']=function(ctx2d,drawInos){
             let points=this.points;
-            let ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform')); 
+            
             let len=points.length;
             ctx2d.save();
             ctx2d.lineWidth=1.5;          
-            if(ctm)
-                ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);
+            SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
             ctx2d.beginPath();
             var startX =points[0].x;
             var startY =points[0].y;
@@ -322,12 +338,11 @@ class SvgDrawService{
           funcs['polygon']=function(ctx2d,drawInfos){ 
 
             let points=this.points;
-            let ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform')); 
+           
             let len=points.length;
             ctx2d.save();
                       
-            if(ctm)
-                ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);
+            SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
             ctx2d.beginPath();
             var startX =points[0].x;
             var startY =points[0].y;
@@ -351,11 +366,10 @@ class SvgDrawService{
             var x=parseFloat(this.getAttribute('cx'));
             var y=parseFloat(this.getAttribute('cy'));
             var r=this.r.baseVal.value;
-            var ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform'));
+           
             ctx2d.save();
             
-            if(ctm)
-              ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);
+            SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
             ctx2d.beginPath();
             ctx2d.strokeStyle=this.attributes["stroke"];
             ctx2d.arc(x,y, r, 0, Math.PI*2);
@@ -371,15 +385,9 @@ class SvgDrawService{
           funcs['text']=function(ctx2d,drawInfos){
               var x=parseFloat(this.getAttribute('x'));
               var y=parseFloat(this.getAttribute('y'));
-              var ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform'));
-
               ctx2d.save();
-              
-              if(ctm)
-                { 
-                  ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);}
-             
-                  var text=this.textContent;
+              SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
+              var text=this.textContent;
               ctx2d.font=this.attributes["font-size"].nodeValue+ 'px ' +this.attributes["font-family"].nodeValue;
               ctx2d.strokeStyle=this.attributes["stroke"];
               ctx2d.textAlign = "left";
@@ -397,9 +405,9 @@ class SvgDrawService{
               var y=parseFloat(this.getAttribute('y'));
               var width=parseFloat(this.getAttribute('width'));
               var height=parseFloat(this.getAttribute('height'));
-              var ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform'));
+             
               ctx2d.save();
-              if(ctm)  ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);
+              SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
               ctx2d.beginPath();
               ctx2d.rect(x,y, width,height);
               setCtx2dStyle(this,ctx2d); 
@@ -418,13 +426,7 @@ class SvgDrawService{
              var box=this.getClientRects()[0];
              ctx2d.translate(-box.x,-box.y);//将符号左上角定位原始坐标原点
              }
-             var ctm=SvgDrawService.matrixStringToArray(this.getAttribute('transform'));
-             if(ctm)
-               ctx2d.transform(ctm[0],ctm[1],ctm[2],ctm[3],ctm[4],ctm[5]);
-             var trans;
-            
-
-             
+             SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
              for(var i=0;i<this.childNodes.length;i++){
               this.childNodes[i].draw(ctx2d,drawInfos);
              }
