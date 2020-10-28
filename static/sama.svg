@@ -555,7 +555,7 @@
 			<path d="M0 1647.78 L20.04 1647.78" class="st14" />
 		</g>
 	</g>
-	<g id="group264-163" transform="matrix(1,0,0,1,0,0) translate(429.969,-846.607)" v:mID="0" v:groupContext="foregroundPage" v:index="1">
+	<g  industry="SAMA" group="singnal" device="trigger" caption="trigger" id="group264-163" transform="matrix(1,0,0,1,0,0) translate(429.969,-846.607)" v:mID="0" v:groupContext="foregroundPage" v:index="1">
 		<title>
 		RS触发器</title>
 		<g id="group265-164" v:mID="265" v:groupContext="group">
@@ -602,7 +602,7 @@
 		<g id="shape270-174" v:mID="270" v:groupContext="shape" transform="translate(0.708661,-19.3586)">
 			<title>
 			工作表.270</title>
-			<path d="M0 1647.78 L19.84 1647.78" class="st2" />
+			<path d="M-0.78 1647.78 L19.44 1647.78" class="st2" />
 		</g>
 	</g>
 	<g industry="SAMA" group="singnal" device="temprature" caption="temprature measure" id="shape271-177" v:mID="0" v:groupContext="foregroundPage" transform="matrix(1,0,0,1,0,0) translate(464.693,-857.293)" v:index="1">

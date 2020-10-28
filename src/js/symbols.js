@@ -1,5 +1,5 @@
 "use strict"
-
+var NEED_STROKE=true;//if NEED_STROKE==false ,not to strok when draw
 const NOTHING=null;
 import{Node_PopMenu} from './menu.js'
 import{PropPanelFactory} from './ui-property.js'
@@ -10,6 +10,72 @@ class SvgDrawService{
     var ctmArray=[svgMatrix.a,svgMatrix.b,svgMatrix.c,svgMatrix.d,svgMatrix.e,svgMatrix.f]
     return ctmArray;
   }
+ 
+ 
+  
+  /////////////////////////
+  static handleCss(svgDom,ele,ctx2d){
+    function handleClass(svgDom,classname,ctx2d){
+      var css=svgDom.myStyles[classname];
+      for(let prop in css){
+        switch(prop){
+          case "fill":
+            ctx2d.fillStyle=css[prop];
+          　break;
+          case "font-size":
+            ctx2d.font=ctx2d.font +' '+css[prop];
+            break;
+          case "font-family":
+            ctx2d.font=ctx2d.font +' '+css[prop];
+            break;
+            case "stroke":
+              let strokeStyle=css[prop].replace(/(^\s*)|(\s*$)/g, "");
+              if(strokeStyle!='none') {ctx2d.strokeStyle=strokeStyle;NEED_STROKE=true;}
+              else NEED_STROKE=false;
+              break;
+          default:
+            break;
+
+        }
+      }
+
+    }
+    //---------
+    if(!ele.classList) return;
+    var clist=ele.classList
+    for(let i=0;i<clist.length;i++){
+      let classname=clist[i];
+      handleClass(svgDom,classname,ctx2d)
+    }
+       
+  }
+
+  ///////////////////////////////////
+  static handleAttributes(ele,ctx2d){
+     
+     var attrs=ele.attributes;
+     for( let attr in attrs){
+       switch(attrs[attr].name){
+         case "font-size":
+          ctx2d.font=ctx2d.font +' '+attrs[attr].nodeValue;
+          break;
+        case "font-family":
+          ctx2d.font=ctx2d.font +' '+attrs[attr].nodeValue;
+          break;
+         case "fill":
+          if(attrs[attr].nodeValue!='none')ctx2d.fillStyle=attrs[attr].nodeValue;
+          break;
+         case "stroke":
+          let strokeStyle=attrs[attr].nodeValue.replace(/(^\s*)|(\s*$)/g, "");
+          if(strokeStyle!='none') {ctx2d.strokeStyle=strokeStyle;NEED_STROKE=true;}
+          else NEED_STROKE=false;
+          break;
+       }
+     }
+       
+        
+  }
+  ///////////////////////////////////
   static getTransform(ts){
     var trans=[] ,k=0;
     var ctm;
@@ -47,7 +113,8 @@ class SvgDrawService{
      }
  
      return trans;
-  }
+  } 
+  ///////////////////////////////   
   static handlTransforms(transformStr,ctx2d){
       if(!transformStr) return null;
       var trans=SvgDrawService.getTransform(transformStr)
@@ -77,13 +144,7 @@ class SvgDrawService{
       return point;
   }
   static getDrawFunc(cmd){
-          var fillStyle='none';
-          function setCtx2dStyle(svgEle,ctx2d){
-            var fillStyle=svgEle.getAttribute('fill');
-            if(fillStyle!='none')ctx2d.fillStyle=fillStyle;
-            ctx2d.strokeStyle=svgEle.getAttribute('stroke');
-            
-          }     
+          
           var funcs=new Array();
           funcs['default']=function(){
              // console.log("this element not surpported!")
@@ -140,7 +201,8 @@ class SvgDrawService{
             ctx2d.save();
             ctx2d.beginPath();
             SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
-            
+            SvgDrawService.handleCss(drawInfos.svgDom,this,ctx2d);
+            SvgDrawService.handleAttributes(this,ctx2d);
             for(;pos<len;){
               pathCmd=d[pos++];
               
@@ -289,10 +351,10 @@ class SvgDrawService{
                 
               }
             }
-            setCtx2dStyle(this,ctx2d);
-            if(this.getAttribute('fill')!='none')ctx2d.fill();
+           
+            if(this.getAttribute('fill')&&this.getAttribute('fill')!='none')ctx2d.fill();
             ctx2d.setTransform(1, 0, 0, 1, 0, 0)
-            ctx2d.stroke();
+            if(NEED_STROKE)  ctx2d.stroke();
             ctx2d.restore();
           }
           //-------------
@@ -301,12 +363,14 @@ class SvgDrawService{
             x2=this.x2.baseVal.value,y2=this.y2.baseVal.value;
             ctx2d.save();
             SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
+            SvgDrawService.handleCss(drawInfos.svgDom,this,ctx2d);
+            SvgDrawService.handleAttributes(this,ctx2d);
             ctx2d.beginPath();
             ctx2d.moveTo(x1, y1);
             ctx2d.lineTo(x2, y2);
-            setCtx2dStyle(this,ctx2d)
+            
             ctx2d.setTransform(1, 0, 0, 1, 0, 0)
-            ctx2d.stroke();
+            if(NEED_STROKE)  ctx2d.stroke();
             ctx2d.restore();
           }
           //----------
@@ -317,6 +381,8 @@ class SvgDrawService{
             ctx2d.save();
             ctx2d.lineWidth=1.5;          
             SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
+            SvgDrawService.handleCss(drawInfos.svgDom,this,ctx2d);
+            SvgDrawService.handleAttributes(this,ctx2d); 
             ctx2d.beginPath();
             var startX =points[0].x;
             var startY =points[0].y;
@@ -328,10 +394,10 @@ class SvgDrawService{
             ctx2d.lineTo(newX, newY);
             }
             
-            setCtx2dStyle(this,ctx2d)
-            if(this.getAttribute('fill')!='none')ctx2d.fill();
+      
+            if(this.getAttribute('fill')&&this.getAttribute('fill')!='none')ctx2d.fill();
             ctx2d.setTransform(1, 0, 0, 1, 0, 0)
-            ctx2d.stroke();
+            if(NEED_STROKE)  ctx2d.stroke();
             ctx2d.restore();
           }
           //----------line end
@@ -343,6 +409,8 @@ class SvgDrawService{
             ctx2d.save();
                       
             SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
+            SvgDrawService.handleCss(drawInfos.svgDom,this,ctx2d);
+            SvgDrawService.handleAttributes(this,ctx2d); 
             ctx2d.beginPath();
             var startX =points[0].x;
             var startY =points[0].y;
@@ -354,10 +422,10 @@ class SvgDrawService{
             ctx2d.lineTo(newX, newY);
             }
             ctx2d.closePath();
-            setCtx2dStyle(this,ctx2d)
-            if(this.getAttribute('fill')!='none')ctx2d.fill();
+            
+            if(this.getAttribute('fill')&&this.getAttribute('fill')!='none')ctx2d.fill();
             ctx2d.setTransform(1, 0, 0, 1, 0, 0)
-            ctx2d.stroke();
+            if(NEED_STROKE)  ctx2d.stroke();
             ctx2d.restore();
 
          }
@@ -370,28 +438,32 @@ class SvgDrawService{
             ctx2d.save();
             
             SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
+            SvgDrawService.handleCss(drawInfos.svgDom,this,ctx2d);
+            SvgDrawService.handleAttributes(this,ctx2d); 
+            
             ctx2d.beginPath();
             ctx2d.strokeStyle=this.attributes["stroke"];
             ctx2d.arc(x,y, r, 0, Math.PI*2);
-            setCtx2dStyle(this,ctx2d);
-            if(this.getAttribute('fill')!='none')ctx2d.fill();
+            
+            if(this.getAttribute('fill')&&this.getAttribute('fill')!='none')ctx2d.fill();
             ctx2d.setTransform(1, 0, 0, 1, 0, 0)
-            ctx2d.stroke();
+            if(NEED_STROKE)  ctx2d.stroke();
             ctx2d.closePath();
             ctx2d.restore();
 
           }
            //----------Circle end
           funcs['text']=function(ctx2d,drawInfos){
+              
               var x=parseFloat(this.getAttribute('x'));
               var y=parseFloat(this.getAttribute('y'));
               ctx2d.save();
               SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
-              var text=this.textContent;
-              ctx2d.font=this.attributes["font-size"].nodeValue+ 'px ' +this.attributes["font-family"].nodeValue;
-              ctx2d.strokeStyle=this.attributes["stroke"];
-              ctx2d.textAlign = "left";
-              setCtx2dStyle(this,ctx2d)
+              SvgDrawService.handleCss(drawInfos.svgDom,this,ctx2d);
+              SvgDrawService.handleAttributes(this,ctx2d);
+              var text=this.textContent.replace(/(^\s*)|(\s*$)/g, "");
+             
+              
               if(this.getAttribute("writing-mode")=="tb")
                 {ctx2d.fillTextVertical(text, x, y) }
               else 
@@ -408,12 +480,14 @@ class SvgDrawService{
              
               ctx2d.save();
               SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
+              SvgDrawService.handleCss(drawInfos.svgDom,this,ctx2d);
+              SvgDrawService.handleAttributes(this,ctx2d); 
               ctx2d.beginPath();
               ctx2d.rect(x,y, width,height);
-              setCtx2dStyle(this,ctx2d); 
-              if(fillStyle!='none')ctx2d.fill();
+              
+              if(this.getAttribute('fill')&&this.getAttribute('fill')!='none')ctx2d.fill();
               ctx2d.setTransform(1, 0, 0, 1, 0, 0)
-              ctx2d.stroke();
+              if(NEED_STROKE)  ctx2d.stroke();
               ctx2d.closePath();
               ctx2d.restore();
           }
@@ -421,12 +495,14 @@ class SvgDrawService{
           funcs['g']=function(ctx2d,drawInfos){
              ctx2d.save();
              ctx2d.lineWidth=1.5;//default width
-             setCtx2dStyle(this,ctx2d);         
+                  
              if(this.parentNode.nodeName!="g"){
              var box=this.getClientRects()[0];
              ctx2d.translate(-box.x,-box.y);//将符号左上角定位原始坐标原点
              }
              SvgDrawService.handlTransforms(this.getAttribute('transform'),ctx2d);
+             SvgDrawService.handleCss(drawInfos.svgDom,this,ctx2d);
+             SvgDrawService.handleAttributes(this,ctx2d);
              for(var i=0;i<this.childNodes.length;i++){
               this.childNodes[i].draw(ctx2d,drawInfos);
              }
@@ -441,7 +517,34 @@ class SvgDrawService{
 }
 class SvgService{
   
-
+  static  parseSvgDomStyle(svgDom){
+    svgDom.myStyles={};
+    var cssRules=svgDom.styleSheets[0].cssRules;
+    let length=cssRules.length;
+    
+    if(length==0) return;
+   
+    for(let i=0;i<length;i++){
+      let rule=cssRules[i];
+      let classname=rule.selectorText.replace(".","");
+      let cssText=rule.cssText;
+      cssText='{'+cssText.split("{")[1];
+     
+      cssText=cssText.replace("{","");
+      cssText=cssText.replace("}","");
+      cssText=cssText.toLowerCase();
+      var css=cssText.split(";")
+      var styles={};
+      for(let k=0;k<css.length;k++){
+        let c=css[k].split(":");
+        c[0]=c[0].replace(/(^\s*)|(\s*$)/g, "");
+       
+        if(c[0]&&c[1])styles[c[0]]=c[1].replace(/(^(\s*"))|(\s*")$/g,"");;
+      }
+      
+      svgDom.myStyles[classname]=styles;
+      } 
+  }
   static setSvgDomDrawFunc(root){
         
     if(!root) return null;
@@ -533,7 +636,7 @@ function SvgNode(selector,text,svgDom){
           ctx2d.transform(this.svgScaleX,0,0,this.svgScaleY,0,0);
           for(var i=0;i<this.svgElements.length;i++){
              var oneEle = this.svgElements[i];
-             var drawInfos={center_x:this.cx,center_y:this.cy};
+             var drawInfos={svgDom:this.svgDom};
              oneEle.draw(ctx2d,drawInfos);
           }
           ctx2d.restore();

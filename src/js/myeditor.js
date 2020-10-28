@@ -150,6 +150,7 @@ class MyEditor{
         var svgThermalDom = svgThermalObject.contentDocument;
         
         SvgService.setSvgDomDrawFunc(svgThermalDom);
+        SvgService.parseSvgDomStyle(svgThermalDom);
         JTopo.svgDoms['thermal']=svgThermalDom;
         
 
@@ -160,7 +161,9 @@ class MyEditor{
         var svgSamaDom = svgSamaObject.contentDocument;
         
         SvgService.setSvgDomDrawFunc(svgSamaDom);
+        SvgService.parseSvgDomStyle(svgSamaDom);
         JTopo.svgDoms['sama']=svgSamaDom;
+
         
 
      });

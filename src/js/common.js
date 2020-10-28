@@ -298,7 +298,12 @@ CanvasRenderingContext2D.prototype.fillTextVertical = function (text, x0, y0) {
   context.textBaseline = baseline;
   context.restore();
 };
-
+function textGenSubSup(txt){
+  var i=0,len=txt.length;
+  for(i=0;i<len;i++){
+    
+  }
+}
 export {EventDispatcher,CURRENT_SCENE_CHANGE,EditorEvent,CommonUtilities,WsAgent,FILE_SAVE_EVENT,USER_LOGIN_EVENT,
 GET_FILELIST_EVENT, OPEN_FILE_EVENT}
   
