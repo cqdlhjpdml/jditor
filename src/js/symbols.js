@@ -17,6 +17,7 @@ class SvgDrawService{
   static handleCss(svgDom,ele,ctx2d){
     function handleClass(svgDom,classname,ctx2d){
       var css=svgDom.myStyles[classname];
+      
       for(let prop in css){
         switch(prop){
           case "fill":
@@ -462,7 +463,7 @@ class SvgDrawService{
               SvgDrawService.handleCss(drawInfos.svgDom,this,ctx2d);
               SvgDrawService.handleAttributes(this,ctx2d);
               var text=this.textContent.replace(/(^\s*)|(\s*$)/g, "");
-             
+              //var text=this.textContent
               
               if(this.getAttribute("writing-mode")=="tb")
                 {ctx2d.fillTextVertical(text, x, y) }
@@ -568,7 +569,8 @@ function SvgNode(selector,text,svgDom){
   this.text=text;
   this.lineColor="#000000";
   //this.ctx2d=ctx2d;
-  this.svgDom=svgDom
+  this.svgDom=svgDom;
+  this.svgFilename=svgDom.URL.split(/http.*\//)[1];
   this.getSvgElementsBox=function(){
       var wrapBox={},box;
       if(this.svgElements.length==0) return null;
@@ -618,7 +620,7 @@ function SvgNode(selector,text,svgDom){
       this.lineColor="black";
       this.selector=selector;
       this.elementType="SvgNode";
-      var properties="svgScaleX,svgScaleY,selector".split(",");
+      var properties="svgScaleX,svgScaleY,selector,svgFilename".split(",");
       this.serializedProperties=this.serializedProperties.concat(properties);
       this.toFill=false;//not to fill the node's background
       this.borderwidth=0;//not to draw the border;

@@ -210,33 +210,11 @@ this.initialize(nodeA,nodeZ,text) ;
 }
 JTopo.FreeLink.prototype=new JTopo.Link;
 ////////////////////////////////////////
-JTopo.loadFromJson=function(jsonStr, canvas,stage) {
-  eval("var jsonObj = " + jsonStr);
-  if(!stage)
-        var stage = new JTopo.Stage(canvas);
-  else stage.clear();
-  for (var k in jsonObj)
-      "childs" != k && (stage[k] = jsonObj[k]);
-  var scenes = jsonObj.childs;
-  return scenes.forEach(function(a) {
-      var b = new JTopo.Scene(stage);
-      for (var c in a)
-          "childs" != c && (b[c] = a[c]),
-          "background" == c && (b.background = a[c]);
-      var d = a.childs;
-      d.forEach(function(a) {
-          var c = null
-            , t = a.elementType;
-          c=JTopo.createNode(t,a,b);
-          if(c)  b.add(c);
-      })
-  }),
-  stage
-}
+
 //////////////////////////////////////
 /*从JSON文件中加载时创建NODES*/
 JTopo.Nodes_Tables={};
-JTopo.createNode=function(nodeType,properties){
+JTopo.createNode=function(nodeType,properties,canvas){
  
   var createFuns={};
   createFuns["node"]=function(){
@@ -254,7 +232,7 @@ JTopo.createNode=function(nodeType,properties){
     return nodes[id];;
   }
   createFuns["TextNode"]=function(){
-    var node=new JTopo.TextBox;
+    var node=new JTopo.TextBox("nothign",canvas.getContext('2d'));
     setProperyies(node,properties);
     var id=node._id;
     JTopo.Nodes_Tables[id]=node;
@@ -263,8 +241,9 @@ JTopo.createNode=function(nodeType,properties){
   
   createFuns["SvgNode"]=function(){
     var selector=properties['selector'];
-    var text=properties['text']
-    var node=new JTopo.SvgNode(selector,text);
+    var text=properties['text'];
+    var svgDom=JTopo.svgDoms[properties.svgFilename];
+    var node=new JTopo.SvgNode(selector,text,svgDom);
     setProperyies(node,properties);
     var id=node._id;
     JTopo.Nodes_Tables[id]=node;

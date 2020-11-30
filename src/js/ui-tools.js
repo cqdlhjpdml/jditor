@@ -37,7 +37,8 @@ class ToolsPanel extends Tool{
        {
            var industry=toolItem.industry;
            var selector=`[industry='${industry}']`;
-           var domName=toolItem.symbolfile.split('.')[0];
+           //var domName=toolItem.symbolfile.split('.')[0];
+           var domName=toolItem.symbolfile;
            var svgElements=JTopo.svgDoms[domName].querySelectorAll(selector);
            var toolgroups={};
            

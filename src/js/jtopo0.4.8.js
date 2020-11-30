@@ -2293,7 +2293,9 @@ function(a) {
             this.elementType = "node",
             this.zIndex = a.zIndex_Node,
             this.text = c,
-            this.font = "12px Consolas",
+           // this.font="12px Consolas",
+            this.fontSize = "12px",//dml
+            this.fontFamily=" Consolas",//dml
             this.fontColor = "255,255,255",
             this.borderWidth = 0,
             this.borderColor = "255,255,255",
@@ -2307,7 +2309,9 @@ function(a) {
             this.inLinks = null,
             this.toFill=true,//dml
             this.outLinks = null;
-            var d = "text,font,fontColor,textPosition,textOffsetX,textOffsetY,borderRadius".split(",");
+            //var d = "text,font,fontColor,textPosition,textOffsetX,textOffsetY,borderRadius".split(",");
+            var d = "text,fontStyle,fontSize,fontFamily,fontColor,textPosition,textOffsetX,textOffsetY,borderColor,borderWidth,borderRadius".split(",");
+            //this.fontStyle+' '+ this.fontSize+'px'+' '+this.fontFamily;
             this.serializedProperties = this.serializedProperties.concat(d)
         }
         ,

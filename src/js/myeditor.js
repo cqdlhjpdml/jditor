@@ -151,7 +151,7 @@ class MyEditor{
         
         SvgService.setSvgDomDrawFunc(svgThermalDom);
         SvgService.parseSvgDomStyle(svgThermalDom);
-        JTopo.svgDoms['thermal']=svgThermalDom;
+        JTopo.svgDoms['thermal.svg']=svgThermalDom;
         
 
      });
@@ -162,7 +162,7 @@ class MyEditor{
         
         SvgService.setSvgDomDrawFunc(svgSamaDom);
         SvgService.parseSvgDomStyle(svgSamaDom);
-        JTopo.svgDoms['sama']=svgSamaDom;
+        JTopo.svgDoms['sama.svg']=svgSamaDom;
 
         
 
@@ -178,7 +178,7 @@ class MyEditor{
         canvas.addClass("editorCanvas");
         this.canvas=$(canvas)[0]; 
         this.canvas.width=0;this.canvas.height=10;
-        this.cxt2d=this.canvas.getContext('2d');
+       // this.cxt2d=this.canvas.getContext('2d');
         this.stage=new this.jtopo.Stage(this.canvas);
         this.username="dml";console.log("statement for debug");;
         this.scenes={};
@@ -278,7 +278,7 @@ class MyEditor{
                 d.forEach(function(n) {
                                        var c = null
                                        , t = n.elementType;
-                                        c=JTopo.createNode(t,n);
+                                        c=JTopo.createNode(t,n,me.canvas);
                                        if(c)  b.add(c);
                                      })
                 me.scenes[b.name]=b;

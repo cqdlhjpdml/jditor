@@ -196,7 +196,7 @@ var WsAgent=new WS_Agent("ws://111.229.239.244:3001");
    }
    next();
   }
-static *loadSymbolsFromFile(loaderType){
+static *loadSymbolsFromFile(loaderType){//this function not used 
     var filename= yield CommonUtilities.thunkify( CommonUtilities.popFileDialog)();
     var fileContent=yield CommonUtilities.thunkify(CommonUtilities.readFileToString)(filename);
     var loader;
