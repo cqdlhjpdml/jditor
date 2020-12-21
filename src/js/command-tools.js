@@ -44,7 +44,7 @@ class SaveTool extends Command{
     constructor(toolItem,toolMannager){
         super(toolItem,toolMannager);
         this.dialog=new SaveDialog("保存文件",this);
-        this.dialog.addEventListener(this,FILE_SAVE_EVENT,this.wsNotiyHandler,)       
+        this.dialog.addEventListener(this,FILE_SAVE_EVENT,this.wsNotiyHandler)       
     }  
     execute(event){
         this.dialog.show();

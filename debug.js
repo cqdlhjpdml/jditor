@@ -26,7 +26,14 @@ app.use(async (ctx, next) => {
     ctx.response.type="text/html";
     ctx.response.body = fs.readFileSync(path.join(__dirname,viewspath,ctx.request.path), 'utf8');
     console.log(ctx)
-  } else {
+  } else
+  if (ctx.request.path === '/tree.html') { // 列表页
+    ctx.response.status = 200;
+    ctx.response.type="text/html";
+    ctx.response.body = fs.readFileSync(path.join(__dirname,viewspath,ctx.request.path), 'utf8');
+    console.log(ctx)
+  }
+  else {
     ctx.throw(404, 'Not found') // 404
   }
 await next()

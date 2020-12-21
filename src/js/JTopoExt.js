@@ -35,8 +35,7 @@ JTopo.EditorNode=function(){
     this.width = this.ctx2d.measureText(this.text).width+5;
     this.height =this.ctx2d.measureText("田").width+10;
     this.ctx2d.restore();
-    
-
+  
   }
 }
 JTopo.EditorNode.prototype=new JTopo.Node()

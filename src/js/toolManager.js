@@ -104,7 +104,7 @@ var tools_config=[
     ] ;
 
     ////////////////////////////// 
-class ToolManager{
+class EditorToolManager{
     currentSceneChangeEventHandler(event){
         var newScene=event.newScene;
         this.ctool&&this.ctool.clearTask();
@@ -311,4 +311,4 @@ class ToolManager{
       this.actionManager.pushUndoAction(undoAction);
   }  
 }
-export {ToolManager};
+export {EditorToolManager as ToolManager};

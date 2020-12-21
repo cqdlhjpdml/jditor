@@ -36,6 +36,7 @@ class EditorEvent{
 }
 const USER_LOGIN_EVENT="user_login_event";
 const FILE_SAVE_EVENT ="file-save-event";
+const REQUEST_CHILDREN_OF_ONE_FOLDER="request_children_of_one_folder";
 const GET_FILELIST_EVENT="get_fieList_event"
 const OPEN_FILE_EVENT="open_file_event"
 class TaskEvent{
@@ -74,6 +75,10 @@ class WS_Agent{
       case "openfile":
            var openFileEvent=new TaskEvent(this,OPEN_FILE_EVENT,response)
            this.eventDispatcher.dispatchEvent(openFileEvent);
+           break;
+      case REQUEST_CHILDREN_OF_ONE_FOLDER:
+           var requestChildrenEvent=new TaskEvent(this,REQUEST_CHILDREN_OF_ONE_FOLDER,response)
+           this.eventDispatcher.dispatchEvent(requestChildrenEvent);
            break;      
      default:
          throw(response.taskname+":"+"未定义的操作，服务器返回信息无法处理！")
@@ -92,7 +97,8 @@ class WS_Agent{
     this.eventDispatcher.publish(event);  
   }
 }
-var WsAgent=new WS_Agent("ws://111.229.239.244:3001");
+//var WsAgent=new WS_Agent("ws://111.229.239.244:3001");
+var WsAgent=new WS_Agent("ws://127.0.0.1:3001");
 //class CommonUtilities---public utilites
    class CommonUtilities
    {   
@@ -304,7 +310,8 @@ function textGenSubSup(txt){
     
   }
 }
-export {EventDispatcher,CURRENT_SCENE_CHANGE,EditorEvent,CommonUtilities,WsAgent,FILE_SAVE_EVENT,USER_LOGIN_EVENT,
-GET_FILELIST_EVENT, OPEN_FILE_EVENT}
+export {EventDispatcher,EditorEvent,CommonUtilities,WsAgent,CURRENT_SCENE_CHANGE,FILE_SAVE_EVENT,USER_LOGIN_EVENT,
+GET_FILELIST_EVENT, OPEN_FILE_EVENT,REQUEST_CHILDREN_OF_ONE_FOLDER}
+
   
   

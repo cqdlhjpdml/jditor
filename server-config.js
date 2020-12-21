@@ -35,7 +35,8 @@ var ENV_CONFIG={
     
     "staticpath":"static",
     "viewpath":"views",
-    "SeerverIP":"111.229.239.244",
+    //"SeerverIP":"111.229.239.244",
+    "SeerverIP":"127.0.0.1",
     "webSocketPort":3001,
     "httpPort":80
   }
