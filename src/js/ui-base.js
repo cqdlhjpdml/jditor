@@ -4,67 +4,69 @@ import { EventDispatcher, CommonUtilities } from './common.js'
 ////////////////////////////////
 class BaseIconTool {//abstract class
 
-  constructor(toolItem, owner) {
+  constructor(toolItem, manager) {
+
     this.toolItem = toolItem;
-    this.owner = owner;
-    var me=this;
+    this.manager = manager;
+    var me = this;
     this.toolIcon = new Image();
     this.toolIcon.src = "icons/" + toolItem.icon;
     this.toolIcon.alt = toolItem.caption;
     this.toolIcon.tooltips = toolItem.tooltips;
-    this.toolButton=document.createElement("div");
-    this.toolButton.className = "toolBtn";
-    this.toolButton.width='50px';
-    this.toolButton.height='50px';
+    this.toolButton = document.createElement("div");
+    //this.toolButton.className = "toolBtn";
+    this.toolButton.width = '50px';
+    this.toolButton.height = '50px';
     this.toolButton.appendChild(this.toolIcon);
-    this.toolButton.onclick = function mouseclick(event){ me.mouseclick(event,me)};
-    this.toolButton.ondbclick = function mousedbclick(event){ me.mousedbclick(event,me)};
-    this.toolButton.onmouseenter =function mouseenter(event){ me.mouseenter(event,me)};;
-    this.toolButton.onmouseleave =function mouseleave(event){ me.mouseleave(event,me)};
-    this.state='close';
+    this.toolButton.onclick = function mouseclick(event) { me.mouseclick(event, me) };
+    this.toolButton.ondblclick = function mousedblclick(event) {
+      me.mousedblclick(event, me)
+    };
+    this.toolButton.onmouseenter = function mouseenter(event) { me.mouseenter(event, me) };;
+    this.toolButton.onmouseleave = function mouseleave(event) { me.mouseleave(event, me) };
+    if (toolItem.caption) {
+      var captionSpan = document.createElement("span");
+      captionSpan.innerHTML = toolItem.caption;
+      this.toolButton.appendChild(captionSpan);
+    }
   }
   /*********** */
   getToolBtn() { return this.toolButton };
   /************* */
-  mouseclick(event,self) {//virtual,self---the tool
-     
-  }
-  /**************************** */
-  mousedbclick(event,self) {//virtual
+  mouseclick(event, self) {//virtual,self---the tool
 
   }
   /**************************** */
-  mouseleave(event,toolManager) {//virtual;
+  mousedblclick(event, self) {//virtual
+
+  }
+  /**************************** */
+  mouseleave(event, toolManager) {//virtual;
 
   }
   /*********** */
-  mouseenter(event,toolManager) {//virtual
+  mouseenter(event, toolManager) {//virtual
   }
 
 }
-/////////////////////////
-class RootFolderNavigitorTool extends BaseIconTool{
-  
-  mouseclick(event,self) {//virtual
-    
-  }
-}
-const FOLDER_ICON_TOOL=1
+/////////////////////////////////////////////////////////////////
+const FOLDER_ICON_TOOL = 1
 //////////class folderIcon of user folder UI/////////////////////
-class FolderIconTool extends BaseIconTool{
-   /************* */
-   mouseclick(event,self) {//virtual
-    event.sourceTool=self; 
-    if(self.owner)    self.owner.toolClick(event);
-   }
-   mousedbClick(event,self){//virtual
-    event.sourceTool=self;
-    if(self.owner) self.toolDbClick(event);
+class FolderIconTool extends BaseIconTool {
+  /************* */
+  mouseclick(event, self) {//virtual
+
+    if (self.manager) self.manager.toolClick(event, self);
+  }
+  mousedblclick(event, self) {//virtual
+
+    if (self.manager) self.manager.toolDbClick(event, self);
 
   }
-  
-  constructor(){
-    this.toolType=FOLDER_ICON_TOOL;
+
+  constructor(toolItem, manager) {
+    super(toolItem, manager)
+    this.toolType = FOLDER_ICON_TOOL;
   }
 }
 /////////////////////////////////////
@@ -242,6 +244,6 @@ class MyDialog {
 ////////////////////
 
 
-export { EditorTool as Tool, Command, MyDialog, FolderIconTool}
+export { EditorTool as Tool, Command, MyDialog, FolderIconTool, FOLDER_ICON_TOOL }
 
 

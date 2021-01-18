@@ -70,7 +70,7 @@ class DB {
                 content: file.content,
                 ip: file.ip,
                 timestamp: file.timestamp,
-                folder: file.folder
+                isfolder: file.isfolder
             });
             return { succeed: true, msg: "文件保存成功" };
         } catch (err) { return { succeed: false, msg: err }; }
@@ -78,7 +78,7 @@ class DB {
     async getFileList(filter) {
         try {
             return await this.file.findAll({
-                attributes: [['filename', 'filename']],
+                attributes: [['name', 'name']],
                 where: filter
             })
         } catch (err) { return { succeed: false, msg: "获取文件列表失败" }; }

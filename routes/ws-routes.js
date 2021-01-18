@@ -102,8 +102,8 @@ class OpenFile_TaskHandler extends Task_Handler{
 class SaveFile_TaskHandler extends Task_Handler{
   async checkvalid(file){
     //file:{filename:`${filename}`,username:`${username}`,content:`${jsonStr}`}
-    var filter={filename:file.filename,username:file.username,folder:file.folder};
-    if(!filter.filename||!filter.username||!filter.folder) return {succeed:false,msg:"[用户名|文件名|路径]不能为空！"};
+    var filter={name:file.filename,username:file.username,folder:file.folder};
+    if(!filter.name||!filter.username||!filter.folder) return {succeed:false,msg:"[用户名|文件名|路径]不能为空！"};
     
     var r=await this.db.getFileList(filter);
     if(r.length!=0)      return {succeed:false,msg:"该文件已存在！" };

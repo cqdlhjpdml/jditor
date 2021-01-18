@@ -1,4 +1,4 @@
-import { MyDialog,FolderIconTool } from './ui-base.js'
+import { MyDialog, FolderIconTool, FOLDER_ICON_TOOL } from './ui-base.js'
 import { CommonUtilities, WsAgent, FILE_SAVE_EVENT, USER_LOGIN_EVENT, GET_FILELIST_EVENT, OPEN_FILE_EVENT, REQUEST_CHILDREN_OF_ONE_FOLDER } from './common.js'
 class OpenFileDialog extends MyDialog {
     resetUI() {
@@ -295,7 +295,7 @@ class BaseSaveDialog extends MyDialog {
                     text: "保存",
 
                     click: function () {
-                        var filename = document.getElementById(me.fileInputID).value;
+                        var filename = document.getElementById(me.folder.fileInputID).value;
                         var username = me.tool.getUsername();
                         var content = me.tool.getContent();
                         var date = new Date();
@@ -324,6 +324,8 @@ class BaseSaveDialog extends MyDialog {
     constructor(title, savetool) {
         super(title);
         this.tool = savetool;
+        this.currentUser=null;
+        this.path="Root";
         this.create();
         WsAgent.addEventListener(this, FILE_SAVE_EVENT, this.wsNotiyHandler);
         WsAgent.addEventListener(this, REQUEST_CHILDREN_OF_ONE_FOLDER, this.wsNotifyRequestChildren);
@@ -335,14 +337,24 @@ class BaseSaveDialog extends MyDialog {
 /////////////////////////////////
 class Folder {
     constructor() {
-      
+
 
     }
-    toolClick(event){
-        var tool=event.sourceTool;
-        var toolType=typeof tool;
-        switch(toolType){
-            case "FolderIconTool":
+    toolClick(event, sourceTool) {
+        var toolType = sourceTool.toolType;
+        switch (toolType) {
+            case FOLDER_ICON_TOOL:
+               
+                sourceTool.toolButton.style.border = "1px solid blue";
+                sourceTool.toolButton.style.background = "#806099";
+                break;
+        }
+    }
+    toolDbClick(event, sourceTool) {
+
+        var toolType = sourceTool.toolType;
+        switch (toolType) {
+            case FOLDER_ICON_TOOL:
                 console.log(toolType);
                 break;
         }
@@ -350,8 +362,8 @@ class Folder {
     loadFolders(folderArray) {
 
         for (let i = 0; i < folderArray.length; i++) {
-            let toolItem = { icon: 'folder.png', cpation: folderArray[i].name }
-            let folderIconTool = new FolderIconTool(toolItem,this);
+            let toolItem = { icon: 'folder.png', caption: folderArray[i].name }
+            let folderIconTool = new FolderIconTool(toolItem, this);
             this.appendFolderToolIcon(folderIconTool.getToolBtn());
             this.folderIconTool = folderIconTool;
         }
@@ -429,18 +441,18 @@ class Folder {
         return this.jqContentBar;
 
     }
-    appendFolderToolIcon(folderToolIcon){
+    appendFolderToolIcon(folderToolIcon) {
         this.jqFolderListBar.append(folderToolIcon)
     }
 
 }
 ///////////////////////////////////////////////////
 const ROOT = '-2'
-class SaveDialog extends BaseSaveDialog {
+class SaveAsDialog extends BaseSaveDialog {
 
     requestChildrenOfFolder(folderID) {
         var id = folderID;
-        var username = this.tool.getUsername();
+        var username = this.currentUser;
         var date = new Date();
         var time = date.toLocaleDateString() + date.toLocaleTimeString();
         var ip = "fakeIP";//real IP will be set by server;
@@ -450,7 +462,12 @@ class SaveDialog extends BaseSaveDialog {
 
     }
     initDialogUI() {//virtual
-        this.requestChildrenOfFolder(ROOT);
+        var user=this.tool.getUsername();
+        if(user&&user!=this.currentUser) {
+            this.currentUser=this.tool.getUsername();
+            this.requestChildrenOfFolder(ROOT); 
+        }
+        
     }
     restetUI() {
         // let jqHintBar=document.getElementById(`${this.jqHintBarID}`);
@@ -468,7 +485,7 @@ class SaveDialog extends BaseSaveDialog {
 
     wsNotiyHandler(wsTaskEvent) {
         var response = wsTaskEvent.response;
-        var hintSBar = document.getElementById(`${this.jqHintBarID}`);
+        var hintSBar = document.getElementById(`${this.folder.jqHintBarID}`);
         //console.log(wsTaskEvent);
         var response = wsTaskEvent.response;
 
@@ -492,9 +509,10 @@ class SaveDialog extends BaseSaveDialog {
         return this.folder.createFolderUIElements();
 
     }
+    
 
 }
 /////////////////////////////////
 
 //////////////////////////////////
-export { LoginDialog, SaveDialog, OpenFileDialog }
+export { LoginDialog, SaveAsDialog as SaveDialog, OpenFileDialog }
