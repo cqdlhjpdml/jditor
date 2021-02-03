@@ -23,9 +23,9 @@ class DB {
                 timestamps: false
             });
         this.file = this.sequelize.define('file', {
-            id:Sequelize.INTEGER,
-            name: { type: Sequelize.STRING,primaryKey: true  },
-            isfolder:Sequelize.BOOLEAN,
+            id: Sequelize.INTEGER,
+            name: { type: Sequelize.STRING, primaryKey: true },
+            isfolder: Sequelize.BOOLEAN,
             username: { type: Sequelize.STRING, primaryKey: true },
             content: Sequelize.STRING,
             ip: Sequelize.STRING,
@@ -94,24 +94,28 @@ class DB {
         } catch (err) { return { succeed: false, msg: "文件内容加载失败！" } }
     }
     async getChildren(folder) {
-        if (folder.id == '-2')//means root folder
+        if (folder.id == '-1')//means root folder
         {
-            var filter = { username: folder.username, parent_id: -1 }//获取根目录
+            var filter = { username: folder.username, parent_id: 0 }//获取根目录
+        }
+        else {
+            var filter = { username: folder.username, parent_id: folder.id }//获取根目录
 
-            try {
-                let r = await this.file.findAll({
-                    attributes: [['name', 'name'], ['id', 'id']],
-                    where: filter
-                })
-                return r;
+        }
+        try {
+            let r = await this.file.findAll({
+                attributes: [['name', 'name'], ['id', 'id']],
+                where: filter
+            })
+            return r;
 
-            } catch (err) { return { succeed: false, msg: "获取子目录失败！" } }
+        } catch (err) {
+            return { succeed: false, msg: "获取子目录失败！" }
+
         }
 
     }
-
 }
-
 /*some test statements
 var db=new DB();
 //db.createFile({name:"file2",username:"dml",content:"hello world",ip:"127.0.0.1",timestamp:"2020-02-29",folder:"."})

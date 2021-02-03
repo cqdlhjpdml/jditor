@@ -303,7 +303,7 @@ class BaseSaveDialog extends MyDialog {
                         var ip = "fakeIP";//real IP will be set by server;
                         var folder = '.';
 
-                        var request = { taskname: "savefile", file: { filename: `${filename}`, username: `${username}`, content: `${content}`, folder: `${folder}` }, time: `${time}`, ip: `${ip}` };
+                        var request = { taskname: "savefile", file: { name: `${filename}`, username: `${username}`, content: `${content}`, folder: `${folder}` }, time: `${time}`, ip: `${ip}` };
                         var jsonRequest = JSON.stringify(request);
                         WsAgent.send(jsonRequest);
 
@@ -336,8 +336,8 @@ class BaseSaveDialog extends MyDialog {
 }
 /////////////////////////////////
 class Folder {
-    constructor() {
-
+    constructor(owner) {
+　　　this.owner=owner;　
 
     }
     toolClick(event, sourceTool) {
@@ -355,14 +355,15 @@ class Folder {
         var toolType = sourceTool.toolType;
         switch (toolType) {
             case FOLDER_ICON_TOOL:
-                console.log(toolType);
+                var folderID=sourceTool.toolItem.folderID;
+                this.owner.requestChildrenOfFolder(folderID);
                 break;
         }
     }
     loadFolders(folderArray) {
 
         for (let i = 0; i < folderArray.length; i++) {
-            let toolItem = { icon: 'folder.png', caption: folderArray[i].name }
+            let toolItem = { icon: 'folder.png', caption: folderArray[i].name,folderID:folderArray[i].id}
             let folderIconTool = new FolderIconTool(toolItem, this);
             this.appendFolderToolIcon(folderIconTool.getToolBtn());
             this.folderIconTool = folderIconTool;
@@ -385,7 +386,20 @@ class Folder {
         function createNavigitorBar(id) {
 
             var jqNavigitorBar = $(`<div　id=${id}><h5>导航</h5></div>`);
-            jqNavigitorBar.css({ "align": "left" });
+            jqNavigitorBar.css({
+                "display": "flex",
+                'flex-direction': 'column',
+                'justify-content': 'center',
+                
+            });
+            var jqPathDiv= $(`<div　'><span>Root\><span></div>`);
+            jqNavigitorBar.append(jqPathDiv);
+            var jqButtonDiv= $(`<div　'></div>`);
+            var jqGoBackButton=$('<button>GoBack</button>').button();
+            jqButtonDiv.append(jqGoBackButton);
+            var jqForwardButton=$('<button>Forward</button>').button();
+            jqButtonDiv.append(jqForwardButton);
+            jqNavigitorBar.append(jqButtonDiv);
             return jqNavigitorBar;
         }
         //---------
@@ -447,7 +461,7 @@ class Folder {
 
 }
 ///////////////////////////////////////////////////
-const ROOT = '-2'
+const ROOT = '-1'
 class SaveAsDialog extends BaseSaveDialog {
 
     requestChildrenOfFolder(folderID) {
@@ -476,8 +490,6 @@ class SaveAsDialog extends BaseSaveDialog {
 
     }
     wsNotifyRequestChildren(wsTaskEvent) {//virtual
-
-        console.log(wsTaskEvent.response);
         var folders = wsTaskEvent.response.result;
         this.folder.loadFolders(folders)
 
@@ -505,7 +517,7 @@ class SaveAsDialog extends BaseSaveDialog {
         }
     }
     contentBar() {
-        this.folder = new Folder()
+        this.folder = new Folder(this);
         return this.folder.createFolderUIElements();
 
     }
