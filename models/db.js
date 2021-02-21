@@ -104,7 +104,7 @@ class DB {
         }
         try {
             let r = await this.file.findAll({
-                attributes: [['name', 'name'], ['id', 'id']],
+                attributes: [['name', 'name'], ['id', 'id'],['isfolder','isfolder']],
                 where: filter
             })
             return r;
