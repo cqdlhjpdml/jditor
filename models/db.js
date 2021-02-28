@@ -23,7 +23,7 @@ class DB {
                 timestamps: false
             });
         this.file = this.sequelize.define('file', {
-            id: Sequelize.INTEGER,
+            id: Sequelize.UUID,
             name: { type: Sequelize.STRING, primaryKey: true },
             isfolder: Sequelize.BOOLEAN,
             username: { type: Sequelize.STRING, primaryKey: true },
@@ -34,13 +34,21 @@ class DB {
         },
 
             { timestamps: false });
-        (async () => { await this.getMaxFileID() })();
+      
 
     };
-    async getMaxFileID() {//be careful of ID overflow,ID is a sqlite Integer data type
-
-        var r = await this.file.max('id');
-        this.maxID = r;
+    uuid() {
+        var s = [];
+        var hexDigits = "0123456789abcdef";
+        for (var i = 0; i < 36; i++) {
+            s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+        }
+        s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+        s[8] = s[13] = s[18] = s[23] = "-";
+    
+        var uuid = s.join("");
+        return uuid;
     }
     async createUser(newuser) {
         var user = await this.getUser(newuser.name);
@@ -62,15 +70,17 @@ class DB {
     }
     ////file={name:`${filename}`,username:`${username}`,content:`${jsonStr}`}};
     async createFile(file)//to databse
-    {
+    {   var uid=this.uuid();
         try {
             await this.file.create({
+                id:uid,
                 username: file.username,
-                filename: file.filename,
+                name: file.name,
                 content: file.content,
                 ip: file.ip,
                 timestamp: file.timestamp,
-                isfolder: file.isfolder
+                isfolder: file.isfolder,
+                parent_id:file.parentFolderID
             });
             return { succeed: true, msg: "文件保存成功" };
         } catch (err) { return { succeed: false, msg: err }; }

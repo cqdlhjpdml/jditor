@@ -313,7 +313,7 @@ class FileDialog extends MyDialog {
                         var time = date.toLocaleDateString() + date.toLocaleTimeString();
                         var ip = "fakeIP";//real IP will be set by server;
                         var parentFolderID=me.folder.currentFolderFolderIconTool.toolItem.folderID;
-                        var request = { taskname: "savefile", file: { name: `${filename}`, username: `${username}`, content: `${content}`, parentFolderID: `${parentFolderID}` }, time: `${time}`, ip: `${ip}` };
+                        var request = { taskname: "savefile", file: { name: `${filename}`, isfolder:false,username: `${username}`, content: `${content}`, parentFolderID: `${parentFolderID}` }, time: `${time}`, ip: `${ip}` };
                         var jsonRequest = JSON.stringify(request);
                         WsAgent.send(jsonRequest);
 
@@ -335,7 +335,7 @@ class FileDialog extends MyDialog {
         super(title);
         this.tool = savetool;
         this.currentUser=null;
-        //this.path="Root";
+        
         this.create();
         WsAgent.addEventListener(this, FILE_SAVE_EVENT, this.wsNotiyHandler);
         WsAgent.addEventListener(this, REQUEST_CHILDREN_OF_ONE_FOLDER, this.wsNotifyRequestChildren);
@@ -478,7 +478,7 @@ class Folder {
 
 }
 ///////////////////////////////////////////////////
-const ROOT = '-1'
+const ROOTID="a1ca0f7b-51bd-4bf3-a5d5-6a74f6adc1c7"
 class SaveAsDialog extends FileDialog {
 
    
@@ -487,7 +487,7 @@ class SaveAsDialog extends FileDialog {
         if(user&&user!=this.currentUser) {
             this.currentUser=this.tool.getUsername();
             this.folder.jqNavigitorBarElements.pathBar.html('Root')
-            this.requestChildrenOfFolder(ROOT); 
+            this.requestChildrenOfFolder(ROOTID); 
         }
         
     }
