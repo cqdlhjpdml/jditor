@@ -1,5 +1,7 @@
 import { MyDialog, FolderIconTool, FOLDER_ICON_TOOL } from './ui-base.js'
-import { CommonUtilities, WsAgent, FILE_SAVE_EVENT, USER_LOGIN_EVENT, GET_FILELIST_EVENT, OPEN_FILE_EVENT, REQUEST_CHILDREN_OF_ONE_FOLDER } from './common.js'
+import { CommonUtilities, WsAgent, FILE_SAVE_EVENT, USER_LOGIN_EVENT, GET_FILELIST_EVENT,
+         OPEN_FILE_EVENT, REQUEST_CHILDREN_BY_FOLDER_ID,REQUEST_FOLDER_INFO_BY_FILE_NAME } from './common.js'
+
 class OpenFileDialog extends MyDialog {
     resetUI() {
 
@@ -277,15 +279,8 @@ class FileDialog extends MyDialog {
 
 
     }
-    requestChildrenOfFolder(folderID) {
-        var id = folderID;
-        var username = this.currentUser;
-        var date = new Date();
-        var time = date.toLocaleDateString() + date.toLocaleTimeString();
-        var ip = "fakeIP";//real IP will be set by server;
-        var request = { taskname: REQUEST_CHILDREN_OF_ONE_FOLDER, folder: { username: `${username}`, id: `${id}`, time: `${time}`, ip: `${ip}` } };
-        var jsonRequest = JSON.stringify(request);
-        WsAgent.send(jsonRequest);
+   
+    requestFolderInfoByFileName(filename,pID){
 
     }
     wsNotiyHandler(wsTaskEvent) {//virtual
@@ -338,7 +333,7 @@ class FileDialog extends MyDialog {
         
         this.create();
         WsAgent.addEventListener(this, FILE_SAVE_EVENT, this.wsNotiyHandler);
-        WsAgent.addEventListener(this, REQUEST_CHILDREN_OF_ONE_FOLDER, this.wsNotifyRequestChildren);
+        WsAgent.addEventListener(this, OPEN_FILE_EVENT, this.wsNotifyFileLoadHandler);
         this.currentFolder = '#';//??????????????????????????????????
         this.restetUI();
 
@@ -347,8 +342,41 @@ class FileDialog extends MyDialog {
 /////////////////////////////////
 class Folder {
     constructor(owner) {
-　　　this.owner=owner;　
+　　　this.owner=owner;
+     WsAgent.addEventListener(this, REQUEST_CHILDREN_BY_FOLDER_ID, this.wsNotifyRequestChildrenByFolderID);　
+     WsAgent.addEventListener(this,REQUEST_FOLDER_INFO_BY_FILE_NAME,this.wsNotifyRequestFolderInfoByFileName)
      this.path='';
+
+    }
+    requestChildrenByFolderID(folderID) {
+        var id = folderID;
+        var username = this.owner.tool.getUsername();;
+        var date = new Date();
+        var time = date.toLocaleDateString() + date.toLocaleTimeString();
+        var ip = "fakeIP";//real IP will be set by server;
+        var request = { taskname: REQUEST_CHILDREN_BY_FOLDER_ID, folder: { username: `${username}`, id: `${id}`, time: `${time}`, ip: `${ip}` } };
+        var jsonRequest = JSON.stringify(request);
+        WsAgent.send(jsonRequest);
+
+    }
+    wsNotifyRequestChildrenByFolderID(wsTaskEvent) {//virtual
+        var folders = wsTaskEvent.response.result;
+        this.loadFolders(folders)
+
+    }
+    requestFolderInfoBYFileName(filename,parent_id){
+       
+        var username = this.owner.tool.getUsername();;
+        var date = new Date();
+        var time = date.toLocaleDateString() + date.toLocaleTimeString();
+        var ip = "fakeIP";//real IP will be set by server;
+        var request = { taskname: REQUEST_FOLDER_INFO_BY_FILE_NAME, folder: { username: `${username}`, filename: `${filename}`,
+                                       parent_id:`${parent_id}`, time: `${time}`, ip: `${ip}` } };
+        var jsonRequest = JSON.stringify(request);
+        WsAgent.send(jsonRequest);
+
+    }
+    wsNotifyRequestFolderInfoByFileName(wsTaskEvent){
 
     }
     toolClick(event, sourceTool) {
@@ -483,11 +511,13 @@ class SaveAsDialog extends FileDialog {
 
    
     initDialogUI() {//virtual
+        
         var user=this.tool.getUsername();
         if(user&&user!=this.currentUser) {
             this.currentUser=this.tool.getUsername();
-            this.folder.jqNavigitorBarElements.pathBar.html('Root')
-            this.requestChildrenOfFolder(ROOTID); 
+            this.folder.jqNavigitorBarElements.pathBar.html('dml')
+            this.folder.requestChildrenByFolderID(ROOTID);
+            
         }
         
     }
@@ -497,11 +527,7 @@ class SaveAsDialog extends FileDialog {
         //  $(jqHintBar).html("文件将存到服务器");
 
     }
-    wsNotifyRequestChildren(wsTaskEvent) {//virtual
-        var folders = wsTaskEvent.response.result;
-        this.folder.loadFolders(folders)
-
-    }
+   
 
     wsNotiyHandler(wsTaskEvent) {
         var response = wsTaskEvent.response;

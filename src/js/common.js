@@ -36,7 +36,8 @@ class EditorEvent{
 }
 const USER_LOGIN_EVENT="user_login_event";
 const FILE_SAVE_EVENT ="file-save-event";
-const REQUEST_CHILDREN_OF_ONE_FOLDER="request_children_of_one_folder";
+const REQUEST_CHILDREN_BY_FOLDER_ID="request_children_by_folder_id";
+const REQUEST_FOLDER_INFO_BY_FILE_NAME="request_fodler_info_by_file_name"
 const GET_FILELIST_EVENT="get_fieList_event"
 const OPEN_FILE_EVENT="open_file_event"
 class TaskEvent{
@@ -76,8 +77,8 @@ class WS_Agent{
            var openFileEvent=new TaskEvent(this,OPEN_FILE_EVENT,response)
            this.eventDispatcher.dispatchEvent(openFileEvent);
            break;
-      case REQUEST_CHILDREN_OF_ONE_FOLDER:
-           var requestChildrenEvent=new TaskEvent(this,REQUEST_CHILDREN_OF_ONE_FOLDER,response)
+      case REQUEST_CHILDREN_BY_FOLDER_ID:
+           var requestChildrenEvent=new TaskEvent(this,REQUEST_CHILDREN_BY_FOLDER_ID,response)
            this.eventDispatcher.dispatchEvent(requestChildrenEvent);
            break;      
      default:
@@ -311,7 +312,7 @@ function textGenSubSup(txt){
   }
 }
 export {EventDispatcher,EditorEvent,CommonUtilities,WsAgent,CURRENT_SCENE_CHANGE,FILE_SAVE_EVENT,USER_LOGIN_EVENT,
-GET_FILELIST_EVENT, OPEN_FILE_EVENT,REQUEST_CHILDREN_OF_ONE_FOLDER}
+GET_FILELIST_EVENT, OPEN_FILE_EVENT,REQUEST_CHILDREN_BY_FOLDER_ID,REQUEST_FOLDER_INFO_BY_FILE_NAME}
 
   
   

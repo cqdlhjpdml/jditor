@@ -171,7 +171,7 @@ class Login_Register_TaskHandller extends Task_Handler{
 }
 /////////////////////////////////////////////
 //var request={taskname:"requestChildren",folder:{username:`${username}`,folder:`${crrentFolder}`},time:`${time}`,ip:`${ip}`};
-class RequestChildren_TaskHandler extends Task_Handler{
+class RequestChildrenByFolderID_TaskHandler extends Task_Handler{
   
  async getChildren(taskReq){
       return await this.db.getChildren(taskReq);
@@ -181,7 +181,7 @@ class RequestChildren_TaskHandler extends Task_Handler{
     var folder=taskReq.folder;
     var r=await this.getChildren(folder);
     if(!r.succeed) {
-      var response={taskname:"request_children_of_one_folder",result:r};
+      var response={taskname:"request_children_by_folder_id",result:r};
       return response;
        
     }
@@ -196,7 +196,7 @@ taskRouter.addRouter('login',new Login_Register_TaskHandller("default-login-hanl
 taskRouter.addRouter('register',new Login_Register_TaskHandller("default-register-handler",db));
 taskRouter.addRouter('getFileList',new getFileList_TaskHandler("default-getFilList-handler",db));
 taskRouter.addRouter('openfile',new OpenFile_TaskHandler("default-openfile-handler",db));
-taskRouter.addRouter('request_children_of_one_folder',new RequestChildren_TaskHandler('request_children_of_one_folder',db));
+taskRouter.addRouter('request_children_by_folder_id',new RequestChildrenByFolderID_TaskHandler('request_children_by_folder_id',db));
 //////////////////
 ////////////////////////////////
 
