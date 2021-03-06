@@ -1,6 +1,6 @@
 import { MyDialog, FolderIconTool, FOLDER_ICON_TOOL } from './ui-base.js'
 import { CommonUtilities, WsAgent, FILE_SAVE_EVENT, USER_LOGIN_EVENT, GET_FILELIST_EVENT,
-         OPEN_FILE_EVENT, REQUEST_CHILDREN_BY_FOLDER_ID,REQUEST_FOLDER_INFO_BY_FILE_NAME } from './common.js'
+         OPEN_FILE_EVENT, REQUEST_CHILDREN_BY_FOLDER_ID,REQUEST_FOLDER_INFO_BY_FILE_NAME,REQUEST_USER_ROOT_FOLDER } from './common.js'
 
 class OpenFileDialog extends MyDialog {
     resetUI() {
@@ -280,14 +280,10 @@ class FileDialog extends MyDialog {
 
     }
    
-    requestFolderInfoByFileName(filename,pID){
-
-    }
+  
     wsNotiyHandler(wsTaskEvent) {//virtual
     }
-    wsNotifyRequestChildren(wsTaskEvent) {//virtual
-
-    }
+  
     jqDialog() {//virtual
         var me = this;
         $(`#${this.id}`).dialog({
@@ -344,8 +340,10 @@ class Folder {
     constructor(owner) {
 　　　this.owner=owner;
      WsAgent.addEventListener(this, REQUEST_CHILDREN_BY_FOLDER_ID, this.wsNotifyRequestChildrenByFolderID);　
-     WsAgent.addEventListener(this,REQUEST_FOLDER_INFO_BY_FILE_NAME,this.wsNotifyRequestFolderInfoByFileName)
+     
+     WsAgent.addEventListener(this,REQUEST_USER_ROOT_FOLDER,this.wsNotifyRequestUserRootFolder);
      this.path='';
+     this.FolderStack=new Array();//?????????
 
     }
     requestChildrenByFolderID(folderID) {
@@ -379,16 +377,39 @@ class Folder {
     wsNotifyRequestFolderInfoByFileName(wsTaskEvent){
 
     }
+    requestUserRootFolder(username,rootid){
+        
+        var date = new Date();
+        var time = date.toLocaleDateString() + date.toLocaleTimeString();
+        var ip = "fakeIP";//real IP will be set by server;
+        //ACCORDING CONVENTION,ROOT FOLDER'S NAME IS USERNAME
+        var request = { taskname: REQUEST_USER_ROOT_FOLDER, folder: { username: `${username}`, filename: `${username}`,
+                                       parent_id:`${rootid}`, time: `${time}`, ip: `${ip}` } };
+        var jsonRequest = JSON.stringify(request);
+        WsAgent.send(jsonRequest);  
+    }
+    wsNotifyRequestUserRootFolder(wsTaskEvent){
+        var folders = wsTaskEvent.response.result;
+        var toolItem={ icon: 'folder.png', caption: folders[0].name,folderID:folders[0].id}
+        toolItem.icon='folder.png';
+        let folderIconTool = new FolderIconTool(toolItem, this);
+        this.appendFolderToolIcon(folderIconTool.getToolBtn());
+        folderIconTool.toolIcon.click();
+        this.folderIconTool = folderIconTool;
+       
+
+    }
     toolClick(event, sourceTool) {
         var toolType = sourceTool.toolType;
         switch (toolType) {
             case FOLDER_ICON_TOOL:
                 var path=this.jqNavigitorBarElements.pathBar.html();
-                path=path+'>'+sourceTool.toolItem.caption;
+                if(path.length>0)  path=path+'>'+sourceTool.toolItem.caption;
+                path=sourceTool.toolItem.caption;
                 this.jqNavigitorBarElements.pathBar.html(path);
                 sourceTool.toolButton.style.border = "1px solid blue";
                 sourceTool.toolButton.style.background = "#aaaaaa";
-                this.owner.requestChildrenOfFolder(sourceTool.toolItem.folderID);
+                this.requestChildrenByFolderID(sourceTool.toolItem.folderID);
                 this.jqFolderListBar.html("");
                 this.currentFolderFolderIconTool=sourceTool;
                 break;
@@ -400,7 +421,7 @@ class Folder {
         switch (toolType) {
             case FOLDER_ICON_TOOL:
                 var folderID=sourceTool.toolItem.folderID;
-                this.owner.requestChildrenOfFolder(folderID);
+                this.owner.requestChildrenByFolderID(folderID);
                 break;
         }
     }
@@ -513,12 +534,7 @@ class SaveAsDialog extends FileDialog {
     initDialogUI() {//virtual
         
         var user=this.tool.getUsername();
-        if(user&&user!=this.currentUser) {
-            this.currentUser=this.tool.getUsername();
-            this.folder.jqNavigitorBarElements.pathBar.html('dml')
-            this.folder.requestChildrenByFolderID(ROOTID);
-            
-        }
+        this.folder.requestUserRootFolder(user,ROOTID);
         
     }
     restetUI() {

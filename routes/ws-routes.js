@@ -191,13 +191,30 @@ class RequestChildrenByFolderID_TaskHandler extends Task_Handler{
 
 }
 ////////////////////////////////////////////
+class RequestUserRootFolder_TaskHandler extends Task_Handler{
+  async getFolderInfoByFileName(taskReq){
+    return await this.db.getUserRootFolder(taskReq);
+  }
+  async doTask(taskReq){
+    var folder=taskReq.folder;
+    var r=await this.getFolderInfoByFileName(folder);
+    if(!r.succeed) {
+      var response={taskname:"request_user_root_folder",result:r};
+      return response;
+       
+    }
+  }
+}
+
+////////////////////////////////////////////
 taskRouter.addRouter('savefile',new SaveFile_TaskHandler("default-saveFile-handler",db));
 taskRouter.addRouter('login',new Login_Register_TaskHandller("default-login-hanler",db));
 taskRouter.addRouter('register',new Login_Register_TaskHandller("default-register-handler",db));
 taskRouter.addRouter('getFileList',new getFileList_TaskHandler("default-getFilList-handler",db));
 taskRouter.addRouter('openfile',new OpenFile_TaskHandler("default-openfile-handler",db));
 taskRouter.addRouter('request_children_by_folder_id',new RequestChildrenByFolderID_TaskHandler('request_children_by_folder_id',db));
-//////////////////
+taskRouter.addRouter('request_user_root_folder',new RequestUserRootFolder_TaskHandler('request_user_root_folder',db));
+////////////////////////////////
 ////////////////////////////////
 
 
@@ -206,7 +223,6 @@ wss.on('connection', function connection(ws) {
    //console.log(ws);
     ws.on('message', async function incoming(message) {
       var taskreq=JSON.parse(message);
-      var taskname=taskreq.taskname;
       var jsonReponse
       let r=await taskRouter.route(taskreq);
       jsonReponse=JSON.stringify(r);

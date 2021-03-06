@@ -125,6 +125,19 @@ class DB {
         }
 
     }
+    async getUserRootFolder(folder){
+        var filter={username:folder.username,parent_id:folder.parent_id}
+        try{
+            let r=await this.file.findAll({
+                attributes: [['name', 'name'], ['id', 'id'],['isfolder','isfolder']],
+                where: filter 
+            })
+            return r;
+        }
+        catch(err){
+            return { succeed: false, msg: "获取文件夹信息失败！" }
+        }
+    }
 }
 /*some test statements
 var db=new DB();
