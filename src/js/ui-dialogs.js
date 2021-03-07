@@ -343,7 +343,7 @@ class Folder {
      
      WsAgent.addEventListener(this,REQUEST_USER_ROOT_FOLDER,this.wsNotifyRequestUserRootFolder);
      this.path='';
-     this.FolderStack=new Array();//?????????
+     this.pathStack=new Array();//?????????
 
     }
     requestChildrenByFolderID(folderID) {
@@ -404,9 +404,10 @@ class Folder {
         switch (toolType) {
             case FOLDER_ICON_TOOL:
                 var path=this.jqNavigitorBarElements.pathBar.html();
-                if(path.length>0)  path=path+'>'+sourceTool.toolItem.caption;
-                path=sourceTool.toolItem.caption;
-                this.jqNavigitorBarElements.pathBar.html(path);
+                if(path.length>0)  this.path=path+'>'+sourceTool.toolItem.caption;
+                this.path=sourceTool.toolItem.caption;
+                this.jqNavigitorBarElements.pathBar.html(this.path);
+                this.pathStack.push(sourceTool);
                 sourceTool.toolButton.style.border = "1px solid blue";
                 sourceTool.toolButton.style.background = "#aaaaaa";
                 this.requestChildrenByFolderID(sourceTool.toolItem.folderID);
@@ -485,6 +486,23 @@ class Folder {
             });
             return jqFolderBar;
         }
+        //-----------------------
+        function createCommandBar(id){
+            var jqCommandBar = $(`<div　id=${id}></div>`);
+            jqCommandBar.css({
+                "display": "flex",
+                'flex-direction': 'row',
+                'justify-content': 'center',
+                
+            });
+            
+            var jqNewButton=$('<button>新建</button>').button();
+            jqCommandBar.append(jqNewButton);
+            var jqDeletedButton=$('<button>删除</button>').button();
+            jqCommandBar.append(jqDeletedButton);
+            return jqCommandBar;
+         
+        }
         //----------------
         function createFileNameBar(id) {
             var jqFileNameBar = $(`<div><h5>文件名</h5><input type="text"  id=${id} /></div>`);
@@ -508,13 +526,18 @@ class Folder {
         this.folderDivID = CommonUtilities.getGuid();
         this.fileInputID = CommonUtilities.getGuid();
         this.jqHintBarID = CommonUtilities.getGuid();
+        this.jqCommandBarID=CommonUtilities.getGuid();
+        
         this.jqContentBar = createContentBar(this.id);
         this.jqNavigitorBarElements = createNavigitorBar(this.navigitorID);
         this.jqFolderListBar = createFolderListBar(this.folderDivID);
+        this.jqCommandBar=createCommandBar(this.jqCommandBarID);
         this.jqFilInputBar = createFileNameBar(this.fileInputID)
         this.jqHintBar = createHintBar(this.jqHintBarID);
         this.jqContentBar.append(this.jqNavigitorBarElements.naviBar);
         this.jqContentBar.append(this.jqFolderListBar);
+        this.jqContentBar.append(this.jqCommandBar);
+        this.jqContentBar.append(this.jqContentBar);
         this.jqContentBar.append(this.jqFilInputBar);
         this.jqContentBar.append(this.jqHintBar);
         
