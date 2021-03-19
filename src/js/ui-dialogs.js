@@ -437,6 +437,17 @@ class Folder {
             this.folderIconTool = folderIconTool;
         }
     }
+    //-----
+    //called by owner.newFolderButtonClick(event),and owner is folder Object
+    newFolderButtonClick(event){
+        
+        //console.log(this.jqNavigitorBarElements.pathBar.html())
+        var parentFolderID=this.currentFolderFolderIconTool.toolItem.folderID;
+        var request = { taskname: "newFolder", file: { name: '新文件夹', isfolder:true,username: `${username}`,  parentFolderID: `${parentFolderID}` }, time: `${time}`, ip: `${ip}` };
+        var jsonRequest = JSON.stringify(request);
+        WsAgent.send(jsonRequest);
+    }
+    ////////////////////
     createFolderUIElements() {
 
         function createContentBar(id) {
@@ -486,8 +497,9 @@ class Folder {
             });
             return jqFolderBar;
         }
+               
         //-----------------------
-        function createCommandBar(id){
+        function createCommandBar(id,owner){
             var jqCommandBar = $(`<div　id=${id}></div>`);
             jqCommandBar.css({
                 "display": "flex",
@@ -497,6 +509,8 @@ class Folder {
             });
             
             var jqNewButton=$('<button>新建</button>').button();
+            jqNewButton[0].onclick=function (event){
+                owner.newFolderButtonClick(event)}
             jqCommandBar.append(jqNewButton);
             var jqDeletedButton=$('<button>删除</button>').button();
             jqCommandBar.append(jqDeletedButton);
@@ -531,7 +545,7 @@ class Folder {
         this.jqContentBar = createContentBar(this.id);
         this.jqNavigitorBarElements = createNavigitorBar(this.navigitorID);
         this.jqFolderListBar = createFolderListBar(this.folderDivID);
-        this.jqCommandBar=createCommandBar(this.jqCommandBarID);
+        this.jqCommandBar=createCommandBar(this.jqCommandBarID,this);
         this.jqFilInputBar = createFileNameBar(this.fileInputID)
         this.jqHintBar = createHintBar(this.jqHintBarID);
         this.jqContentBar.append(this.jqNavigitorBarElements.naviBar);
