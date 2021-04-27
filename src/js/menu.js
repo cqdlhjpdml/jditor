@@ -40,17 +40,25 @@ class PopMenu{
         $(`#${this.id}`).hide();	  
     }
     
-    constructor(menuConfigs){
+    constructor(menuConfigs,parent){
         this.menuConfigs=menuConfigs;
         this.id=CommonUtilities.getGuid();
         this.jqUl=$(`<ul id=${this.id}></ul>`);
         this.jqUl[0].setAttribute("class","contextmenu");
         this.createMenus();
-        document.body.appendChild(this.jqUl[0]);
+        if(parent) 
+          parent.appendChild(this.jqUl[0]);
+        else
+          document.body.appendChild(this.jqUl[0]);
+        this.parent=parent;
       
+    }
+    setParent(parent){
+        parent.appendChild(this.jqUl[0]);
     }
 
 }
+//delete element in the scene
 function deleteCallback(targetEvent){
     var scene=targetEvent.scene;
     if(!targetEvent.target) return;
@@ -73,4 +81,4 @@ function deleteCallback(targetEvent){
    }
 var Node_PopMenu_Config=[{caption:"删除",icon:"delete.png",tooltips:"删除",handler:deleteCallback}]
 var Node_PopMenu=new PopMenu(Node_PopMenu_Config);
-export{Node_PopMenu}
+export{PopMenu,Node_PopMenu}

@@ -14,6 +14,7 @@ class BaseIconTool {//abstract class
     this.toolIcon.alt = toolItem.caption;
     this.toolIcon.tooltips = toolItem.tooltips;
     this.toolButton = document.createElement("div");
+    this.toolButton.setAttribute('id',CommonUtilities.getGuid());
     //this.toolButton.className = "toolBtn";
     this.toolButton.width = '50px';
     this.toolButton.height = '50px';
@@ -22,8 +23,13 @@ class BaseIconTool {//abstract class
     this.toolButton.ondblclick = function mousedblclick(event) {
       me.mousedblclick(event, me)
     };
-    this.toolButton.onmouseenter = function mouseenter(event) { me.mouseenter(event, me) };;
-    this.toolButton.onmouseleave = function mouseleave(event) { me.mouseleave(event, me) };
+    this.toolButton.onmouseenter = function (event) { me.mouseenter(event, me) };;
+    this.toolButton.onmouseleave = function (event) { me.mouseleave(event, me) };
+    this.toolButton.onmouseup = function (event) { me.mouseup(event, me) };
+    this.toolButton.oncontextmenu = (event) => {
+      // e.preventDefault()
+      me.contextmenu(event, me);
+    }
     if (toolItem.caption) {
       var captionSpan = document.createElement("span");
       captionSpan.innerHTML = toolItem.caption;
@@ -37,20 +43,33 @@ class BaseIconTool {//abstract class
 
   }
   /**************************** */
+  mouseup(event, self) {
+
+  }
+  /**************************** */
   mousedblclick(event, self) {//virtual
 
   }
   /**************************** */
-  mouseleave(event, toolManager) {//virtual;
+  mouseleave(event, self) {//virtual;
 
   }
   /*********** */
-  mouseenter(event, toolManager) {//virtual
+  mouseenter(event, self) {//virtual
+  }
+  //*******************
+  oncontextmenu(event, self) {
+
+  }
+  /************************* */
+  setPopMenu(popmenu) {
+    this.popmenu = popmenu;
   }
 
 }
 /////////////////////////////////////////////////////////////////
 const FOLDER_ICON_TOOL = 1
+
 //////////class folderIcon of user folder UI/////////////////////
 class FolderIconTool extends BaseIconTool {
   /************* */
@@ -63,10 +82,25 @@ class FolderIconTool extends BaseIconTool {
     if (self.manager) self.manager.toolDbClick(event, self);
 
   }
-
+  mouseup(event, self) {
+    if (self.manager) self.manager.toolMouseup(event, self);
+  }
+  contextmenu(event, self) {
+    if (self.manager) self.manager.contextmenu(event, self)
+  }
+  /***********service****/
+  getUsername() {
+    return this.manager.getUsername();
+  }
+  /***********service */
+  getFolderID() {
+    return this.toolItem.folderID;
+  }
+  /***************/
   constructor(toolItem, manager) {
-    super(toolItem, manager)
+    super(toolItem, manager);
     this.toolType = FOLDER_ICON_TOOL;
+    
   }
 }
 /////////////////////////////////////

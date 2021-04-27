@@ -41,6 +41,8 @@ const REQUEST_FOLDER_INFO_BY_FILE_NAME="request_folder_info_by_file_name"
 const REQUEST_USER_ROOT_FOLDER="request_user_root_folder"
 const GET_FILELIST_EVENT="get_fieList_event"
 const OPEN_FILE_EVENT="open_file_event"
+const CREATE_FOLDER_EVENT="create_folder_event"
+const REMOVE_FILE_OR_FOLDER_EVENT="remove_file_or_folder"
 class TaskEvent{
   constructor(publisher,eventname,response)//eventInfo={succeed:true|false[,detail:detailInfo]}
   {
@@ -85,7 +87,15 @@ class WS_Agent{
       case REQUEST_USER_ROOT_FOLDER:
            var requestUserRootFolderEvent=new TaskEvent(this,REQUEST_USER_ROOT_FOLDER,response)
            this.eventDispatcher.dispatchEvent(requestUserRootFolderEvent);
-           break;     
+           break;
+      case CREATE_FOLDER_EVENT:
+        var requestUserRootFolderEvent=new TaskEvent(this,CREATE_FOLDER_EVENT,response)
+        this.eventDispatcher.dispatchEvent(requestUserRootFolderEvent);
+        break;
+      case REMOVE_FILE_OR_FOLDER_EVENT:
+           var removeEvent=new TaskEvent(this,REMOVE_FILE_OR_FOLDER_EVENT,response);
+           this.eventDispatcher.dispatchEvent(removeEvent);
+           break; 
      default:
          throw(response.taskname+":"+"未定义的操作，服务器返回信息无法处理！")
     }
@@ -317,7 +327,8 @@ function textGenSubSup(txt){
   }
 }
 export {EventDispatcher,EditorEvent,CommonUtilities,WsAgent,CURRENT_SCENE_CHANGE,FILE_SAVE_EVENT,USER_LOGIN_EVENT,
-GET_FILELIST_EVENT, OPEN_FILE_EVENT,REQUEST_CHILDREN_BY_FOLDER_ID,REQUEST_FOLDER_INFO_BY_FILE_NAME,REQUEST_USER_ROOT_FOLDER}
+GET_FILELIST_EVENT, OPEN_FILE_EVENT,CREATE_FOLDER_EVENT,REQUEST_CHILDREN_BY_FOLDER_ID,REQUEST_FOLDER_INFO_BY_FILE_NAME,
+REQUEST_USER_ROOT_FOLDER,REMOVE_FILE_OR_FOLDER_EVENT}
 
   
   

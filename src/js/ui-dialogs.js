@@ -1,6 +1,10 @@
 import { MyDialog, FolderIconTool, FOLDER_ICON_TOOL } from './ui-base.js'
-import { CommonUtilities, WsAgent, FILE_SAVE_EVENT, USER_LOGIN_EVENT, GET_FILELIST_EVENT,
-         OPEN_FILE_EVENT, REQUEST_CHILDREN_BY_FOLDER_ID,REQUEST_FOLDER_INFO_BY_FILE_NAME,REQUEST_USER_ROOT_FOLDER } from './common.js'
+import {
+    CommonUtilities, WsAgent, FILE_SAVE_EVENT, USER_LOGIN_EVENT, GET_FILELIST_EVENT,
+    OPEN_FILE_EVENT, CREATE_FOLDER_EVENT, REQUEST_CHILDREN_BY_FOLDER_ID, REQUEST_FOLDER_INFO_BY_FILE_NAME,
+    REQUEST_USER_ROOT_FOLDER, REMOVE_FILE_OR_FOLDER_EVENT
+} from './common.js'
+import { PopMenu } from './menu.js'
 
 class OpenFileDialog extends MyDialog {
     resetUI() {
@@ -279,11 +283,15 @@ class FileDialog extends MyDialog {
 
 
     }
-   
-  
+
+
     wsNotiyHandler(wsTaskEvent) {//virtual
     }
-  
+    /****************** */
+    getUsername() {
+        return this.tool.getUsername();
+    }
+    /******************* */
     jqDialog() {//virtual
         var me = this;
         $(`#${this.id}`).dialog({
@@ -303,8 +311,8 @@ class FileDialog extends MyDialog {
                         var date = new Date();
                         var time = date.toLocaleDateString() + date.toLocaleTimeString();
                         var ip = "fakeIP";//real IP will be set by server;
-                        var parentFolderID=me.folder.currentFolderFolderIconTool.toolItem.folderID;
-                        var request = { taskname: "savefile", file: { name: `${filename}`, isfolder:false,username: `${username}`, content: `${content}`, parentFolderID: `${parentFolderID}` }, time: `${time}`, ip: `${ip}` };
+                        var parentFolderID = me.folder.currentFolderFolderIconTool.toolItem.folderID;
+                        var request = { taskname: "savefile", file: { name: `${filename}`, isfolder: false, username: `${username}`, content: `${content}`, parentFolderID: `${parentFolderID}` }, time: `${time}`, ip: `${ip}` };
                         var jsonRequest = JSON.stringify(request);
                         WsAgent.send(jsonRequest);
 
@@ -325,8 +333,8 @@ class FileDialog extends MyDialog {
     constructor(title, savetool) {
         super(title);
         this.tool = savetool;
-        this.currentUser=null;
-        
+        this.currentUser = null;
+
         this.create();
         WsAgent.addEventListener(this, FILE_SAVE_EVENT, this.wsNotiyHandler);
         WsAgent.addEventListener(this, OPEN_FILE_EVENT, this.wsNotifyFileLoadHandler);
@@ -336,16 +344,24 @@ class FileDialog extends MyDialog {
     }
 }
 /////////////////////////////////
+
+/////////////////////////////////
 class Folder {
     constructor(owner) {
-　　　this.owner=owner;
-     WsAgent.addEventListener(this, REQUEST_CHILDREN_BY_FOLDER_ID, this.wsNotifyRequestChildrenByFolderID);　
-     
-     WsAgent.addEventListener(this,REQUEST_USER_ROOT_FOLDER,this.wsNotifyRequestUserRootFolder);
-     this.path='';
-     this.pathStack=new Array();//?????????
+        this.owner = owner;
+        WsAgent.addEventListener(this, REQUEST_CHILDREN_BY_FOLDER_ID, this.wsNotifyRequestChildrenByFolderID);
+        WsAgent.addEventListener(this, REQUEST_USER_ROOT_FOLDER, this.wsNotifyRequestUserRootFolder);
+        WsAgent.addEventListener(this, CREATE_FOLDER_EVENT, this.wsNotifyCreateFolder);
+        WsAgent.addEventListener(this, REMOVE_FILE_OR_FOLDER_EVENT, this.wsNotifyFileRemove)
+        this.path = '';
+        this.pathStack = new Array();//?????????
 
     }
+    /***************/
+    getUsername() {
+        return this.owner.getUsername();
+    }
+    /*********** */
     requestChildrenByFolderID(folderID) {
         var id = folderID;
         var username = this.owner.tool.getUsername();;
@@ -357,62 +373,101 @@ class Folder {
         WsAgent.send(jsonRequest);
 
     }
+    /************* */
     wsNotifyRequestChildrenByFolderID(wsTaskEvent) {//virtual
         var folders = wsTaskEvent.response.result;
         this.loadFolders(folders)
 
     }
-    requestFolderInfoBYFileName(filename,parent_id){
-       
+    /************* */
+    wsNotifyRequestFolderInfoByFileName(wsTaskEvent) {
+
+    }
+    /******************** */
+    wsNotifyCreateFolder(wsTaskEvent) {
+        var folder = wsTaskEvent.response.result;
+        var toolItem = toolItem = { icon: 'folder.png', caption: folder.name, folderID: folder.id };
+        var folderIconTool = new FolderIconTool(toolItem, this);
+        folderIconTool.setPopMenu(this.folder_icon_tool_popMenu);
+        this.appendFolderToolIcon(folderIconTool.getToolBtn());
+        this.folderIconTool = folderIconTool;
+
+    }
+    //***************
+    wsNotifyFileRemove(wsTaskEvent) {
+        console.log(wsTaskEvent);
+        var toolDiv = document.getElementById(wsTaskEvent.response.result.toolDivId);
+        toolDiv.remove();       
+    }
+    /************ */
+    requestFolderInfoBYFileName(filename, parent_id) {
+
         var username = this.owner.tool.getUsername();;
         var date = new Date();
         var time = date.toLocaleDateString() + date.toLocaleTimeString();
         var ip = "fakeIP";//real IP will be set by server;
-        var request = { taskname: REQUEST_FOLDER_INFO_BY_FILE_NAME, folder: { username: `${username}`, filename: `${filename}`,
-                                       parent_id:`${parent_id}`, time: `${time}`, ip: `${ip}` } };
+        var request = {
+            taskname: REQUEST_FOLDER_INFO_BY_FILE_NAME, folder: {
+                username: `${username}`, filename: `${filename}`,
+                parent_id: `${parent_id}`, time: `${time}`, ip: `${ip}`
+            }
+        };
         var jsonRequest = JSON.stringify(request);
         WsAgent.send(jsonRequest);
 
     }
-    wsNotifyRequestFolderInfoByFileName(wsTaskEvent){
+    /*************** */
+    requestUserRootFolder(username, rootid) {
 
-    }
-    requestUserRootFolder(username,rootid){
-        
         var date = new Date();
         var time = date.toLocaleDateString() + date.toLocaleTimeString();
         var ip = "fakeIP";//real IP will be set by server;
         //ACCORDING CONVENTION,ROOT FOLDER'S NAME IS USERNAME
-        var request = { taskname: REQUEST_USER_ROOT_FOLDER, folder: { username: `${username}`, filename: `${username}`,
-                                       parent_id:`${rootid}`, time: `${time}`, ip: `${ip}` } };
+        var request = {
+            taskname: REQUEST_USER_ROOT_FOLDER, folder: {
+                username: `${username}`, filename: `${username}`,
+                parent_id: `${rootid}`, time: `${time}`, ip: `${ip}`
+            }
+        };
         var jsonRequest = JSON.stringify(request);
-        WsAgent.send(jsonRequest);  
+        WsAgent.send(jsonRequest);
     }
-    wsNotifyRequestUserRootFolder(wsTaskEvent){
+    /****************** */
+    wsNotifyRequestUserRootFolder(wsTaskEvent) {
         var folders = wsTaskEvent.response.result;
-        var toolItem={ icon: 'folder.png', caption: folders[0].name,folderID:folders[0].id}
-        toolItem.icon='folder.png';
+        var toolItem = { icon: 'folder.png', caption: folders[0].name, folderID: folders[0].id }
+        toolItem.icon = 'folder.png';
         let folderIconTool = new FolderIconTool(toolItem, this);
+        folderIconTool.setPopMenu(this.folder_icon_tool_popMenu);
         this.appendFolderToolIcon(folderIconTool.getToolBtn());
         folderIconTool.toolIcon.click();
         this.folderIconTool = folderIconTool;
-       
+
+
+    }
+    /**************** */
+    toolMouseup(event, sourceTool) {
 
     }
     toolClick(event, sourceTool) {
         var toolType = sourceTool.toolType;
         switch (toolType) {
             case FOLDER_ICON_TOOL:
-                var path=this.jqNavigitorBarElements.pathBar.html();
-                if(path.length>0)  this.path=path+'>'+sourceTool.toolItem.caption;
-                this.path=sourceTool.toolItem.caption;
+                var path = this.jqNavigitorBarElements.pathBar.html();
+                if (path.length > 0) this.path = path + '>' + sourceTool.toolItem.caption;
+                this.path = sourceTool.toolItem.caption;
                 this.jqNavigitorBarElements.pathBar.html(this.path);
                 this.pathStack.push(sourceTool);
                 sourceTool.toolButton.style.border = "1px solid blue";
                 sourceTool.toolButton.style.background = "#aaaaaa";
                 this.requestChildrenByFolderID(sourceTool.toolItem.folderID);
                 this.jqFolderListBar.html("");
-                this.currentFolderFolderIconTool=sourceTool;
+                this.folder_icon_tool_popMenu.setParent(this.jqFolderListBar[0]);
+                this.currentFolderFolderIconTool = sourceTool;
+                break;
+
+            default:
+
                 break;
         }
     }
@@ -421,33 +476,72 @@ class Folder {
         var toolType = sourceTool.toolType;
         switch (toolType) {
             case FOLDER_ICON_TOOL:
-                var folderID=sourceTool.toolItem.folderID;
+                var folderID = sourceTool.toolItem.folderID;
                 this.owner.requestChildrenByFolderID(folderID);
                 break;
         }
     }
+    //***** */
+    contextmenu(event, sourceTool) {
+        var toolType = sourceTool.toolType;
+        switch (toolType) {
+            case FOLDER_ICON_TOOL:
+                event.preventDefault();
+                var ox = event.currentTarget.offsetLeft;
+                var oy = event.currentTarget.offsetTop;
+                var sh = event.currentTarget.parentElement.scrollTop;
+                event.sourceTool = sourceTool;
+                sourceTool.popmenu.setTargetEvent(event)
+                sourceTool.popmenu.showAt(ox + event.offsetX,
+                    oy - sh + event.offsetY);
+                break;
+            default:
+                break;
+        }
+
+    }
+    //******** */
     loadFolders(folderArray) {
         var toolItem;
         for (let i = 0; i < folderArray.length; i++) {
-            toolItem={ icon: 'folder.png', caption: folderArray[i].name,folderID:folderArray[i].id}
-            if(!folderArray[i].isfolder)
-                toolItem.icon='file.png';
+            toolItem = { icon: 'folder.png', caption: folderArray[i].name, folderID: folderArray[i].id }
+            if (!folderArray[i].isfolder)
+                toolItem.icon = 'file.png';
             let folderIconTool = new FolderIconTool(toolItem, this);
+            folderIconTool.setPopMenu(this.folder_icon_tool_popMenu);
             this.appendFolderToolIcon(folderIconTool.getToolBtn());
             this.folderIconTool = folderIconTool;
         }
     }
     //-----
     //called by owner.newFolderButtonClick(event),and owner is folder Object
-    newFolderButtonClick(event){
-        
-        //console.log(this.jqNavigitorBarElements.pathBar.html())
-        var parentFolderID=this.currentFolderFolderIconTool.toolItem.folderID;
-        var request = { taskname: "newFolder", file: { name: '新文件夹', isfolder:true,username: `${username}`,  parentFolderID: `${parentFolderID}` }, time: `${time}`, ip: `${ip}` };
+    newFolderButtonClick(username, event) {
+        var date = new Date();
+        var time = date.toLocaleDateString() + date.toLocaleTimeString();
+        var ip = "fakeIP";//real IP will be set by server;
+        var username = this.owner.tool.getUsername()
+        var parentFolderID = this.currentFolderFolderIconTool.toolItem.folderID;
+        var request = { taskname: CREATE_FOLDER_EVENT, file: { isfolder: true, username: `${username}`, parentFolderID: `${parentFolderID}` }, time: `${time}`, ip: `${ip}` };
         var jsonRequest = JSON.stringify(request);
         WsAgent.send(jsonRequest);
     }
-    ////////////////////
+    //-----------------------
+    deleteCtxMenuClick(event) {
+        var sourceTool = event.sourceTool;
+        var date = new Date();
+        var time = date.toLocaleDateString() + date.toLocaleTimeString();
+        var toolDivId = sourceTool.getToolBtn().getAttribute('id');
+        var ip = "fakeIP";//real IP will be set by server;
+        var username = sourceTool.getUsername();
+        var id = sourceTool.getFolderID();
+        var request = {
+            taskname: REMOVE_FILE_OR_FOLDER_EVENT, file: { username: `${username}`, id: `${id}`, toolDivId: `${toolDivId}` },
+            time: `${time}`, ip: `${ip}`
+        };
+        var jsonRequest = JSON.stringify(request);
+        WsAgent.send(jsonRequest);
+    }
+    //------------------------
     createFolderUIElements() {
 
         function createContentBar(id) {
@@ -469,58 +563,60 @@ class Folder {
                 "display": "flex",
                 'flex-direction': 'column',
                 'justify-content': 'center',
-                
+
             });
-            var jqPathBar= $(`<div　></div>`);
-            
-            jqPathBar.css({"height":"20px","width":"200px","border":"1px solid"})
+            var jqPathBar = $(`<div　></div>`);
+
+            jqPathBar.css({ "height": "20px", "width": "200px", "border": "1px solid" })
             jqNavigitorBar.append(jqPathBar);
-            var jqButtonDiv= $(`<div　'></div>`);
-            jqButtonDiv.css({"height":"40px","width":"200px","padding":"5px"})
-            var jqGoBackButton=$('<button>GoBack</button>').button();
+            var jqButtonDiv = $(`<div　'></div>`);
+            jqButtonDiv.css({ "height": "40px", "width": "200px", "padding": "5px" })
+            var jqGoBackButton = $('<button>GoBack</button>').button();
             jqButtonDiv.append(jqGoBackButton);
-            var jqForwardButton=$('<button>Forward</button>').button();
+            var jqForwardButton = $('<button>Forward</button>').button();
             jqButtonDiv.append(jqForwardButton);
             jqNavigitorBar.append(jqButtonDiv);
-            return {naviBar:jqNavigitorBar,pathBar:jqPathBar};
+            return { naviBar: jqNavigitorBar, pathBar: jqPathBar };
         }
         //---------
         function createFolderListBar(id) {
 
             var jqFolderBar = $(`<div id=${id}></div>`);
             jqFolderBar.css({
-                "height":"150px",
-                "width":"200px",
-                "border":"1px solid",
+                "height": "150px",
+                "width": "200px",
+                "border": "1px solid",
                 'justify-content': 'space-around',
-                         
+                'overflow': 'scroll'
+
             });
             return jqFolderBar;
         }
-               
+
         //-----------------------
-        function createCommandBar(id,owner){
+        function createCommandBar(id, owner) {
             var jqCommandBar = $(`<div　id=${id}></div>`);
             jqCommandBar.css({
                 "display": "flex",
                 'flex-direction': 'row',
                 'justify-content': 'center',
-                
+
             });
-            
-            var jqNewButton=$('<button>新建</button>').button();
-            jqNewButton[0].onclick=function (event){
-                owner.newFolderButtonClick(event)}
+
+            var jqNewButton = $('<button>新建</button>').button();
+            jqNewButton[0].onclick = function (event) {
+                owner.newFolderButtonClick(event)
+            }
             jqCommandBar.append(jqNewButton);
-            var jqDeletedButton=$('<button>删除</button>').button();
+            var jqDeletedButton = $('<button>删除</button>').button();
             jqCommandBar.append(jqDeletedButton);
             return jqCommandBar;
-         
+
         }
         //----------------
         function createFileNameBar(id) {
             var jqFileNameBar = $(`<div><h5>文件名</h5><input type="text"  id=${id} /></div>`);
-           
+
             return jqFileNameBar;
 
         }
@@ -540,12 +636,12 @@ class Folder {
         this.folderDivID = CommonUtilities.getGuid();
         this.fileInputID = CommonUtilities.getGuid();
         this.jqHintBarID = CommonUtilities.getGuid();
-        this.jqCommandBarID=CommonUtilities.getGuid();
-        
+        this.jqCommandBarID = CommonUtilities.getGuid();
+
         this.jqContentBar = createContentBar(this.id);
         this.jqNavigitorBarElements = createNavigitorBar(this.navigitorID);
         this.jqFolderListBar = createFolderListBar(this.folderDivID);
-        this.jqCommandBar=createCommandBar(this.jqCommandBarID,this);
+        this.jqCommandBar = createCommandBar(this.jqCommandBarID, this);
         this.jqFilInputBar = createFileNameBar(this.fileInputID)
         this.jqHintBar = createHintBar(this.jqHintBarID);
         this.jqContentBar.append(this.jqNavigitorBarElements.naviBar);
@@ -554,7 +650,8 @@ class Folder {
         this.jqContentBar.append(this.jqContentBar);
         this.jqContentBar.append(this.jqFilInputBar);
         this.jqContentBar.append(this.jqHintBar);
-        
+        var folde_icon_tool_popMenu_config = [{ caption: "删除", icon: "delete.png", tooltips: "删除", handler: this.deleteCtxMenuClick }];
+        this.folder_icon_tool_popMenu = new PopMenu(folde_icon_tool_popMenu_config, this.jqFolderListBar[0]);
         return this.jqContentBar;
 
     }
@@ -564,15 +661,15 @@ class Folder {
 
 }
 ///////////////////////////////////////////////////
-const ROOTID="a1ca0f7b-51bd-4bf3-a5d5-6a74f6adc1c7"
+const ROOTID = "a1ca0f7b-51bd-4bf3-a5d5-6a74f6adc1c7"
 class SaveAsDialog extends FileDialog {
 
-   
+
     initDialogUI() {//virtual
-        
-        var user=this.tool.getUsername();
-        this.folder.requestUserRootFolder(user,ROOTID);
-        
+
+        var user = this.tool.getUsername();
+        this.folder.requestUserRootFolder(user, ROOTID);
+
     }
     restetUI() {
         // let jqHintBar=document.getElementById(`${this.jqHintBarID}`);
@@ -580,7 +677,7 @@ class SaveAsDialog extends FileDialog {
         //  $(jqHintBar).html("文件将存到服务器");
 
     }
-   
+
 
     wsNotiyHandler(wsTaskEvent) {
         var response = wsTaskEvent.response;
@@ -608,7 +705,7 @@ class SaveAsDialog extends FileDialog {
         return this.folder.createFolderUIElements();
 
     }
-    
+
 
 }
 /////////////////////////////////

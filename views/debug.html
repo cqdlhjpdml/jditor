@@ -1,38 +1,46 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>debug pug</title>
-        <link rel="stylesheet" href="/stylesheets/style.css">
-        <link rel="stylesheet" href="stylesheets/myEditor.css">
-        <link rel="stylesheet" href="lib/jquery-ui-1.12.1/jquery-ui.css">
-        <link rel="stylesheet" href="lib/jstree/themes/default/style.min.css">
-        <link rel="stylesheet" href="lib/evol-colorpicker/css/evol-colorpicker.css"  type="text/css">
-    </head>
-    <body>
-        <div class="fullRow" id="headerBar">ditor-user1-未命名.sg.</div>
-        <div id="workArea"></div>
-        <footer id="FooterBar" style="border:solid 1px;background-color:#c0c0c0">
-            <span style="text-align:center">欢迎光临 @联系作者</span>
-        </footer>
-      
-        <div class="svgContainer">
-            <object class="svgClass" style="visibility:hidden;" id="svgThermalObject" data="thermal.svg" type="image/svg+xml" height="0" width="0"></object>
-            <object class="svgClass" style="visibility:hidden;" id="svgSamaObject" data="sama.svg" type="image/svg+xml" height="0" width="0"> </object>  
-        </div>
-        
-        <script type="application/javascript" src="jquery-3.1.1.js"></script>
-        <script type="application/javascript" src="lib/jquery-ui-1.12.1/jquery-ui.js"></script>
-        <script type="application/javascript" src="jtopo0.4.8.js"></script>
-        <script type="application/javascript" src="lib/evol-colorpicker/js/evol-colorpicker.js"></script> 
-        <script  type="module">
-            import './jTopoExt.js'
-            import{MyEditor} from './myeditor.js'
-            $(document).ready(function() {
 
-                JTopo.editor = new MyEditor("workArea",JTopo);
+<head>
+    <title>debug pug</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="stylesheets/myEditor.css">
+    <link rel="stylesheet" href="lib/jquery-ui-1.12.1/jquery-ui.css">
+    <link rel="stylesheet" href="lib/jstree/themes/default/style.min.css">
+    <link rel="stylesheet" href="lib/evol-colorpicker/css/evol-colorpicker.css" type="text/css">
+</head>
 
-            });
-        </script>
+<body>
+    <div class="fullRow" id="headerBar">ditor-user1-未命名.sg.</div>
+    <div id="workArea"></div>
+    <footer id="FooterBar" style="border:solid 1px;background-color:#c0c0c0">
+        <span style="text-align:center">欢迎光临 @联系作者</span>
+    </footer>
 
-    </body>
+    <div class="svgContainer">
+        <object class="svgClass" style="visibility:hidden;" id="svgThermalObject" data="thermal.svg"
+            type="image/svg+xml" height="0" width="0"></object>
+        <object class="svgClass" style="visibility:hidden;" id="svgSamaObject" data="sama.svg" type="image/svg+xml"
+            height="0" width="0"> </object>
+    </div>
+
+    <script type="application/javascript" src="jquery-3.1.1.js"></script>
+    <script type="application/javascript" src="lib/jquery-ui-1.12.1/jquery-ui.js"></script>
+    <script type="application/javascript" src="jtopo0.4.8.js"></script>
+    <script type="application/javascript" src="lib/evol-colorpicker/js/evol-colorpicker.js"></script>
+    <script type="module">
+        import './jTopoExt.js'
+        import { MyEditor } from './myeditor.js'
+        $(document).ready(function () {
+
+            JTopo.editor = new MyEditor("workArea", JTopo);
+            document.oncontextmenu = (e) => {
+                e.preventDefault()
+            }
+
+        });
+    </script>
+
+</body>
+
 </html>

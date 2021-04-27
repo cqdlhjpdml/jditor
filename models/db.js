@@ -30,7 +30,8 @@ class DB {
             content: Sequelize.STRING,
             ip: Sequelize.STRING,
             timestamp: Sequelize.STRING,
-            parent_id: { type: Sequelize.INTEGER, primaryKey: true }
+            parent_id: { type: Sequelize.INTEGER, primaryKey: true },
+            removed:Sequelize.BOOLEAN
         },
 
             { timestamps: false });
@@ -125,6 +126,21 @@ class DB {
         }
 
     }
+    async createFolder(file)//to databse
+    {   var uid=this.uuid();
+        try {
+            await this.file.create({
+                id:uid,
+                username: file.username,
+                name: file.name,
+                ip: file.ip,
+                timestamp: file.timestamp,
+                isfolder: file.isfolder,
+                parent_id:file.parentFolderID
+            });
+            return { succeed: true, msg: "文件创建成功",folderID:`${uid}` };
+        } catch (err) { return { succeed: false, msg: err }; }
+    } 
     async getUserRootFolder(folder){
         var filter={username:folder.username,parent_id:folder.parent_id}
         try{
@@ -138,7 +154,19 @@ class DB {
             return { succeed: false, msg: "获取文件夹信息失败！" }
         }
     }
+   /******************************* */ 
+   async removeFile(file)//to databse
+   {   var filter={username:file.username,id:file.id};
+       try {
+            let r = await this.file.update(
+            { removed:true },
+            { where: filter });
+           return { succeed: true, msg: "文件已移到回收站",file:`${file}` };
+       } catch (err) { return { succeed: false, msg: err }; }
+   } 
 }
+//////////////////////////////////
+
 /*some test statements
 var db=new DB();
 //db.createFile({name:"file2",username:"dml",content:"hello world",ip:"127.0.0.1",timestamp:"2020-02-29",folder:"."})
