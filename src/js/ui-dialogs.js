@@ -440,8 +440,10 @@ class Folder {
         let folderIconTool = new FolderIconTool(toolItem, this);
         folderIconTool.setPopMenu(this.folder_icon_tool_popMenu);
         this.appendFolderToolIcon(folderIconTool.getToolBtn());
-        folderIconTool.toolIcon.click();
         this.folderIconTool = folderIconTool;
+        //this.owner is a saveAsDialog　Object 
+        //this.owner.tool is a tool clicked that popup the saveAsDialog window
+        this.jqNavigitorBarElements.pathBar.html(this.owner.tool.getUsername()+">");
 
 
     }
@@ -453,15 +455,11 @@ class Folder {
         var toolType = sourceTool.toolType;
         switch (toolType) {
             case FOLDER_ICON_TOOL:
-                var path = this.jqNavigitorBarElements.pathBar.html();
-                if (path.length > 0) this.path = path + '>' + sourceTool.toolItem.caption;
-                this.path = sourceTool.toolItem.caption;
-                this.jqNavigitorBarElements.pathBar.html(this.path);
-                this.pathStack.push(sourceTool);
+             
                 sourceTool.toolButton.style.border = "1px solid blue";
                 sourceTool.toolButton.style.background = "#aaaaaa";
-                this.requestChildrenByFolderID(sourceTool.toolItem.folderID);
-                this.jqFolderListBar.html("");
+                //this.requestChildrenByFolderID(sourceTool.toolItem.folderID);
+                //this.jqFolderListBar.html("");
                 this.folder_icon_tool_popMenu.setParent(this.jqFolderListBar[0]);
                 this.currentFolderFolderIconTool = sourceTool;
                 break;
@@ -476,8 +474,14 @@ class Folder {
         var toolType = sourceTool.toolType;
         switch (toolType) {
             case FOLDER_ICON_TOOL:
+                var path = this.jqNavigitorBarElements.pathBar.html();
+                if (path.length > 0) this.path = path + sourceTool.toolItem.caption + '>';
+                else this.path=sourceTool.toolItem.caption+ '>';
+                this.jqNavigitorBarElements.pathBar.html(this.path);
+                this.pathStack.push(sourceTool);
                 var folderID = sourceTool.toolItem.folderID;
-                this.owner.requestChildrenByFolderID(folderID);
+                this.jqFolderListBar.html("");
+                this.requestChildrenByFolderID(folderID);
                 break;
         }
     }
@@ -567,7 +571,7 @@ class Folder {
             });
             var jqPathBar = $(`<div　></div>`);
 
-            jqPathBar.css({ "height": "20px", "width": "200px", "border": "1px solid" })
+            jqPathBar.css({ "height": "60px", "width": "200px", "border": "1px solid" , 'overflow': 'scroll'})
             jqNavigitorBar.append(jqPathBar);
             var jqButtonDiv = $(`<div　'></div>`);
             jqButtonDiv.css({ "height": "40px", "width": "200px", "padding": "5px" })

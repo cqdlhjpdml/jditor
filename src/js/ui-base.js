@@ -74,11 +74,14 @@ const FOLDER_ICON_TOOL = 1
 class FolderIconTool extends BaseIconTool {
   /************* */
   mouseclick(event, self) {//virtual
-
+    this.timeoutID= window.setTimeout(function(){
     if (self.manager) self.manager.toolClick(event, self);
+  }, 200);
+
+     
   }
   mousedblclick(event, self) {//virtual
-
+    clearTimeout(this.timeoutID);
     if (self.manager) self.manager.toolDbClick(event, self);
 
   }
@@ -100,6 +103,7 @@ class FolderIconTool extends BaseIconTool {
   constructor(toolItem, manager) {
     super(toolItem, manager);
     this.toolType = FOLDER_ICON_TOOL;
+    this.timeoutID=null;
     
   }
 }

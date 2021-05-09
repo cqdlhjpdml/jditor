@@ -107,10 +107,10 @@ class DB {
     async getChildren(folder) {
         if (folder.id == '-1')//means root folder
         {
-            var filter = { username: folder.username, parent_id: 0 }//获取根目录
+            var filter = { username: folder.username, parent_id: 0, removed:false}//获取根目录
         }
         else {
-            var filter = { username: folder.username, parent_id: folder.id }//获取根目录
+            var filter = { username: folder.username, parent_id: folder.id, removed:false }//获取根目录
 
         }
         try {
@@ -142,7 +142,7 @@ class DB {
         } catch (err) { return { succeed: false, msg: err }; }
     } 
     async getUserRootFolder(folder){
-        var filter={username:folder.username,parent_id:folder.parent_id}
+        var filter={username:folder.username,parent_id:folder.parent_id, removed:false}
         try{
             let r=await this.file.findAll({
                 attributes: [['name', 'name'], ['id', 'id'],['isfolder','isfolder']],
